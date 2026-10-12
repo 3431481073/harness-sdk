@@ -658,7 +658,7 @@ async def test_deferred_cancel_lets_sibling_tools_finish_and_sets_final_message(
     @tool(context=True)
     def finish(tool_context: ToolContext, summary: str) -> str:
         """Stop the loop after this batch."""
-        tool_context.agent.cancel(summary, after_current_tools=True)
+        tool_context.agent.cancel(message=summary, after_current_tools=True)
         return summary
 
     model = MockedModelProvider(

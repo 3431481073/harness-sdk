@@ -31,14 +31,14 @@ class TestStopBehavior:
         ctx = _tool_context()
         result = await stop(tool_context=ctx)
         assert result == "Agent loop stopped."
-        ctx.agent.cancel.assert_called_once_with("Agent loop stopped.", after_current_tools=True)
+        ctx.agent.cancel.assert_called_once_with(message="Agent loop stopped.", after_current_tools=True)
 
     @pytest.mark.asyncio
     async def test_requests_deferred_cancel_with_provided_message(self):
         ctx = _tool_context()
         result = await stop(tool_context=ctx, message="all done")
         assert result == "all done"
-        ctx.agent.cancel.assert_called_once_with("all done", after_current_tools=True)
+        ctx.agent.cancel.assert_called_once_with(message="all done", after_current_tools=True)
 
     @pytest.mark.asyncio
     async def test_does_not_touch_invocation_state(self):
@@ -53,7 +53,7 @@ class TestStopBehavior:
         ctx = _tool_context()
         result = await stop(tool_context=ctx, message="")
         assert result == "Agent loop stopped."
-        ctx.agent.cancel.assert_called_once_with("Agent loop stopped.", after_current_tools=True)
+        ctx.agent.cancel.assert_called_once_with(message="Agent loop stopped.", after_current_tools=True)
 
 
 class TestInputValidation:
