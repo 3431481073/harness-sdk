@@ -649,12 +649,21 @@ async def _handle_model_execution(
 
             # Apply the cancel message after hooks observe the real model output,
             # so hooks tracing model behavior still see what the model produced.
-            # Preserve non-text blocks (reasoningContent, toolUse, cachePoint) that
-            # the model already emitted; only the partial text is replaced.
+            # Rebind to a new dict rather than mutating in place: hooks that
+            # retained a reference to the message they received would otherwise
+            # see the cancel-text overlay when they serialize later. The
+            # upstream ModelStopReason event has already been yielded, so update
+            # its tuple too — the outer event_loop_cycle re-reads ``message``
+            # from ``model_event["stop"]`` after the inner generator finishes.
+            # Non-text blocks (reasoningContent, toolUse, cachePoint) the model
+            # already emitted are preserved; only the partial text is replaced.
             if stop_reason == "cancelled" and agent._cancel_message is not None:
-                message["content"] = [
-                    block for block in message["content"] if "text" not in block
-                ] + [{"text": agent._cancel_message}]
+                message = {
+                    **message,
+                    "content": [block for block in message["content"] if "text" not in block]
+                    + [{"text": agent._cancel_message}],
+                }
+                last_event["stop"] = (stop_reason, message, usage, metrics)
 
             # Check if hooks want to retry the model call
             if after_model_call_event.retry:
