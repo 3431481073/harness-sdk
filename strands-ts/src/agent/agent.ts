@@ -1302,22 +1302,36 @@ export class Agent implements LocalAgent, InvokableAgent {
         AgentStreamStage,
         context,
         async function* (ctx: AgentStreamContext): AsyncGenerator<AgentStreamEvent, AgentStreamResult, undefined> {
-          const combinedArgs = continuations.combine(continuationEvent, ctx.args, (continuationArgs) =>
-            self._normalizeInput(continuationArgs)
-          )
-          const continuationApplied = combinedArgs !== ctx.args
+          const combineWith = (base: InvokeArgs): InvokeArgs =>
+            continuations.combine(continuationEvent, base, (continuationArgs) => self._normalizeInput(continuationArgs))
+
+          // Three input sources feed the model request, in precedence order:
+          //   1. middleware-replaced args — an AgentStreamStage swapped `ctx.args`; it wins.
+          //   2. active continuation — layer prepared continuation messages onto the input.
+          //   3. the post-hook public input (`inputMessages`) — the plain, common case.
+          // `combine` returns its base unchanged when no continuation is prepared, so
+          // `continuationApplied` distinguishes source 2 from source 3.
           const middlewareReplacedArgs = ctx.args !== args
-          const streamArgs =
-            continuationApplied && !middlewareReplacedArgs
-              ? continuations.combine(continuationEvent, inputMessages, (continuationArgs) =>
-                  self._normalizeInput(continuationArgs)
-                )
-              : combinedArgs
+          const combinedArgs = combineWith(ctx.args)
+          const continuationApplied = combinedArgs !== ctx.args
+
+          // When a continuation is active without a middleware swap, rebase it onto the
+          // post-hook public input so a hook's edits (redaction, replacement, emptying)
+          // reach the model — `ctx.args` still holds the pre-hook input. Otherwise the
+          // model gets `combinedArgs`, which preserves raw `ctx.args` (interrupt-response
+          // blocks that `_normalizeInput` would strip, or the middleware replacement).
+          const streamArgs = continuationApplied && !middlewareReplacedArgs ? combineWith(inputMessages) : combinedArgs
+
+          // The dedicated history-append value is only needed in the plain case: elsewhere
+          // `_stream` re-derives it from `streamArgs` (the combined/replaced value), so the
+          // continuation messages or swapped args land in history correctly.
+          const historyMessages = !continuationApplied && !middlewareReplacedArgs ? inputMessages : undefined
+
           const result = yield* self._streamCore(
             streamArgs,
             ctx.options,
             continuationApplied ? continuationEvent : undefined,
-            !continuationApplied && !middlewareReplacedArgs ? inputMessages : undefined
+            historyMessages
           )
           return { result }
         }
