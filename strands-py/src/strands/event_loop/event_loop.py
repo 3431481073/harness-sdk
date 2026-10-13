@@ -1001,9 +1001,7 @@ async def _handle_tool_execution(
             message = {"role": "assistant", "content": [{"text": agent._cancel_message}]}
             await agent._append_messages(message)
         if cycle_span:
-            tracer.end_event_loop_cycle_span(
-                span=cycle_span, message=message, tool_result_message=tool_result_message
-            )
+            tracer.end_event_loop_cycle_span(span=cycle_span, message=message, tool_result_message=tool_result_message)
         yield EventLoopStopEvent(
             "cancelled",
             message,
@@ -1018,15 +1016,12 @@ async def _handle_tool_execution(
     # until they migrate to agent.cancel(after_current_tools=True).
     if invocation_state["request_state"].get("stop_event_loop", False):
         warnings.warn(
-            "request_state['stop_event_loop'] is deprecated; "
-            "call agent.cancel(after_current_tools=True) instead.",
+            "request_state['stop_event_loop'] is deprecated; call agent.cancel(after_current_tools=True) instead.",
             DeprecationWarning,
             stacklevel=2,
         )
         if cycle_span:
-            tracer.end_event_loop_cycle_span(
-                span=cycle_span, message=message, tool_result_message=tool_result_message
-            )
+            tracer.end_event_loop_cycle_span(span=cycle_span, message=message, tool_result_message=tool_result_message)
         yield EventLoopStopEvent(
             stop_reason,
             message,
@@ -1038,9 +1033,7 @@ async def _handle_tool_execution(
 
     if structured_output_context.stop_loop:
         if cycle_span:
-            tracer.end_event_loop_cycle_span(
-                span=cycle_span, message=message, tool_result_message=tool_result_message
-            )
+            tracer.end_event_loop_cycle_span(span=cycle_span, message=message, tool_result_message=tool_result_message)
         yield EventLoopStopEvent(
             stop_reason,
             message,
