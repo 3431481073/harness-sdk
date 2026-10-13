@@ -342,7 +342,7 @@ One PR per step per SDK:
 
 - Guard unit tests: append-only strips nothing, an edit at *k* strips from *k* only, a `compact()` swap strips nothing, and `reasoning_binding="none"` is untouched.
 - Every [reproduction scenario](#appendix-reproduction-snippets) returns 200 in both SDKs; today four return 400.
-- After compaction, the next request keeps the tail's thinking and returns 200, as the API already does on Bedrock InvokeModel ([snippet](#native-messages-api-on-demand-compaction)). When `compact()` returns `None`, the fallback also returns 200.
+- After compaction, the next request keeps the tail's thinking and returns 200, as the API already does on Bedrock InvokeModel ([snippet](#native-messages-api-bedrock-invokemodel)). When `compact()` returns `None`, the fallback also returns 200.
 
 ## Open questions
 
@@ -420,11 +420,30 @@ class _ReasoningGuard:
 
 ### Appendix: reproduction snippets
 
-These run against Bedrock with AWS credentials (`AWS_PROFILE`) and cost a few cents per scenario. Thinking is adaptive, so the model sometimes skips it on a short turn. If no thinking block ends up in the history, an edit has nothing to invalidate and the scenario passes; re-run it.
+There are two scripts. The Strands one reproduces each failure through `BedrockModel` (Bedrock Converse). The native one exercises Anthropic's append-only replacements through the Messages API on Bedrock InvokeModel. Both set `prefix_mismatch_behavior: "error"`, so results are the same on any account age.
+
+#### How to run
+
+Set up a virtualenv in `strands-py/` with the SDK and the Anthropic client:
+
+```bash
+cd strands-py
+uv venv && source .venv/bin/activate
+uv pip install -e . "anthropic[bedrock]"
+```
+
+Both scripts call `global.anthropic.claude-opus-5-5` in `us-west-2` with your default AWS credentials (set `AWS_PROFILE` if needed), and cost a few cents per scenario.
+
+| Script | Saved as | Run with | Expected |
+|---|---|---|---|
+| Strands | `strands-py/src/test_preserved_thinking.py` | `python -i test_preserved_thinking.py` from `strands-py/src`, then paste each scenario | The baseline and `drop_block` scenarios return; the other four raise the 400 shown in their comments |
+| Native | `strands-py/src/test_preserved_thinking_anthropic.py` | `python test_preserved_thinking_anthropic.py` from `strands-py/src` | Runs top to bottom: prints the applied context edits and `compaction`, then ends with the expected 400 from the last scenario |
+
+Thinking is adaptive, so the model sometimes skips it on a short turn. If no thinking block ends up in the history, an edit has nothing to invalidate and the scenario passes; re-run it.
 
 #### Strands (`BedrockModel`, Converse)
 
-Run from the repo root with `PYTHONPATH=strands-py/src .venv/bin/python <file>`.
+`make_agent()` builds an agent with binding enforcement opted in:
 
 ```python
 import json
@@ -509,7 +528,7 @@ agent("Weather in Seattle?"); agent("And Portland?"); agent("And Boise?")
 
 #### Native Messages API (Bedrock InvokeModel)
 
-Needs `anthropic[bedrock]` (`uv pip install --python .venv/bin/python "anthropic[bedrock]"`).
+`make_chat()` returns a conversation that is called like a Strands agent, so each scenario mirrors the Strands ones. `chat.compact()` replaces everything before the last turn with a server-signed compaction block, and the compact beta header is added whenever one is in the history.
 
 ```python
 import json
@@ -526,78 +545,105 @@ TOOLS = [
         "input_schema": {"type": "object", "properties": {"city": {"type": "string"}}, "required": ["city"]},
     }
 ]
+BINDING_BETA = "thinking-binding-controls-2026-08-01"
+CONTEXT_BETA = "context-management-2025-06-27"
+COMPACT_BETA = "compact-2026-09-04"
+CLEAR_TOOL_USES = {
+    "edits": [{"type": "clear_tool_uses_20250919",
+               "trigger": {"type": "tool_uses", "value": 2},
+               "keep": {"type": "tool_uses", "value": 1}}]
+}
 
 
-def turn(messages, prompt, system=SYSTEM, betas=(), system_note=None, **extra):
-    """Run one user turn, including its tool loop, appending everything to messages."""
-    messages.append({"role": "user", "content": prompt})
-    if system_note:
-        messages.append({"role": "system", "content": system_note})
-    while True:
-        response = client.beta.messages.create(
+class Chat:
+    """A Messages API conversation through Bedrock InvokeModel, called like a Strands agent."""
+
+    def __init__(self, context_management=None, compact_header=True):
+        self.messages = []
+        self.context_management = context_management
+        self.compact_header = compact_header
+
+    def __call__(self, prompt, system_note=None):
+        """Run one user turn, including its tool loop."""
+        self.messages.append({"role": "user", "content": prompt})
+        if system_note:
+            self.messages.append({"role": "system", "content": system_note})
+        while True:
+            response = self._create(self.messages)
+            self.messages.append({"role": "assistant", "content": [b.to_dict() for b in response.content]})
+            if response.stop_reason != "tool_use":
+                return response
+            self.messages.append({"role": "user", "content": [
+                {"type": "tool_result", "tool_use_id": b.id,
+                 "content": json.dumps({"city": b.input["city"], "temp_f": 61, "conditions": "overcast"})}
+                for b in response.content if b.type == "tool_use"
+            ]})
+
+    def compact(self):
+        """Replace everything before the last turn with a server-signed compaction block."""
+        split = max(i for i, m in enumerate(self.messages) if isinstance(m["content"], str))
+        older, tail = self.messages[:split], self.messages[split:]
+        response = self._create(older, compaction={"type": "summarize"})
+        block = next(b for b in response.model_dump()["content"] if b["type"] == "compaction")
+        compaction = {"type": "compaction", "content": block["content"], "signature": block["signature"]}
+        self.messages = [{"role": "assistant", "content": [compaction]}, *tail]
+        return response
+
+    def _create(self, messages, compaction=None):
+        betas = [BINDING_BETA]
+        extra = {}
+        if self.context_management:
+            betas.append(CONTEXT_BETA)
+            extra["context_management"] = self.context_management
+        if compaction or (self.compact_header and self._has_compaction(messages)):
+            betas.append(COMPACT_BETA)
+        if compaction:
+            extra["extra_body"] = {"compaction": compaction}
+        return client.beta.messages.create(
             model=MODEL,
             max_tokens=8000,
-            betas=["thinking-binding-controls-2026-08-01", *betas],
-            system=system,
+            betas=betas,
+            system=SYSTEM,
             tools=TOOLS,
             thinking={"type": "adaptive", "block_binding": {"prefix_mismatch_behavior": "error"}},
             messages=messages,
             **extra,
         )
-        messages.append({"role": "assistant", "content": [b.to_dict() for b in response.content]})
-        if response.stop_reason != "tool_use":
-            return response
-        messages.append({"role": "user", "content": [
-            {"type": "tool_result", "tool_use_id": b.id,
-             "content": json.dumps({"city": b.input["city"], "temp_f": 61, "conditions": "overcast"})}
-            for b in response.content if b.type == "tool_use"
-        ]})
+
+    @staticmethod
+    def _has_compaction(messages):
+        return any(
+            isinstance(m["content"], list) and any(b.get("type") == "compaction" for b in m["content"])
+            for m in messages
+        )
 
 
-# Mid-conversation system message instead of editing the system prompt
-messages = []
-turn(messages, "Weather in Seattle?")
-turn(messages, "And Portland?")
-turn(messages, "And Boise?", system_note="Answer in Celsius from now on.")  # 200
+def make_chat(context_management=None, compact_header=True):
+    return Chat(context_management, compact_header)
 
-# Context editing instead of truncating tool results
-messages = []
-clear = {"edits": [{"type": "clear_tool_uses_20250919",
-                    "trigger": {"type": "tool_uses", "value": 2},
-                    "keep": {"type": "tool_uses", "value": 1}}]}
-for prompt in ["Weather in Seattle?", "And Portland?", "And Boise?"]:
-    r = turn(messages, prompt, betas=["context-management-2025-06-27"], context_management=clear)
-print(r.context_management.applied_edits)  # 200, with cleared_tool_uses > 0
-```
 
-#### Native Messages API: on-demand compaction
+# Mid-conversation system message instead of editing the system prompt -> 200
+chat = make_chat()
+chat("Weather in Seattle?"); chat("And Portland?")
+chat("And Boise?", system_note="Answer in Celsius from now on.")
 
-Continues the snippet above (same `client`, `MODEL`, `SYSTEM`, `TOOLS`, and `turn`). Compacts turn 1, keeps turn 2 with its thinking, then runs turn 3.
+# Context editing instead of truncating tool results -> 200, with cleared_tool_uses > 0
+chat = make_chat(context_management=CLEAR_TOOL_USES)
+chat("Weather in Seattle?"); chat("And Portland?")
+print(chat("And Boise?").context_management.applied_edits)
 
-```python
-messages = []
-turn(messages, "Weather in Seattle?")
-turn(messages, "And Portland?")
-split = next(i for i, m in enumerate(messages) if i > 0 and isinstance(m["content"], str))
-older, tail = messages[:split], messages[split:]
+# On-demand compaction instead of summarizing -> 200, the kept turn's thinking still valid
+chat = make_chat()
+chat("Weather in Seattle?"); chat("And Portland?")
+print(chat.compact().stop_reason)  # compaction
+chat("And Boise?")
 
-compacted = client.beta.messages.create(
-    model=MODEL,
-    max_tokens=8000,
-    betas=["thinking-binding-controls-2026-08-01", "compact-2026-09-04"],
-    system=SYSTEM,
-    tools=TOOLS,
-    thinking={"type": "adaptive", "block_binding": {"prefix_mismatch_behavior": "error"}},
-    messages=older,
-    extra_body={"compaction": {"type": "summarize"}},
-)
-print(compacted.stop_reason, [b.type for b in compacted.content])  # compaction ['compaction']
-block = next(b for b in compacted.model_dump()["content"] if b["type"] == "compaction")
-compaction = {"type": "compaction", "content": block["content"], "signature": block["signature"]}
-
-kept = [{"role": "assistant", "content": [compaction]}, *tail]
-turn(kept, "And Boise?", betas=["compact-2026-09-04"])  # 200, the tail's thinking still valid
-turn([{"role": "assistant", "content": [compaction]}, *tail], "And Boise?")  # 400 without the header
+# Same compaction, without the compact beta header -> 400
+# "Input tag 'compaction' found using 'type' does not match any of the expected tags"
+chat = make_chat(compact_header=False)
+chat("Weather in Seattle?"); chat("And Portland?")
+chat.compact()
+chat("And Boise?")
 ```
 
 </details>
