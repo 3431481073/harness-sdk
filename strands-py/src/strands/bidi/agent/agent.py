@@ -295,7 +295,8 @@ class BidiAgent(LocalAgent):
 
         Args:
             message: Optional terminal message describing why cancellation was
-                requested. Preserves the first non-None value across repeat calls.
+                requested. When several callers set a message, the last write wins;
+                a no-arg call leaves any previously set message intact.
             after_current_tools: Accepted for signature parity with
                 ``Agent.cancel()``; BidiAgent cancellation is always deferred to
                 the end of the current tool group.
