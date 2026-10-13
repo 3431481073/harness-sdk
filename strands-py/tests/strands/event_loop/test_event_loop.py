@@ -501,6 +501,25 @@ async def test_event_loop_cycle_deferred_cancel_stops_after_tools(agent, model, 
 
 
 @pytest.mark.asyncio
+async def test_event_loop_cycle_legacy_stop_event_loop_flag_still_halts_with_warning(
+    agent, model, tool_stream, agenerator, alist
+):
+    """Pre-0019 stop tool wrote request_state['stop_event_loop']; honor it with a DeprecationWarning."""
+    model.stream.side_effect = [agenerator(tool_stream)]
+    invocation_state: dict = {"request_state": {"stop_event_loop": True}}
+
+    with pytest.warns(DeprecationWarning, match="stop_event_loop"):
+        events = await alist(
+            strands.event_loop.event_loop.event_loop_cycle(agent=agent, invocation_state=invocation_state)
+        )
+
+    tru_stop_reason, _, _, request_state, _, _, _ = events[-1]["stop"]
+    assert tru_stop_reason != "cancelled"
+    assert request_state["stop_event_loop"] is True
+    assert model.stream.call_count == 1
+
+
+@pytest.mark.asyncio
 async def test_event_loop_cycle_deferred_cancel_without_message_keeps_model_message(
     agent, model, tool_stream, agenerator, alist
 ):

@@ -651,7 +651,7 @@ async def _handle_model_execution(
             # Rebind to a new dict and update last_event so late-serializing hooks still see
             # the original.
             if stop_reason == "cancelled" and agent._cancel_message is not None:
-                message = {**message, "content": [{"text": agent._cancel_message}]}
+                message = Message(role=message["role"], content=[{"text": agent._cancel_message}])
                 last_event["stop"] = (stop_reason, message, usage, metrics)
 
             # Check if hooks want to retry the model call
