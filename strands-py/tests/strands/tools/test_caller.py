@@ -461,3 +461,32 @@ def test_tool_caller_raises_reference_error_after_agent_collected():
 
     with pytest.raises(ReferenceError, match="Agent has been garbage collected"):
         _ = caller._agent
+
+
+def test_direct_tool_call_isolates_cancel_state():
+    """A direct agent.tool.* call that cancels the agent must not leak state into the next invocation."""
+    from strands.experimental.tools import stop as stop_tool
+
+    agent = Agent(tools=[stop_tool])
+    assert not agent.cancel_signal.is_set()
+    assert agent._deferred_cancel is False
+    assert agent._cancel_message is None
+
+    agent.tool.stop(message="done", record_direct_tool_call=False)
+
+    assert not agent.cancel_signal.is_set()
+    assert agent._deferred_cancel is False
+    assert agent._cancel_message is None
+
+
+def test_direct_tool_call_preserves_pre_existing_cancel_state():
+    """Cancel state the caller set before the tool call survives verbatim."""
+    from strands.experimental.tools import stop as stop_tool
+
+    agent = Agent(tools=[stop_tool])
+    agent.cancel(message="caller intent")
+
+    agent.tool.stop(message="tool-authored", record_direct_tool_call=False)
+
+    assert agent.cancel_signal.is_set()
+    assert agent._cancel_message == "caller intent"

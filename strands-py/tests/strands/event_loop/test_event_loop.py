@@ -535,6 +535,30 @@ async def test_event_loop_cycle_deferred_cancel_without_message_keeps_model_mess
 
 
 @pytest.mark.asyncio
+async def test_event_loop_cycle_deferred_cancel_fires_on_plain_text_turn(agent, model, agenerator, alist):
+    """cancel(after_current_tools=True) must still halt when the model answers with text and no tools."""
+
+    def set_deferred_cancel(event):
+        agent.cancel(message="all done", after_current_tools=True)
+
+    agent.hooks.add_callback(AfterModelCallEvent, set_deferred_cancel)
+    model.stream.return_value = agenerator(
+        [
+            {"contentBlockDelta": {"delta": {"text": "hi"}}},
+            {"contentBlockStop": {}},
+            {"messageStop": {"stopReason": "end_turn"}},
+        ]
+    )
+
+    events = await alist(strands.event_loop.event_loop.event_loop_cycle(agent=agent, invocation_state={}))
+    tru_stop_reason, tru_message, _, _, _, _, _ = events[-1]["stop"]
+
+    assert tru_stop_reason == "cancelled"
+    assert tru_message["content"] == [{"text": "all done"}]
+    assert agent.messages[-1]["content"] == [{"text": "all done"}]
+
+
+@pytest.mark.asyncio
 async def test_event_loop_cycle_cancel_message_replaces_streaming_cancel_text(agent, model, agenerator, alist):
     agent.cancel(message="stopped by caller")
     model.stream.return_value = agenerator([{"contentBlockDelta": {"delta": {"text": "partial"}}}])
@@ -969,6 +993,8 @@ async def test_request_state_initialization(alist):
     mock_agent._interrupt_state.activated = False
     mock_agent._cancel_signal = threading.Event()
     mock_agent._observe_cancellation = mock_agent._cancel_signal.is_set
+    mock_agent._deferred_cancel = False
+    mock_agent._cancel_message = None
     mock_agent._system_prompt_content = None
     mock_agent.system_prompt = None
     mock_agent._model_state = {}

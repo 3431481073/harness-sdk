@@ -390,6 +390,19 @@ async def event_loop_cycle(
                     yield typed_event
                 return
 
+            # Honor cancel(after_current_tools=True) when the model answered without tools.
+            # Without this, a deferred cancel set from a hook or callback is silently lost on
+            # a plain-text turn (the deferred-cancel branch in _handle_tool_execution never runs).
+            if agent._deferred_cancel:
+                if agent._cancel_message is not None:
+                    message = Message(role="assistant", content=[{"text": agent._cancel_message}])
+                    await agent._append_messages(message)
+                tracer.end_event_loop_cycle_span(cycle_span, message)
+                yield EventLoopStopEvent(
+                    "cancelled", message, agent.event_loop_metrics, invocation_state["request_state"]
+                )
+                return
+
             tracer.end_event_loop_cycle_span(cycle_span, message)
             yield EventLoopStopEvent(stop_reason, message, agent.event_loop_metrics, invocation_state["request_state"])
         except (
