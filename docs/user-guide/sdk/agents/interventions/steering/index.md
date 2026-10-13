@@ -247,7 +247,7 @@ await agent.invoke('Send an urgent email to the team about the deadline')
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `systemPrompt` | `string | SystemContentBlock[]` | *(required)* | Steering rules for the evaluation LLM |
-| `model` | `Model` | Parent agent’s model | Model used for steering evaluation |
+| `model` | `Model` | `agent.auxModel` | Model used for steering evaluation |
 | `contextProviders` | `SteeringContextProvider[]` | `[new ToolLedgerProvider()]` | Providers that supply evaluation context. Pass `[]` to disable |
 | `promptBuilder` | `PromptBuilder` | Built-in builder with cache points | Custom function to build evaluation prompts |
 | `name` | `string` | `'strands:llm-steering-handler'` | Unique handler name (must be distinct if multiple handlers are attached) |

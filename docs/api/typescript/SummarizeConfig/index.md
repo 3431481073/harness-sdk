@@ -16,7 +16,7 @@ Defined in: [src/context-manager/methods/summarize.ts:46](https://github.com/str
 
 **`Experimental`**
 
-Model to use for summarization. When omitted, uses the agent’s model.
+Model used for summarization. Resolution order: `this model > agent.auxModel > agent.model`.
 
 ---
 

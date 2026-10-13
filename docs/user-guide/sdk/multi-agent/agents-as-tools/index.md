@@ -38,18 +38,21 @@ research_agent = Agent(
     factual, well-sourced information in response to research questions.
     Always cite your sources when possible.""",
     tools=[http_request],
+    callback_handler=None,
 )
 
 product_agent = Agent(
     system_prompt="""You are a specialized product recommendation assistant.
     Provide personalized product suggestions based on user preferences.""",
     tools=[http_request],
+    callback_handler=None,
 )
 
 travel_agent = Agent(
     system_prompt="""You are a specialized travel planning assistant.
     Create detailed travel itineraries based on user preferences.""",
     tools=[http_request],
+    callback_handler=None,
 )
 
 # Create the orchestrator: agents are automatically converted to tools
@@ -109,6 +112,8 @@ Always select the most appropriate tool based on the user's query.`,
 ```
 (( /tab "TypeScript" ))
 
+Each specialist sets `callback_handler=None``printer: false` so that only the orchestrator writes to the console. Without it, the specialist’s default handler prints its own response alongside the orchestrator’s output, and with [delegation](#delegation) the specialist’s text appears twice.
+
 ### Customizing agent tools
 
 When you need to customize the tool name, description, or context behavior, use `.as_tool()``.asTool()` explicitly:
@@ -166,6 +171,8 @@ const orchestrator = new Agent({
 ```
 (( /tab "TypeScript" ))
 
+This setting also decides where a sub-agent’s [interrupt](/docs/user-guide/sdk/interrupts/index.md) waits to be resumed. With `preserve_context=False``preserveContext: false` the orchestrator stores the interrupted turn, so it can be resumed after a restart. With `preserve_context=True``preserveContext: true` the sub-agent keeps its own state, so give it its own session manager for that.
+
 ### Creating custom agent tools
 
 For more control over how the agent is invoked, such as custom pre/post-processing, error handling, or passing multiple parameters, create a custom tool that wraps an agent:
@@ -195,7 +202,8 @@ def research_assistant(query: str) -> str:
     try:
         research_agent = Agent(
             system_prompt=RESEARCH_ASSISTANT_PROMPT,
-            tools=[http_request]
+            tools=[http_request],
+            callback_handler=None,
         )
 
         response = research_agent(query)
@@ -250,6 +258,7 @@ def product_recommendation_assistant(query: str) -> str:
             system_prompt="""You are a specialized product recommendation assistant.
             Provide personalized product suggestions based on user preferences.""",
             tools=[http_request, dialog],
+            callback_handler=None,
         )
         # Implementation with response handling
         # ...
@@ -273,6 +282,7 @@ def trip_planning_assistant(query: str) -> str:
             system_prompt="""You are a specialized travel planning assistant.
             Create detailed travel itineraries based on user preferences.""",
             tools=[http_request],
+            callback_handler=None,
         )
         # Implementation with response handling
         # ...
@@ -427,6 +437,7 @@ billing_agent = Agent(
     description="Answers billing questions: charges, refunds, and invoices.",
     system_prompt="You handle billing questions with precision.",
     structured_output_model=BillingResponse,
+    callback_handler=None,
 )
 
 orchestrator = Agent(

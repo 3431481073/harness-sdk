@@ -1,4 +1,4 @@
-Defined in: [src/mcp/client.ts:150](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L150)
+Defined in: [src/mcp/client.ts:205](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L205)
 
 Error thrown when a server reports a task as cancelled.
 
@@ -14,7 +14,7 @@ Error thrown when a server reports a task as cancelled.
 new McpTaskCancelledError(statusMessage?): McpTaskCancelledError;
 ```
 
-Defined in: [src/mcp/client.ts:154](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L154)
+Defined in: [src/mcp/client.ts:209](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L209)
 
 #### Parameters
 
@@ -40,6 +40,6 @@ Error.constructor
 readonly statusMessage: string;
 ```
 
-Defined in: [src/mcp/client.ts:152](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L152)
+Defined in: [src/mcp/client.ts:207](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L207)
 
 Optional server-provided context for the cancellation.

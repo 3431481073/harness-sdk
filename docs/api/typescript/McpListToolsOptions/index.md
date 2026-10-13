@@ -1,4 +1,4 @@
-Defined in: [src/mcp/client.ts:82](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L82)
+Defined in: [src/mcp/client.ts:135](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L135)
 
 Per-call overrides for [McpClient.listTools](/docs/api/typescript/McpClient/index.md#listtools).
 
@@ -10,7 +10,7 @@ Per-call overrides for [McpClient.listTools](/docs/api/typescript/McpClient/inde
 optional prefix?: string;
 ```
 
-Defined in: [src/mcp/client.ts:84](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L84)
+Defined in: [src/mcp/client.ts:137](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L137)
 
 Prefix for agent-facing tool names. An empty string disables a prefix set on the client.
 
@@ -22,6 +22,6 @@ Prefix for agent-facing tool names. An empty string disables a prefix set on the
 optional toolFilters?: McpToolFilters;
 ```
 
-Defined in: [src/mcp/client.ts:86](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L86)
+Defined in: [src/mcp/client.ts:139](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L139)
 
 Tool filters. An empty object disables filters set on the client.

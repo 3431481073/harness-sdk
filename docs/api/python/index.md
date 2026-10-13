@@ -195,6 +195,9 @@
     -   **Notebook**
         -   [Notebook](/docs/api/python/strands.vended_tools.notebook.notebook)
         -   [Types](/docs/api/python/strands.vended_tools.notebook.types)
+    -   **Python Repl**
+        -   [Python Repl](/docs/api/python/strands.vended_tools.python_repl.python_repl)
+        -   [Types](/docs/api/python/strands.vended_tools.python_repl.types)
     -   **Shell**
         -   [Shell](/docs/api/python/strands.vended_tools.shell.shell)
         -   [Types](/docs/api/python/strands.vended_tools.shell.types)

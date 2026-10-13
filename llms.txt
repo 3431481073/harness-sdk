@@ -95,7 +95,6 @@
   - [Prompts](https://strandsagents.com/docs/user-guide/sdk/agents/prompts/index.md): Write system prompts and user messages for Strands agents. Covers multi-modal prompting, direct tool calls, and prompt engineering with agent SOPs.
   - [Hooks](https://strandsagents.com/docs/user-guide/sdk/agents/hooks/index.md): Intercept and customize agent behavior at every step. Hooks let you add logging, validation, guardrails, and custom logic to the agent loop.
   - [Hook events](https://strandsagents.com/docs/user-guide/sdk/agents/hooks-events/index.md): Reference for every hook event a Strands agent emits: when each fires across the single-agent and multi-agent lifecycle, and which event properties you can modify.
-  - [Conversation management](https://strandsagents.com/docs/user-guide/sdk/agents/conversation-management/index.md): Keep long agent conversations within token limits using sliding window and summarizing conversation managers in the Strands Agents SDK.
   - Context management
     - [Overview](https://strandsagents.com/docs/user-guide/sdk/context-management/index.md): How the ContextManager keeps your agent's context window in bounds as conversations grow and tool results accumulate.
     - [built-in-modes](https://strandsagents.com/docs/user-guide/sdk/context-management/built-in-modes/index.md): Auto and agentic context management modes with tuned defaults for most agents.
@@ -179,6 +178,7 @@
     - [session-management](https://strandsagents.com/docs/user-guide/sdk/bidi/session-management/index.md): Save and resume BidiAgent conversations with SnapshotSessionManager. Choose when to persist state, restore saved history, and work with snapshot checkpoints.
     - [interrupts](https://strandsagents.com/docs/user-guide/sdk/bidi/interrupts/index.md): Interrupt support for BidiAgent is in development. This page will cover pausing and resuming bidirectional conversations when interrupt support is available.
     - [observability](https://strandsagents.com/docs/user-guide/sdk/bidi/observability/index.md): Trace, measure, and log BidiAgent sessions: connection lifecycle, time to first audio, barge-ins, per-modality token usage, and restarts.
+  - [Conversation management](https://strandsagents.com/docs/user-guide/sdk/agents/conversation-management/index.md): Keep long agent conversations within token limits using sliding window and summarizing conversation managers in the Strands Agents SDK.
   - Experimental
     - [agent-config](https://strandsagents.com/docs/user-guide/sdk/experimental/agent-config/index.md): Create Strands agents from JSON files or dictionaries with the experimental config_to_agent function, including tool loading and model settings.
 - Reference
@@ -491,6 +491,8 @@
 - [strands.vended_tools.mcp_router.types](https://strandsagents.com/docs/api/python/strands.vended_tools.mcp_router.types/index.md)
 - [strands.vended_tools.notebook.notebook](https://strandsagents.com/docs/api/python/strands.vended_tools.notebook.notebook/index.md)
 - [strands.vended_tools.notebook.types](https://strandsagents.com/docs/api/python/strands.vended_tools.notebook.types/index.md)
+- [strands.vended_tools.python_repl.python_repl](https://strandsagents.com/docs/api/python/strands.vended_tools.python_repl.python_repl/index.md)
+- [strands.vended_tools.python_repl.types](https://strandsagents.com/docs/api/python/strands.vended_tools.python_repl.types/index.md)
 - [strands.vended_tools.shell.shell](https://strandsagents.com/docs/api/python/strands.vended_tools.shell.shell/index.md)
 - [strands.vended_tools.shell.types](https://strandsagents.com/docs/api/python/strands.vended_tools.shell.types/index.md)
 - [strands.vended_tools.sleep.sleep](https://strandsagents.com/docs/api/python/strands.vended_tools.sleep.sleep/index.md)
@@ -516,6 +518,7 @@
 - [AgentResultEvent](https://strandsagents.com/docs/api/typescript/AgentResultEvent/index.md)
 - [AgentStreamEvent](https://strandsagents.com/docs/api/typescript/AgentStreamEvent/index.md)
 - [AgentTrace](https://strandsagents.com/docs/api/typescript/AgentTrace/index.md)
+- [AnswerOf](https://strandsagents.com/docs/api/typescript/AnswerOf/index.md)
 - [AudioBlock](https://strandsagents.com/docs/api/typescript/AudioBlock/index.md)
 - [AudioBlockData](https://strandsagents.com/docs/api/typescript/AudioBlockData/index.md)
 - [AudioFormat](https://strandsagents.com/docs/api/typescript/AudioFormat/index.md)
@@ -569,9 +572,13 @@
 - [ConversationManagerOptions](https://strandsagents.com/docs/api/typescript/ConversationManagerOptions/index.md)
 - [ConversationManagerReduceOptions](https://strandsagents.com/docs/api/typescript/ConversationManagerReduceOptions/index.md)
 - [CountTokensOptions](https://strandsagents.com/docs/api/typescript/CountTokensOptions/index.md)
+- [DecisionInput](https://strandsagents.com/docs/api/typescript/DecisionInput/index.md)
+- [DecisionModel](https://strandsagents.com/docs/api/typescript/DecisionModel/index.md)
+- [DecisionResult](https://strandsagents.com/docs/api/typescript/DecisionResult/index.md)
 - [DefaultModelRetryStrategy](https://strandsagents.com/docs/api/typescript/DefaultModelRetryStrategy/index.md)
 - [DefaultModelRetryStrategyOptions](https://strandsagents.com/docs/api/typescript/DefaultModelRetryStrategyOptions/index.md)
 - [DefaultNotConfiguredError](https://strandsagents.com/docs/api/typescript/DefaultNotConfiguredError/index.md)
+- [defineQuestions](https://strandsagents.com/docs/api/typescript/defineQuestions/index.md)
 - [DirectToolCallOptions](https://strandsagents.com/docs/api/typescript/DirectToolCallOptions/index.md)
 - [DocumentBlock](https://strandsagents.com/docs/api/typescript/DocumentBlock/index.md)
 - [DocumentBlockData](https://strandsagents.com/docs/api/typescript/DocumentBlockData/index.md)
@@ -653,24 +660,50 @@
 - [LifecycleObserver](https://strandsagents.com/docs/api/typescript/LifecycleObserver/index.md)
 - [LinearBackoff](https://strandsagents.com/docs/api/typescript/LinearBackoff/index.md)
 - [LinearBackoffOptions](https://strandsagents.com/docs/api/typescript/LinearBackoffOptions/index.md)
+- [LLMDecisionModel](https://strandsagents.com/docs/api/typescript/LLMDecisionModel/index.md)
+- [LLMDecisionModelOptions](https://strandsagents.com/docs/api/typescript/LLMDecisionModelOptions/index.md)
 - [LocationData](https://strandsagents.com/docs/api/typescript/LocationData/index.md)
 - [Logger](https://strandsagents.com/docs/api/typescript/Logger/index.md)
 - [MaxTokensError](https://strandsagents.com/docs/api/typescript/MaxTokensError/index.md)
 - [McpCallToolOptions](https://strandsagents.com/docs/api/typescript/McpCallToolOptions/index.md)
+- [McpCancelledTask](https://strandsagents.com/docs/api/typescript/McpCancelledTask/index.md)
+- [McpCancelTaskResult](https://strandsagents.com/docs/api/typescript/McpCancelTaskResult/index.md)
 - [McpClient](https://strandsagents.com/docs/api/typescript/McpClient/index.md)
 - [McpClientConfig](https://strandsagents.com/docs/api/typescript/McpClientConfig/index.md)
 - [McpClientCredentials](https://strandsagents.com/docs/api/typescript/McpClientCredentials/index.md)
 - [McpClientOptions](https://strandsagents.com/docs/api/typescript/McpClientOptions/index.md)
+- [McpCompletedTask](https://strandsagents.com/docs/api/typescript/McpCompletedTask/index.md)
 - [McpConnectionState](https://strandsagents.com/docs/api/typescript/McpConnectionState/index.md)
+- [McpCreateTaskResult](https://strandsagents.com/docs/api/typescript/McpCreateTaskResult/index.md)
+- [McpDetailedTask](https://strandsagents.com/docs/api/typescript/McpDetailedTask/index.md)
+- [McpDirectCallToolResult](https://strandsagents.com/docs/api/typescript/McpDirectCallToolResult/index.md)
+- [McpFailedTask](https://strandsagents.com/docs/api/typescript/McpFailedTask/index.md)
+- [McpGetTaskResult](https://strandsagents.com/docs/api/typescript/McpGetTaskResult/index.md)
+- [McpInputRequest](https://strandsagents.com/docs/api/typescript/McpInputRequest/index.md)
+- [McpInputRequests](https://strandsagents.com/docs/api/typescript/McpInputRequests/index.md)
+- [McpInputRequiredTask](https://strandsagents.com/docs/api/typescript/McpInputRequiredTask/index.md)
+- [McpInputResponse](https://strandsagents.com/docs/api/typescript/McpInputResponse/index.md)
+- [McpInputResponses](https://strandsagents.com/docs/api/typescript/McpInputResponses/index.md)
+- [McpListOptions](https://strandsagents.com/docs/api/typescript/McpListOptions/index.md)
 - [McpListToolsOptions](https://strandsagents.com/docs/api/typescript/McpListToolsOptions/index.md)
 - [McpLoadServersOptions](https://strandsagents.com/docs/api/typescript/McpLoadServersOptions/index.md)
+- [McpProgress](https://strandsagents.com/docs/api/typescript/McpProgress/index.md)
+- [McpProgressCallback](https://strandsagents.com/docs/api/typescript/McpProgressCallback/index.md)
 - [McpServerConfig](https://strandsagents.com/docs/api/typescript/McpServerConfig/index.md)
+- [McpSubmitToolResult](https://strandsagents.com/docs/api/typescript/McpSubmitToolResult/index.md)
+- [McpTask](https://strandsagents.com/docs/api/typescript/McpTask/index.md)
 - [McpTaskCancelledError](https://strandsagents.com/docs/api/typescript/McpTaskCancelledError/index.md)
+- [McpTaskError](https://strandsagents.com/docs/api/typescript/McpTaskError/index.md)
 - [McpTaskFailedError](https://strandsagents.com/docs/api/typescript/McpTaskFailedError/index.md)
+- [McpTaskRequestOptions](https://strandsagents.com/docs/api/typescript/McpTaskRequestOptions/index.md)
+- [McpTaskResult](https://strandsagents.com/docs/api/typescript/McpTaskResult/index.md)
+- [McpTaskStatus](https://strandsagents.com/docs/api/typescript/McpTaskStatus/index.md)
 - [McpToolFilterCallback](https://strandsagents.com/docs/api/typescript/McpToolFilterCallback/index.md)
 - [McpToolFilters](https://strandsagents.com/docs/api/typescript/McpToolFilters/index.md)
 - [McpToolMatcher](https://strandsagents.com/docs/api/typescript/McpToolMatcher/index.md)
 - [McpTransport](https://strandsagents.com/docs/api/typescript/McpTransport/index.md)
+- [McpUpdateTaskResult](https://strandsagents.com/docs/api/typescript/McpUpdateTaskResult/index.md)
+- [McpWorkingTask](https://strandsagents.com/docs/api/typescript/McpWorkingTask/index.md)
 - [MemoryAddOptions](https://strandsagents.com/docs/api/typescript/MemoryAddOptions/index.md)
 - [MemoryAddToolConfig](https://strandsagents.com/docs/api/typescript/MemoryAddToolConfig/index.md)
 - [MemoryContentBlockType](https://strandsagents.com/docs/api/typescript/MemoryContentBlockType/index.md)
@@ -732,6 +765,7 @@
 - [Plugin](https://strandsagents.com/docs/api/typescript/Plugin/index.md)
 - [PosixShellSandbox](https://strandsagents.com/docs/api/typescript/PosixShellSandbox/index.md)
 - [ProactiveCompressionConfig](https://strandsagents.com/docs/api/typescript/ProactiveCompressionConfig/index.md)
+- [Question](https://strandsagents.com/docs/api/typescript/Question/index.md)
 - [ReasoningBlock](https://strandsagents.com/docs/api/typescript/ReasoningBlock/index.md)
 - [ReasoningBlockData](https://strandsagents.com/docs/api/typescript/ReasoningBlockData/index.md)
 - [ReasoningContentDelta](https://strandsagents.com/docs/api/typescript/ReasoningContentDelta/index.md)
@@ -822,6 +856,7 @@
 - [ToolUseStart](https://strandsagents.com/docs/api/typescript/ToolUseStart/index.md)
 - [ToolValidationError](https://strandsagents.com/docs/api/typescript/ToolValidationError/index.md)
 - [TruncateConfig](https://strandsagents.com/docs/api/typescript/TruncateConfig/index.md)
+- [Uncertain](https://strandsagents.com/docs/api/typescript/Uncertain/index.md)
 - [Usage](https://strandsagents.com/docs/api/typescript/Usage/index.md)
 - [VideoBlock](https://strandsagents.com/docs/api/typescript/VideoBlock/index.md)
 - [VideoBlockData](https://strandsagents.com/docs/api/typescript/VideoBlockData/index.md)
@@ -833,6 +868,7 @@
 
 ## Blog
 
+- [We ran 94,000 trials to measure the cost of harness choice](https://strandsagents.com/blog/we-ran-94000-trials-to-measure-the-cost-of-harness-choice/index.md): We analyzed 94,000 benchmark trials to measure how harness choice affects token usage, estimated costs, and accuracy with Claude, GPT, and open-weight models.
 - [Strands Box: The Big Picture](https://strandsagents.com/blog/strands-box-the-big-picture/index.md): Strands Box, now in developer preview, is an open source local sandbox for AI agents that pairs operating-system isolation with Dogwood semantic policy. Here's why semantic policy matters, and how Box's design follows from it.
 - [Bidi Agents now GA](https://strandsagents.com/blog/bidi-agents-now-ga/index.md): The easiest way to create voice agents with direct support for Amazon Nova Sonic, OpenAI, and Gemini models.
 - [Introducing Strands Decider 2B: a small, open source, decision model](https://strandsagents.com/blog/introducing-strands-decider/index.md): Strands Decider 2B is a small, open source, decision model optimized for fast experimentation, local development, and innovation.
@@ -868,6 +904,7 @@
 
 - [Changelog](https://strandsagents.com/changelog/index.md): All releases across the SDK and Evals SDK
 - SDK Python
+  - [v1.60.0](https://strandsagents.com/changelog/sdk/python-v1.60.0/index.md): SDK Python v1.60.0 (2026-10-12)
   - [v1.57.2](https://strandsagents.com/changelog/sdk/python-v1.57.2/index.md): SDK Python v1.57.2 (2026-10-01)
   - [v1.57.1](https://strandsagents.com/changelog/sdk/python-v1.57.1/index.md): SDK Python v1.57.1 (2026-09-25)
   - [v1.57.0](https://strandsagents.com/changelog/sdk/python-v1.57.0/index.md): SDK Python v1.57.0 (2026-09-22)
@@ -948,6 +985,7 @@
   - [v0.1.1](https://strandsagents.com/changelog/sdk/python-v0.1.1/index.md): SDK Python v0.1.1 (2025-05-17)
   - [v0.1.0](https://strandsagents.com/changelog/sdk/python-v0.1.0/index.md): SDK Python v0.1.0 (2025-05-16)
 - SDK TypeScript
+  - [v1.20.0](https://strandsagents.com/changelog/sdk/typescript-v1.20.0/index.md): SDK TypeScript v1.20.0 (2026-10-08)
   - [v1.19.0](https://strandsagents.com/changelog/sdk/typescript-v1.19.0/index.md): SDK TypeScript v1.19.0 (2026-09-22)
   - [v1.18.0](https://strandsagents.com/changelog/sdk/typescript-v1.18.0/index.md): SDK TypeScript v1.18.0 (2026-09-15)
   - [v1.17.0](https://strandsagents.com/changelog/sdk/typescript-v1.17.0/index.md): SDK TypeScript v1.17.0 (2026-09-08)

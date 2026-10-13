@@ -8,7 +8,7 @@ This module provides centralized configuration and initialization functionality 
 def get_otel_resource() -> Resource
 ```
 
-Defined in: [src/strands/telemetry/config.py:27](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/telemetry/config.py#L27)
+Defined in: [src/strands/telemetry/config.py:31](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/telemetry/config.py#L31)
 
 Create a standard OpenTelemetry resource with service information.
 
@@ -22,7 +22,7 @@ Resource object with standard service information.
 class StrandsTelemetry()
 ```
 
-Defined in: [src/strands/telemetry/config.py:47](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/telemetry/config.py#L47)
+Defined in: [src/strands/telemetry/config.py:51](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/telemetry/config.py#L51)
 
 OpenTelemetry configuration and setup for Strands applications.
 
@@ -70,7 +70,7 @@ To setup global meter provider
 def __init__(tracer_provider: SDKTracerProvider | None = None) -> None
 ```
 
-Defined in: [src/strands/telemetry/config.py:87](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/telemetry/config.py#L87)
+Defined in: [src/strands/telemetry/config.py:91](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/telemetry/config.py#L91)
 
 Initialize the StrandsTelemetry instance.
 
@@ -87,7 +87,7 @@ Initialize the StrandsTelemetry instance.
 def setup_console_exporter(**kwargs: Any) -> "StrandsTelemetry"
 ```
 
-Defined in: [src/strands/telemetry/config.py:126](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/telemetry/config.py#L126)
+Defined in: [src/strands/telemetry/config.py:130](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/telemetry/config.py#L130)
 
 Set up console exporter for the tracer provider.
 
@@ -108,7 +108,7 @@ Set up console exporter for the tracer provider.
 def setup_otlp_exporter(**kwargs: Any) -> "StrandsTelemetry"
 ```
 
-Defined in: [src/strands/telemetry/config.py:148](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/telemetry/config.py#L148)
+Defined in: [src/strands/telemetry/config.py:152](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/telemetry/config.py#L152)
 
 Set up OTLP exporter for the tracer provider.
 
@@ -123,6 +123,29 @@ Set up OTLP exporter for the tracer provider.
     This method configures a BatchSpanProcessor with an OTLPSpanExporter, allowing trace data to be exported to an OTLP endpoint. Any additional keyword arguments provided will be forwarded to the OTLPSpanExporter.
     
 
+#### setup\_baggage\_processor
+
+```python
+def setup_baggage_processor(
+    baggage_key_predicate: BaggageKeyPredicates | None = None
+) -> "StrandsTelemetry"
+```
+
+Defined in: [src/strands/telemetry/config.py:177](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/telemetry/config.py#L177)
+
+Set up a baggage span processor for the tracer provider.
+
+**Arguments**:
+
+-   `baggage_key_predicate` - A predicate, or sequence of predicates, that receives a baggage key and returns True if the entry should be stamped onto spans. If None, every baggage key is recorded.
+
+**Returns**:
+
+-   `self` - Enables method chaining.
+    
+    This method registers a BaggageSpanProcessor that stamps OTel baggage entries onto spans as attributes when they start.
+    
+
 #### setup\_meter
 
 ```python
@@ -130,6 +153,6 @@ def setup_meter(enable_console_exporter: bool = False,
                 enable_otlp_exporter: bool = False) -> "StrandsTelemetry"
 ```
 
-Defined in: [src/strands/telemetry/config.py:173](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/telemetry/config.py#L173)
+Defined in: [src/strands/telemetry/config.py:200](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/telemetry/config.py#L200)
 
 Initialize the OpenTelemetry Meter.

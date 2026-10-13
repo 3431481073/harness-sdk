@@ -13,7 +13,7 @@ Represents an interrupt that can pause agent execution for human-in-the-loop wor
 
 **Attributes**:
 
--   `id` - Unique identifier.
+-   `id` - Unique identifier. Treat as opaque: pass it back to resume the agent, do not parse or construct it.
 -   `name` - User defined name.
 -   `reason` - User provided reason for raising the interrupt.
 -   `response` - Human response provided when resuming the agent after an interrupt.
@@ -24,7 +24,7 @@ Represents an interrupt that can pause agent execution for human-in-the-loop wor
 def to_dict() -> dict[str, Any]
 ```
 
-Defined in: [src/strands/interrupt.py:32](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L32)
+Defined in: [src/strands/interrupt.py:33](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L33)
 
 Serialize to dict for session management.
 
@@ -34,7 +34,7 @@ Serialize to dict for session management.
 class InterruptException(Exception)
 ```
 
-Defined in: [src/strands/interrupt.py:37](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L37)
+Defined in: [src/strands/interrupt.py:38](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L38)
 
 Exception raised when human input is required.
 
@@ -44,7 +44,7 @@ Exception raised when human input is required.
 def __init__(interrupt: Interrupt) -> None
 ```
 
-Defined in: [src/strands/interrupt.py:40](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L40)
+Defined in: [src/strands/interrupt.py:41](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L41)
 
 Set the interrupt.
 
@@ -55,7 +55,7 @@ Set the interrupt.
 class PendingToolExecution()
 ```
 
-Defined in: [src/strands/interrupt.py:46](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L46)
+Defined in: [src/strands/interrupt.py:47](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L47)
 
 State required to resume tool execution without calling the model again.
 
@@ -71,7 +71,7 @@ State required to resume tool execution without calling the model again.
 class _InterruptState()
 ```
 
-Defined in: [src/strands/interrupt.py:59](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L59)
+Defined in: [src/strands/interrupt.py:60](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L60)
 
 Track the state of interrupt events raised by the user.
 
@@ -90,7 +90,7 @@ Note, unanswered interrupts are cleared after resuming; an answered invocation-s
 def activate() -> None
 ```
 
-Defined in: [src/strands/interrupt.py:79](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L79)
+Defined in: [src/strands/interrupt.py:80](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L80)
 
 Activate the interrupt state.
 
@@ -100,7 +100,7 @@ Activate the interrupt state.
 def deactivate() -> None
 ```
 
-Defined in: [src/strands/interrupt.py:84](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L84)
+Defined in: [src/strands/interrupt.py:85](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L85)
 
 Deactivate the interrupt state.
 
@@ -112,7 +112,7 @@ Interrupts, context, and pending tool execution are cleared.
 def end_tool_cycle() -> None
 ```
 
-Defined in: [src/strands/interrupt.py:95](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L95)
+Defined in: [src/strands/interrupt.py:96](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L96)
 
 Clear a completed tool cycle’s state, keeping answered invocation-scoped responses.
 
@@ -122,7 +122,7 @@ Clear a completed tool cycle’s state, keeping answered invocation-scoped respo
 def end_interrupt_cycle() -> None
 ```
 
-Defined in: [src/strands/interrupt.py:107](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L107)
+Defined in: [src/strands/interrupt.py:108](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L108)
 
 Release invocation-scoped interrupts once their interrupt cycle is over.
 
@@ -132,7 +132,7 @@ Release invocation-scoped interrupts once their interrupt cycle is over.
 def resume(prompt: "AgentInput") -> None
 ```
 
-Defined in: [src/strands/interrupt.py:120](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L120)
+Defined in: [src/strands/interrupt.py:121](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L121)
 
 Configure the interrupt state if resuming from an interrupt event.
 
@@ -151,7 +151,7 @@ def set_pending_tool_results(
         completed_tool_results: list["ToolResult"]) -> None
 ```
 
-Defined in: [src/strands/interrupt.py:156](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L156)
+Defined in: [src/strands/interrupt.py:157](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L157)
 
 Update completed results for a pending tool execution.
 
@@ -161,7 +161,7 @@ Update completed results for a pending tool execution.
 def to_dict() -> dict[str, Any]
 ```
 
-Defined in: [src/strands/interrupt.py:177](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L177)
+Defined in: [src/strands/interrupt.py:178](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L178)
 
 Serialize to dict for session management.
 
@@ -174,7 +174,7 @@ Exclude deactivated invocation-scoped responses — persisting them would give a
 def from_dict(cls, data: dict[str, Any]) -> "_InterruptState"
 ```
 
-Defined in: [src/strands/interrupt.py:201](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L201)
+Defined in: [src/strands/interrupt.py:202](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/interrupt.py#L202)
 
 Initialize interrupt state from serialized interrupt state.
 

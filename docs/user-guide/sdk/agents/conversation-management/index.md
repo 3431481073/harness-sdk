@@ -158,7 +158,7 @@ Configuration parameters:
 (( tab "TypeScript" ))
 Configuration parameters:
 
--   **`model`** (Model, optional): Override model to use for generating summaries. When not provided, uses the agent’s own model.
+-   **`model`** (Model, optional): Override model to use for generating summaries. When not provided, uses `agent.auxModel`.
 -   **`summaryRatio`** (number, default: 0.3): Ratio of the oldest messages to summarize and replace when reducing context (clamped between 0.1 and 0.8)
 -   **`preserveRecentMessages`** (number, default: 10): Minimum number of recent messages to always keep
 -   **`summarizationSystemPrompt`** (string, optional): Custom system prompt for summarization. If not provided, uses a default prompt that creates structured bullet-point summaries focusing on key topics, tools used, and technical information in third-person format.
@@ -168,7 +168,7 @@ Configuration parameters:
 **Basic Usage:**
 
 (( tab "Python" ))
-By default, the `SummarizingConversationManager` uses the same model and configuration as your main agent for summarization.
+By default, the `SummarizingConversationManager` uses `agent.aux_model` for summarization.
 
 ```python
 from strands import Agent
@@ -181,7 +181,7 @@ agent = Agent(
 (( /tab "Python" ))
 
 (( tab "TypeScript" ))
-By default, the `SummarizingConversationManager` uses the agent’s own model for summarization. You can optionally provide a different model to override this behavior.
+By default, the `SummarizingConversationManager` uses `agent.auxModel` for summarization. You can optionally provide a different model to override this behavior.
 
 ```typescript
 import { Agent, SummarizingConversationManager } from '@strands-agents/sdk'

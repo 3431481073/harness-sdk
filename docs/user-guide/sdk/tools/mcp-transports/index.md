@@ -1,6 +1,6 @@
 A transport carries messages between the agent and an MCP server. Which one you use depends on where the server runs: a local process reachable over standard I/O, or a remote server reachable over HTTP. This page covers each transport Strands supports and how to configure it, including authentication for HTTP servers.
 
-To connect an agent to a server and use its tools, see [Connect your agent to MCP tools](/docs/user-guide/sdk/tools/mcp-tools/index.md). The connection pattern is the same for every transport; only the transport object you hand to the client changes.
+To connect an agent to a server and use its tools, see [Connect your agent to MCP tools](/docs/user-guide/sdk/tools/mcp-tools/index.md). The connection pattern is the same for every transport; only how you point the client at the server changes.
 
 ## Standard I/O (stdio)
 
@@ -61,14 +61,13 @@ await agentStdio.invoke('What is AWS Lambda?')
 For HTTP-based MCP servers that use the Streamable HTTP transport:
 
 (( tab "Python" ))
+Pass the server `url` and `MCPClient` builds the transport from the installed `mcp` package:
+
 ```python
-from mcp.client.streamable_http import streamablehttp_client
 from strands import Agent
 from strands.tools.mcp import MCPClient
 
-streamable_http_mcp_client = MCPClient(
-    lambda: streamablehttp_client("http://localhost:8000/mcp")
-)
+streamable_http_mcp_client = MCPClient(url="http://localhost:8000/mcp")
 
 with streamable_http_mcp_client:
     tools = streamable_http_mcp_client.list_tools_sync()
@@ -79,16 +78,15 @@ Pass `headers` to send authentication or other request headers:
 
 ```python
 import os
-from mcp.client.streamable_http import streamablehttp_client
 from strands.tools.mcp import MCPClient
 
 github_mcp_client = MCPClient(
-    lambda: streamablehttp_client(
-        url="https://api.githubcopilot.com/mcp/",
-        headers={"Authorization": f"Bearer {os.getenv('MCP_PAT')}"}
-    )
+    url="https://api.githubcopilot.com/mcp/",
+    headers={"Authorization": f"Bearer {os.getenv('MCP_PAT')}"},
 )
 ```
+
+To configure the transport yourself, pass a callback that opens it instead, as in the stdio example; for Streamable HTTP that is `streamable_http_client` from `mcp.client.streamable_http`.
 
 #### OAuth Authentication
 

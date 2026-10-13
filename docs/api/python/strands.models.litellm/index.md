@@ -165,7 +165,7 @@ Defined in: [src/strands/models/litellm.py:269](https://github.com/strands-agent
 
 Format a LiteLLM response event into a standardized message chunk.
 
-Extends OpenAI’s format\_chunk to extract thought signatures that LiteLLM embeds in tool call IDs for Gemini thinking models.
+Extends OpenAI’s format\_chunk to support legacy Anthropic cache usage and extract thought signatures that LiteLLM embeds in tool call IDs for Gemini thinking models.
 
 **Arguments**:
 
@@ -194,7 +194,7 @@ async def stream(messages: Messages,
                  **kwargs: Any) -> AsyncGenerator[StreamEvent, None]
 ```
 
-Defined in: [src/strands/models/litellm.py:299](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/litellm.py#L299)
+Defined in: [src/strands/models/litellm.py:305](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/litellm.py#L305)
 
 Stream conversation with the LiteLLM model.
 
@@ -223,7 +223,7 @@ async def structured_output(
         **kwargs: Any) -> AsyncGenerator[dict[str, T | Any], None]
 ```
 
-Defined in: [src/strands/models/litellm.py:357](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/litellm.py#L357)
+Defined in: [src/strands/models/litellm.py:363](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/litellm.py#L363)
 
 Get structured output from the model.
 

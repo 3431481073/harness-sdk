@@ -12,7 +12,9 @@ Today we’re releasing [Strands harness](https://github.com/strands-agents/harn
 
 Strands harness **costs 28% less** when using the same Claude or GPT models across six benchmarks. We found Strands harness showed better token-efficiency and nearly equal benchmark scores compared to Claude Code, Codex, and other popular harnesses. That’s important because we never want to sacrifice accuracy for lower cost. Deepseek Harness proved to be the most token-efficient overall, however, it typically reported the lowest accuracy scores. Our testing setup was distributed benchmarking on EC2 with Harbor.
 
-With Fable 5, Strands harness **cost 77% less** than Claude Code *and* **scored higher** on Terminal Bench 2.1. We’re also pleased to see two other open source harnesses perform similarly well on cost/accuracy against Claude Code.
+> **Explore the results:** The chart below is interactive. Hover over any point to see the model, harness, accuracy score, and cost per task.
+
+With Fable 5, Strands harness **cost 77% less** than Claude Code *and* **scored higher** on Terminal-Bench 2.1. We’re also pleased to see two other open source harnesses perform similarly well on cost/accuracy against Claude Code.
 
 Strands harness, built on the [Strands Harness SDK](https://github.com/strands-agents/harness-sdk), contains defaults for prompt caching and context management. Our default context management largely drove the token-efficiency and accuracy: tool results over ~1500 tokens get truncated, summarization (compaction) triggers when the context window hits above 85%, and context recovery runs within the loop if there’s an overflow.
 

@@ -408,6 +408,49 @@ const agent = new Agent({
 ```
 (( /tab "TypeScript" ))
 
+### Baggage Propagation
+
+Use `baggage_attributes` to propagate key-value pairs across process boundaries via the W3C `baggage` header. Unlike `trace_attributes`, baggage is not stamped onto spans by default. It travels through the OTel context and is available to downstream services.
+
+(( tab "Python" ))
+```python
+agent = Agent(
+    system_prompt="You are a helpful assistant.",
+    baggage_attributes={
+        "tenant.id": "acme",
+        "env": "production",
+    },
+)
+```
+(( /tab "Python" ))
+
+If you also want baggage recorded on spans, call `setup_baggage_processor()` on `StrandsTelemetry`. Pass a predicate (or a sequence of predicates) that takes a baggage key and returns `True` to record only matching entries.
+
+(( tab "Python" ))
+```python
+from strands.telemetry import StrandsTelemetry
+
+strands_telemetry = StrandsTelemetry()
+strands_telemetry.setup_otlp_exporter()
+strands_telemetry.setup_baggage_processor(lambda key: key in {"tenant.id", "env"})
+```
+(( /tab "Python" ))
+
+If your agent runs under the AWS Distro for OpenTelemetry (ADOT), note that ADOT registers the global tracer provider before your code runs. `StrandsTelemetry()` cannot replace it, so attach the processor to the existing provider instead:
+
+(( tab "Python" ))
+```python
+from opentelemetry import trace
+from strands.telemetry import StrandsTelemetry
+
+StrandsTelemetry(tracer_provider=trace.get_tracer_provider()).setup_baggage_processor(lambda key: key in {"tenant.id", "env"})
+```
+(( /tab "Python" ))
+
+Caution
+
+Without a predicate, `setup_baggage_processor()` stamps *every* baggage entry onto every span, including values extracted from inbound `baggage` request headers. It requires the `strands-agents[otel]` extra.
+
 ### Custom Spans
 
 You can access the configured tracer to create your own custom spans alongside the auto-instrumented ones:

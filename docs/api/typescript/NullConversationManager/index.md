@@ -16,7 +16,7 @@ Does not register any proactive hooks. Overflow errors will not be retried since
 new NullConversationManager(options?): NullConversationManager;
 ```
 
-Defined in: [src/conversation-manager/conversation-manager.ts:117](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L117)
+Defined in: [src/conversation-manager/conversation-manager.ts:118](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L118)
 
 #### Parameters
 
@@ -40,7 +40,7 @@ Defined in: [src/conversation-manager/conversation-manager.ts:117](https://githu
 protected readonly _compressionThreshold: number;
 ```
 
-Defined in: [src/conversation-manager/conversation-manager.ts:112](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L112)
+Defined in: [src/conversation-manager/conversation-manager.ts:113](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L113)
 
 #### Inherited from
 
@@ -70,7 +70,7 @@ Unique identifier for this conversation manager.
 initAgent(agent): void;
 ```
 
-Defined in: [src/conversation-manager/conversation-manager.ts:166](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L166)
+Defined in: [src/conversation-manager/conversation-manager.ts:167](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L167)
 
 Initialize the conversation manager with the agent instance.
 

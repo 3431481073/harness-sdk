@@ -17,7 +17,7 @@ Key Features:
 class EdgeConditionWithContext(Protocol)
 ```
 
-Defined in: [src/strands/multiagent/graph.py:74](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L74)
+Defined in: [src/strands/multiagent/graph.py:75](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L75)
 
 Protocol for edge conditions that receive invocation\_state.
 
@@ -34,7 +34,7 @@ def __call__(state: "GraphState", *, invocation_state: dict[str, Any],
              **kwargs: Any) -> bool
 ```
 
-Defined in: [src/strands/multiagent/graph.py:88](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L88)
+Defined in: [src/strands/multiagent/graph.py:89](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L89)
 
 Evaluate whether the edge should be traversed.
 
@@ -45,7 +45,7 @@ Evaluate whether the edge should be traversed.
 class GraphState()
 ```
 
-Defined in: [src/strands/multiagent/graph.py:116](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L116)
+Defined in: [src/strands/multiagent/graph.py:117](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L117)
 
 Graph execution state.
 
@@ -67,7 +67,7 @@ def should_continue(max_node_executions: int | None,
                     execution_timeout: float | None) -> tuple[bool, str]
 ```
 
-Defined in: [src/strands/multiagent/graph.py:159](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L159)
+Defined in: [src/strands/multiagent/graph.py:160](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L160)
 
 Check if the graph should continue execution.
 
@@ -80,7 +80,7 @@ Returns: (should\_continue, reason)
 class GraphResult(MultiAgentResult)
 ```
 
-Defined in: [src/strands/multiagent/graph.py:182](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L182)
+Defined in: [src/strands/multiagent/graph.py:183](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L183)
 
 Result from graph execution - extends MultiAgentResult with graph-specific details.
 
@@ -91,7 +91,7 @@ Result from graph execution - extends MultiAgentResult with graph-specific detai
 class GraphEdge()
 ```
 
-Defined in: [src/strands/multiagent/graph.py:195](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L195)
+Defined in: [src/strands/multiagent/graph.py:196](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L196)
 
 Represents an edge in the graph with an optional condition.
 
@@ -101,7 +101,7 @@ Represents an edge in the graph with an optional condition.
 def __hash__() -> int
 ```
 
-Defined in: [src/strands/multiagent/graph.py:203](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L203)
+Defined in: [src/strands/multiagent/graph.py:204](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L204)
 
 Return hash for GraphEdge based on from\_node and to\_node.
 
@@ -112,7 +112,7 @@ def should_traverse(state: GraphState, *, invocation_state: dict[str,
                                                                  Any]) -> bool
 ```
 
-Defined in: [src/strands/multiagent/graph.py:207](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L207)
+Defined in: [src/strands/multiagent/graph.py:208](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L208)
 
 Check if this edge should be traversed based on condition.
 
@@ -128,7 +128,7 @@ Check if this edge should be traversed based on condition.
 class GraphNode()
 ```
 
-Defined in: [src/strands/multiagent/graph.py:232](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L232)
+Defined in: [src/strands/multiagent/graph.py:233](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L233)
 
 Represents a node in the graph.
 
@@ -138,7 +138,7 @@ Represents a node in the graph.
 def __post_init__() -> None
 ```
 
-Defined in: [src/strands/multiagent/graph.py:245](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L245)
+Defined in: [src/strands/multiagent/graph.py:246](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L246)
 
 Capture initial executor state after initialization.
 
@@ -148,7 +148,7 @@ Capture initial executor state after initialization.
 def reset_executor_state() -> None
 ```
 
-Defined in: [src/strands/multiagent/graph.py:257](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L257)
+Defined in: [src/strands/multiagent/graph.py:258](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L258)
 
 Reset GraphNode executor state to initial state when graph was created.
 
@@ -160,7 +160,7 @@ This is useful when nodes are executed multiple times and need to start fresh on
 def __hash__() -> int
 ```
 
-Defined in: [src/strands/multiagent/graph.py:276](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L276)
+Defined in: [src/strands/multiagent/graph.py:277](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L277)
 
 Return hash for GraphNode based on node\_id.
 
@@ -170,7 +170,7 @@ Return hash for GraphNode based on node\_id.
 def __eq__(other: Any) -> bool
 ```
 
-Defined in: [src/strands/multiagent/graph.py:280](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L280)
+Defined in: [src/strands/multiagent/graph.py:281](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L281)
 
 Return equality for GraphNode based on node\_id.
 
@@ -180,7 +180,7 @@ Return equality for GraphNode based on node\_id.
 class GraphBuilder()
 ```
 
-Defined in: [src/strands/multiagent/graph.py:309](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L309)
+Defined in: [src/strands/multiagent/graph.py:310](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L310)
 
 Builder pattern for constructing graphs.
 
@@ -190,7 +190,7 @@ Builder pattern for constructing graphs.
 def __init__() -> None
 ```
 
-Defined in: [src/strands/multiagent/graph.py:312](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L312)
+Defined in: [src/strands/multiagent/graph.py:313](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L313)
 
 Initialize GraphBuilder with empty collections.
 
@@ -201,7 +201,7 @@ def add_node(executor: AgentBase | MultiAgentBase,
              node_id: str | None = None) -> GraphNode
 ```
 
-Defined in: [src/strands/multiagent/graph.py:328](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L328)
+Defined in: [src/strands/multiagent/graph.py:329](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L329)
 
 Add an AgentBase or MultiAgentBase instance as a node to the graph.
 
@@ -213,7 +213,7 @@ def add_edge(from_node: str | GraphNode,
              condition: EdgeCondition | None = None) -> GraphEdge
 ```
 
-Defined in: [src/strands/multiagent/graph.py:343](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L343)
+Defined in: [src/strands/multiagent/graph.py:344](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L344)
 
 Add an edge between two nodes with optional condition function.
 
@@ -228,7 +228,7 @@ The condition can be either:
 def set_entry_point(node_id: str) -> "GraphBuilder"
 ```
 
-Defined in: [src/strands/multiagent/graph.py:375](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L375)
+Defined in: [src/strands/multiagent/graph.py:376](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L376)
 
 Set a node as an entry point for graph execution.
 
@@ -238,7 +238,7 @@ Set a node as an entry point for graph execution.
 def reset_on_revisit(enabled: bool = True) -> "GraphBuilder"
 ```
 
-Defined in: [src/strands/multiagent/graph.py:382](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L382)
+Defined in: [src/strands/multiagent/graph.py:383](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L383)
 
 Control whether nodes reset their state when revisited.
 
@@ -254,7 +254,7 @@ When enabled, nodes will reset their messages and state to initial values each t
 def set_max_node_executions(max_executions: int) -> "GraphBuilder"
 ```
 
-Defined in: [src/strands/multiagent/graph.py:395](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L395)
+Defined in: [src/strands/multiagent/graph.py:396](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L396)
 
 Set maximum number of node executions allowed.
 
@@ -268,7 +268,7 @@ Set maximum number of node executions allowed.
 def set_execution_timeout(timeout: float) -> "GraphBuilder"
 ```
 
-Defined in: [src/strands/multiagent/graph.py:404](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L404)
+Defined in: [src/strands/multiagent/graph.py:405](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L405)
 
 Set total execution timeout.
 
@@ -282,7 +282,7 @@ Set total execution timeout.
 def set_node_timeout(timeout: float) -> "GraphBuilder"
 ```
 
-Defined in: [src/strands/multiagent/graph.py:413](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L413)
+Defined in: [src/strands/multiagent/graph.py:414](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L414)
 
 Set individual node execution timeout.
 
@@ -296,7 +296,7 @@ Set individual node execution timeout.
 def set_graph_id(graph_id: str) -> "GraphBuilder"
 ```
 
-Defined in: [src/strands/multiagent/graph.py:422](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L422)
+Defined in: [src/strands/multiagent/graph.py:423](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L423)
 
 Set graph id.
 
@@ -310,7 +310,7 @@ Set graph id.
 def set_session_manager(session_manager: SessionManager) -> "GraphBuilder"
 ```
 
-Defined in: [src/strands/multiagent/graph.py:431](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L431)
+Defined in: [src/strands/multiagent/graph.py:432](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L432)
 
 Set session manager for the graph.
 
@@ -324,7 +324,7 @@ Set session manager for the graph.
 def set_hook_providers(hooks: list[HookProvider]) -> "GraphBuilder"
 ```
 
-Defined in: [src/strands/multiagent/graph.py:440](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L440)
+Defined in: [src/strands/multiagent/graph.py:441](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L441)
 
 Set hook providers for the graph.
 
@@ -338,7 +338,7 @@ Set hook providers for the graph.
 def set_plugins(plugins: list[MultiAgentPlugin]) -> "GraphBuilder"
 ```
 
-Defined in: [src/strands/multiagent/graph.py:449](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L449)
+Defined in: [src/strands/multiagent/graph.py:450](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L450)
 
 Set plugins for the graph.
 
@@ -352,7 +352,7 @@ Set plugins for the graph.
 def build() -> "Graph"
 ```
 
-Defined in: [src/strands/multiagent/graph.py:458](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L458)
+Defined in: [src/strands/multiagent/graph.py:459](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L459)
 
 Build and validate the graph with configured settings.
 
@@ -362,7 +362,7 @@ Build and validate the graph with configured settings.
 class Graph(MultiAgentBase)
 ```
 
-Defined in: [src/strands/multiagent/graph.py:502](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L502)
+Defined in: [src/strands/multiagent/graph.py:505](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L505)
 
 Directed Graph multi-agent orchestration with configurable revisit behavior.
 
@@ -383,7 +383,7 @@ def __init__(nodes: dict[str, GraphNode],
              plugins: list[MultiAgentPlugin] | None = None) -> None
 ```
 
-Defined in: [src/strands/multiagent/graph.py:505](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L505)
+Defined in: [src/strands/multiagent/graph.py:508](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L508)
 
 Initialize Graph with execution limits and reset behavior.
 
@@ -411,7 +411,7 @@ def add_hook(callback: HookCallback,
              order: float = HookOrder.DEFAULT) -> None
 ```
 
-Defined in: [src/strands/multiagent/graph.py:572](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L572)
+Defined in: [src/strands/multiagent/graph.py:575](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L575)
 
 Register a hook callback with the graph.
 
@@ -429,7 +429,7 @@ def __call__(task: MultiAgentInput,
              **kwargs: Any) -> GraphResult
 ```
 
-Defined in: [src/strands/multiagent/graph.py:586](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L586)
+Defined in: [src/strands/multiagent/graph.py:589](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L589)
 
 Invoke the graph synchronously.
 
@@ -447,7 +447,7 @@ async def invoke_async(task: MultiAgentInput,
                        **kwargs: Any) -> GraphResult
 ```
 
-Defined in: [src/strands/multiagent/graph.py:602](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L602)
+Defined in: [src/strands/multiagent/graph.py:605](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L605)
 
 Invoke the graph asynchronously.
 
@@ -467,7 +467,7 @@ async def stream_async(task: MultiAgentInput,
                        **kwargs: Any) -> AsyncIterator[dict[str, Any]]
 ```
 
-Defined in: [src/strands/multiagent/graph.py:626](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L626)
+Defined in: [src/strands/multiagent/graph.py:629](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L629)
 
 Stream events during graph execution.
 
@@ -492,7 +492,7 @@ Dictionary events during graph execution, such as:
 def serialize_state() -> dict[str, Any]
 ```
 
-Defined in: [src/strands/multiagent/graph.py:1270](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L1270)
+Defined in: [src/strands/multiagent/graph.py:1284](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L1284)
 
 Serialize the current graph state to a dictionary.
 
@@ -502,7 +502,7 @@ Serialize the current graph state to a dictionary.
 def deserialize_state(payload: dict[str, Any]) -> None
 ```
 
-Defined in: [src/strands/multiagent/graph.py:1294](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L1294)
+Defined in: [src/strands/multiagent/graph.py:1308](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py#L1308)
 
 Restore graph state from a session dict and prepare for execution.
 

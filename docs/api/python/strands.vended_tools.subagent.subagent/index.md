@@ -5,17 +5,19 @@ Provides :func:`make_subagent` (a factory that lets the developer pin safety lim
 #### make\_subagent
 
 ```python
-def make_subagent(*,
-                  builder: AgentBuilder | None = None,
-                  presets: Mapping[str, Preset] | None = None,
-                  default_preset: str | None = None,
-                  instructions: Open | Choice | Fixed | None = None,
-                  tools: Choice | Fixed | Inherit | None = None,
-                  mcp_servers: Choice | Fixed | Inherit | None = None,
-                  model: Inherit | Choice | Fixed | None = None,
-                  context: Fixed | Choice | None = None,
-                  max_depth: int = DEFAULT_SUBAGENT_MAX_DEPTH,
-                  name: str = "subagent") -> AgentTool
+def make_subagent(
+        *,
+        builder: AgentBuilder | None = None,
+        presets: Mapping[str, Preset] | None = None,
+        default_preset: str | None = None,
+        instructions: Open | Choice | Fixed | None = None,
+        tools: Choice | Fixed | Inherit | None = None,
+        mcp_servers: Choice | Fixed | Inherit | None = None,
+        model: Inherit | Choice | Fixed | None = None,
+        context: Fixed | Choice | None = None,
+        max_depth: int = DEFAULT_SUBAGENT_MAX_DEPTH,
+        name: str = "subagent",
+        description: str = DEFAULT_SUBAGENT_DESCRIPTION) -> AgentTool
 ```
 
 Defined in: [src/strands/vended\_tools/subagent/subagent.py:366](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/subagent/subagent.py#L366)
@@ -26,7 +28,7 @@ Each axis accepts a policy from :mod:`~strands.multiagent.spec` that controls wh
 
 **Raises**:
 
--   `ValueError` - If *max\_depth* < 1, *name* is empty, or a `Choice` axis violates its constraints (empty options, `multiple=False` for tools).
+-   `ValueError` - If *max\_depth* < 1, *name* or *description* is empty, or a `Choice` axis violates its constraints (empty options, `multiple=False` for tools).
 
 #### subagent
 

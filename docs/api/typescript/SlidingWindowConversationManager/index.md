@@ -48,7 +48,7 @@ Initialize the sliding window conversation manager.
 protected readonly _compressionThreshold: number;
 ```
 
-Defined in: [src/conversation-manager/conversation-manager.ts:112](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L112)
+Defined in: [src/conversation-manager/conversation-manager.ts:113](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L113)
 
 #### Inherited from
 

@@ -14,4 +14,4 @@ optional defaultModel?: Model;
 
 Defined in: [src/memory/extraction/types.ts:57](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/extraction/types.ts#L57)
 
-The agent’s model, supplied so an extractor can default to it.
+Model an extractor without its own falls back to (`agent.auxModel > agent.model`).

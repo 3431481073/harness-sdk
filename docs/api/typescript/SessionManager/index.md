@@ -258,7 +258,7 @@ Loads a snapshot from storage and restores it into the target. Returns false if 
 initMultiAgent(orchestrator): void;
 ```
 
-Defined in: [src/session/session-manager.ts:398](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/session/session-manager.ts#L398)
+Defined in: [src/session/session-manager.ts:399](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/session/session-manager.ts#L399)
 
 Initializes the multi-agent plugin by registering orchestrator lifecycle hooks.
 

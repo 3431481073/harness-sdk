@@ -21,9 +21,9 @@ Configuration for the summarization conversation manager.
 optional model?: Model;
 ```
 
-Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L34)
+Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:33](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L33)
 
-Model to use for generating summaries. When provided, overrides the model attached to the agent. Useful when you want to use a different model than the one attached to the agent.
+Model to use for generating summaries. Resolution order: `this model > agent.auxModel > agent.model`.
 
 ---
 
@@ -33,7 +33,7 @@ Model to use for generating summaries. When provided, overrides the model attach
 optional summaryRatio?: number;
 ```
 
-Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:40](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L40)
+Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:39](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L39)
 
 Ratio of messages to summarize when context overflow occurs. Value is clamped to \[0.1, 0.8\]. Defaults to 0.3 (summarize 30% of oldest messages).
 
@@ -45,7 +45,7 @@ Ratio of messages to summarize when context overflow occurs. Value is clamped to
 optional preserveRecentMessages?: number;
 ```
 
-Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:46](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L46)
+Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:45](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L45)
 
 Minimum number of recent messages to always keep. Defaults to 10.
 
@@ -57,7 +57,7 @@ Minimum number of recent messages to always keep. Defaults to 10.
 optional summarizationSystemPrompt?: string;
 ```
 
-Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:52](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L52)
+Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:51](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L51)
 
 Custom system prompt for summarization. If not provided, uses a default prompt that produces structured bullet-point summaries.
 
@@ -69,7 +69,7 @@ Custom system prompt for summarization. If not provided, uses a default prompt t
 optional proactiveCompression?: boolean | ProactiveCompressionConfig;
 ```
 
-Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:61](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L61)
+Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:60](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L60)
 
 Enable proactive context compression before the model call.
 
@@ -85,6 +85,6 @@ Enable proactive context compression before the model call.
 optional pinFirst?: number;
 ```
 
-Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:67](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L67)
+Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:66](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L66)
 
 Number of messages at the start of the conversation to permanently pin. Pinned messages are protected from summarization and compacted to the front.

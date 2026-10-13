@@ -34,9 +34,9 @@ The agent instance. Mutate `agent.messages` in place to reduce history.
 model: Model;
 ```
 
-Defined in: [src/conversation-manager/conversation-manager.ts:37](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L37)
+Defined in: [src/conversation-manager/conversation-manager.ts:38](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L38)
 
-The model instance. Used by conversation managers that perform model-based reduction (e.g. summarization).
+The model of the call that triggered the reduction (the routed model under a `ModelRouter`). Use it to size the reduction (`countTokens`, `estimateUtilization`); managers that reduce via a model call should resolve their own, typically `agent.auxModel`.
 
 ---
 
@@ -46,7 +46,7 @@ The model instance. Used by conversation managers that perform model-based reduc
 optional error?: ContextWindowOverflowError;
 ```
 
-Defined in: [src/conversation-manager/conversation-manager.ts:49](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L49)
+Defined in: [src/conversation-manager/conversation-manager.ts:50](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L50)
 
 The [ContextWindowOverflowError](/docs/api/typescript/ContextWindowOverflowError/index.md) that triggered this call, or `undefined` for proactive compression calls.
 

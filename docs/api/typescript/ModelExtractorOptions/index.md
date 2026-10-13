@@ -12,7 +12,7 @@ optional model?: Model;
 
 Defined in: [src/memory/extraction/model-extractor.ts:16](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/extraction/model-extractor.ts#L16)
 
-Model used to extract facts. Defaults to the agent’s own model; set a cheaper one to cut cost.
+Model used to extract facts. Resolution order: `this model > agent.auxModel > agent.model`.
 
 ---
 

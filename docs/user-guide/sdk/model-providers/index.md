@@ -150,6 +150,44 @@ response = await agent.invoke('What can you help me with?')
 ```
 (( /tab "TypeScript" ))
 
+### Auxiliary model
+
+Besides the main loop, the SDK makes side calls on your behalf: context summarization, memory extraction, the human-in-the-loop risk classifier, LLM steering, the goal-loop judge, and the `web_fetch` analyst. By default they all run on the agent’s main model. Set `aux_model``auxModel` to route every one of them to a smaller, cheaper model at once:
+
+(( tab "Python" ))
+```python
+from strands import Agent
+from strands.models.bedrock import BedrockModel
+
+agent = Agent(
+    model=BedrockModel(model_id="global.anthropic.claude-opus-5-20260301-v1:0"),
+    aux_model=BedrockModel(model_id="global.anthropic.claude-haiku-4-5-20251001-v1:0"),
+    context_manager="auto",
+)
+
+# A string is a Bedrock model id, like `model`; assign later to change it.
+agent.aux_model = "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```typescript
+import { Agent } from '@strands-agents/sdk'
+import { BedrockModel } from '@strands-agents/sdk/models/bedrock'
+
+const agent = new Agent({
+  model: new BedrockModel({ modelId: 'global.anthropic.claude-opus-5-20260301-v1:0' }),
+  auxModel: new BedrockModel({ modelId: 'global.anthropic.claude-haiku-4-5-20251001-v1:0' }),
+  contextManager: 'auto',
+})
+
+// A string is a Bedrock model id, like `model`; assign later to change it.
+agent.auxModel = 'global.anthropic.claude-haiku-4-5-20251001-v1:0'
+```
+(( /tab "TypeScript" ))
+
+Each side call resolves its model in this order: the component’s own `model` option (for example the summarizer’s or the classifier’s) > `agent.aux_model``agent.auxModel` > `agent.model`. Leaving `aux_model``auxModel` unset changes nothing. A `ModelRouter` is not accepted here: side calls run outside the agent loop the router attaches to.
+
 ## Next Steps
 
 ### Explore Model Providers

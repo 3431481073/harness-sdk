@@ -27105,7 +27105,7 @@ Configuration parameters:
 (( tab "TypeScript" ))
 Configuration parameters:
 
--   **`model`** (Model, optional): Override model to use for generating summaries. When not provided, uses the agent’s own model.
+-   **`model`** (Model, optional): Override model to use for generating summaries. When not provided, uses `agent.auxModel`.
 -   **`summaryRatio`** (number, default: 0.3): Ratio of the oldest messages to summarize and replace when reducing context (clamped between 0.1 and 0.8)
 -   **`preserveRecentMessages`** (number, default: 10): Minimum number of recent messages to always keep
 -   **`summarizationSystemPrompt`** (string, optional): Custom system prompt for summarization. If not provided, uses a default prompt that creates structured bullet-point summaries focusing on key topics, tools used, and technical information in third-person format.
@@ -27115,7 +27115,7 @@ Configuration parameters:
 **Basic Usage:**
 
 (( tab "Python" ))
-By default, the `SummarizingConversationManager` uses the same model and configuration as your main agent for summarization.
+By default, the `SummarizingConversationManager` uses `agent.aux_model` for summarization.
 
 ```python
 from strands import Agent
@@ -27128,7 +27128,7 @@ agent = Agent(
 (( /tab "Python" ))
 
 (( tab "TypeScript" ))
-By default, the `SummarizingConversationManager` uses the agent’s own model for summarization. You can optionally provide a different model to override this behavior.
+By default, the `SummarizingConversationManager` uses `agent.auxModel` for summarization. You can optionally provide a different model to override this behavior.
 
 ```typescript
 import { Agent, SummarizingConversationManager } from '@strands-agents/sdk'
@@ -31345,7 +31345,7 @@ await agent.invoke('Send an urgent email to the team about the deadline')
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `systemPrompt` | `string | SystemContentBlock[]` | *(required)* | Steering rules for the evaluation LLM |
-| `model` | `Model` | Parent agent’s model | Model used for steering evaluation |
+| `model` | `Model` | `agent.auxModel` | Model used for steering evaluation |
 | `contextProviders` | `SteeringContextProvider[]` | `[new ToolLedgerProvider()]` | Providers that supply evaluation context. Pass `[]` to disable |
 | `promptBuilder` | `PromptBuilder` | Built-in builder with cache points | Custom function to build evaluation prompts |
 | `name` | `string` | `'strands:llm-steering-handler'` | Unique handler name (must be distinct if multiple handlers are attached) |
@@ -37258,7 +37258,7 @@ Preview modes: `"head"`, `"tail"`, `"head_tail"``"headTail"`.
 
 ### Summarize
 
-Replaces content with an LLM-generated summary. Uses the agent’s model by default.
+Replaces content with an LLM-generated summary. Uses `agent.aux_model``agent.auxModel` by default.
 
 (( tab "Python" ))
 ```python
@@ -37287,14 +37287,14 @@ Offload.summarize('*').when({
 (( tab "Python" ))
 | Parameter | Key | Default |
 | --- | --- | --- |
-| Model | `model` | Agent’s model |
+| Model | `model` | `agent.aux_model` |
 | System prompt | `system_prompt` | Built-in |
 (( /tab "Python" ))
 
 (( tab "TypeScript" ))
 | Parameter | Key | Default |
 | --- | --- | --- |
-| Model | `model` | Agent’s model |
+| Model | `model` | `agent.auxModel` |
 | System prompt | `systemPrompt` | Built-in |
 (( /tab "TypeScript" ))
 
@@ -39138,14 +39138,11 @@ When using [Model Context Protocol (MCP)](/docs/user-guide/sdk/tools/mcp-tools/i
 **Establish a new MCP connection for each Lambda invocation.** Creating the `MCPClient` object itself is inexpensive - the costly operation is establishing the actual connection to the server. Use context managers to ensure connections are properly opened and closed:
 
 ```python
-from mcp.client.streamable_http import streamablehttp_client
 from strands import Agent
 from strands.tools.mcp import MCPClient
 
 def handler(event, context):
-    mcp_client = MCPClient(
-        lambda: streamablehttp_client("https://your-mcp-server.example.com/mcp")
-    )
+    mcp_client = MCPClient(url="https://your-mcp-server.example.com/mcp")
 
     # Context manager ensures connection is opened and closed safely
     with mcp_client:
@@ -39161,14 +39158,11 @@ def handler(event, context):
 For optimization, you can establish the connection at module level using `start()` to reuse it across Lambda warm invocations:
 
 ```python
-from mcp.client.streamable_http import streamablehttp_client
 from strands import Agent
 from strands.tools.mcp import MCPClient
 
 # Create and start connection at module level (reused across warm invocations)
-mcp_client = MCPClient(
-    lambda: streamablehttp_client("https://your-mcp-server.example.com/mcp")
-)
+mcp_client = MCPClient(url="https://your-mcp-server.example.com/mcp")
 mcp_client.start()
 
 def handler(event, context):
@@ -43733,6 +43727,10 @@ Interrupts work across multi-agent orchestration, so you can pause a swarm or gr
 
 The interfaces mirror those used for [single-agent interrupts](/docs/user-guide/sdk/interrupts/index.md). Read that page first if you have not built an interrupt/resume loop before.
 
+## Agents as Tools
+
+An agent used as a tool with [Agents as Tools](/docs/user-guide/sdk/multi-agent/agents-as-tools/index.md) propagates its interrupts to the orchestrator, where they are raised and answered like any other interrupt. The interrupt ids are scoped to the orchestrator’s tool call; treat them as opaque.
+
 ## Swarm
 
 A [Swarm](/docs/user-guide/sdk/multi-agent/swarm/index.md) is a collaborative agent orchestration system where multiple agents work together as a team to solve complex tasks. The following example interrupts a swarm invocation through a `BeforeNodeCallEvent` hook.
@@ -44034,6 +44032,7 @@ Strands enforces the following rules for interrupts in graph:
 
 ### Python
 
+- [harness-sdk/strands-py/src/strands/agent/_agent_as_tool.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/_agent_as_tool.py)
 - [harness-sdk/strands-py/src/strands/multiagent/swarm.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/swarm.py)
 - [harness-sdk/strands-py/src/strands/multiagent/graph.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py)
 - [harness-sdk/strands-py/src/strands/hooks/events.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/hooks/events.py)
@@ -44792,7 +44791,7 @@ const store = new BedrockKnowledgeBaseStore({
 ```
 (( /tab "TypeScript" ))
 
-The `ModelExtractor` distills messages into discrete facts with a model call. It uses the agent’s own model by default. Pass a cheaper model to cut cost, or a system prompt to steer what information you want to save as memories. Some backends extract server-side instead: a store that implements the `add_messages``addMessages` sink receives the raw message batch with no model call, so for those you omit the extractor.
+The `ModelExtractor` distills messages into discrete facts with a model call. It uses `agent.aux_model``agent.auxModel` by default. Pass a cheaper model to cut cost, or a system prompt to steer what information you want to save as memories. Some backends extract server-side instead: a store that implements the `add_messages``addMessages` sink receives the raw message batch with no model call, so for those you omit the extractor.
 
 Two triggers ship with the SDK. `InvocationTrigger` runs after every turn, `IntervalTrigger` runs every N turns. For a custom trigger, extend `ExtractionTrigger`. A trigger registers a hook on the agent and calls `fire()` when extraction should run. Tying it to agent state can let a tool decide the moment, rather than extracting on a turn cadence:
 
@@ -45534,6 +45533,44 @@ agent = new Agent({ model: openaiModel })
 response = await agent.invoke('What can you help me with?')
 ```
 (( /tab "TypeScript" ))
+
+### Auxiliary model
+
+Besides the main loop, the SDK makes side calls on your behalf: context summarization, memory extraction, the human-in-the-loop risk classifier, LLM steering, the goal-loop judge, and the `web_fetch` analyst. By default they all run on the agent’s main model. Set `aux_model``auxModel` to route every one of them to a smaller, cheaper model at once:
+
+(( tab "Python" ))
+```python
+from strands import Agent
+from strands.models.bedrock import BedrockModel
+
+agent = Agent(
+    model=BedrockModel(model_id="global.anthropic.claude-opus-5-20260301-v1:0"),
+    aux_model=BedrockModel(model_id="global.anthropic.claude-haiku-4-5-20251001-v1:0"),
+    context_manager="auto",
+)
+
+# A string is a Bedrock model id, like `model`; assign later to change it.
+agent.aux_model = "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```typescript
+import { Agent } from '@strands-agents/sdk'
+import { BedrockModel } from '@strands-agents/sdk/models/bedrock'
+
+const agent = new Agent({
+  model: new BedrockModel({ modelId: 'global.anthropic.claude-opus-5-20260301-v1:0' }),
+  auxModel: new BedrockModel({ modelId: 'global.anthropic.claude-haiku-4-5-20251001-v1:0' }),
+  contextManager: 'auto',
+})
+
+// A string is a Bedrock model id, like `model`; assign later to change it.
+agent.auxModel = 'global.anthropic.claude-haiku-4-5-20251001-v1:0'
+```
+(( /tab "TypeScript" ))
+
+Each side call resolves its model in this order: the component’s own `model` option (for example the summarizer’s or the classifier’s) > `agent.aux_model``agent.auxModel` > `agent.model`. Leaving `aux_model``auxModel` unset changes nothing. A `ModelRouter` is not accepted here: side calls run outside the agent loop the router attaches to.
 
 ## Next Steps
 
@@ -52666,18 +52703,21 @@ research_agent = Agent(
     factual, well-sourced information in response to research questions.
     Always cite your sources when possible.""",
     tools=[http_request],
+    callback_handler=None,
 )
 
 product_agent = Agent(
     system_prompt="""You are a specialized product recommendation assistant.
     Provide personalized product suggestions based on user preferences.""",
     tools=[http_request],
+    callback_handler=None,
 )
 
 travel_agent = Agent(
     system_prompt="""You are a specialized travel planning assistant.
     Create detailed travel itineraries based on user preferences.""",
     tools=[http_request],
+    callback_handler=None,
 )
 
 # Create the orchestrator: agents are automatically converted to tools
@@ -52737,6 +52777,8 @@ Always select the most appropriate tool based on the user's query.`,
 ```
 (( /tab "TypeScript" ))
 
+Each specialist sets `callback_handler=None``printer: false` so that only the orchestrator writes to the console. Without it, the specialist’s default handler prints its own response alongside the orchestrator’s output, and with [delegation](#delegation) the specialist’s text appears twice.
+
 ### Customizing agent tools
 
 When you need to customize the tool name, description, or context behavior, use `.as_tool()``.asTool()` explicitly:
@@ -52794,6 +52836,8 @@ const orchestrator = new Agent({
 ```
 (( /tab "TypeScript" ))
 
+This setting also decides where a sub-agent’s [interrupt](/docs/user-guide/sdk/interrupts/index.md) waits to be resumed. With `preserve_context=False``preserveContext: false` the orchestrator stores the interrupted turn, so it can be resumed after a restart. With `preserve_context=True``preserveContext: true` the sub-agent keeps its own state, so give it its own session manager for that.
+
 ### Creating custom agent tools
 
 For more control over how the agent is invoked, such as custom pre/post-processing, error handling, or passing multiple parameters, create a custom tool that wraps an agent:
@@ -52823,7 +52867,8 @@ def research_assistant(query: str) -> str:
     try:
         research_agent = Agent(
             system_prompt=RESEARCH_ASSISTANT_PROMPT,
-            tools=[http_request]
+            tools=[http_request],
+            callback_handler=None,
         )
 
         response = research_agent(query)
@@ -52878,6 +52923,7 @@ def product_recommendation_assistant(query: str) -> str:
             system_prompt="""You are a specialized product recommendation assistant.
             Provide personalized product suggestions based on user preferences.""",
             tools=[http_request, dialog],
+            callback_handler=None,
         )
         # Implementation with response handling
         # ...
@@ -52901,6 +52947,7 @@ def trip_planning_assistant(query: str) -> str:
             system_prompt="""You are a specialized travel planning assistant.
             Create detailed travel itineraries based on user preferences.""",
             tools=[http_request],
+            callback_handler=None,
         )
         # Implementation with response handling
         # ...
@@ -53055,6 +53102,7 @@ billing_agent = Agent(
     description="Answers billing questions: charges, refunds, and invoices.",
     system_prompt="You handle billing questions with precision.",
     structured_output_model=BillingResponse,
+    callback_handler=None,
 )
 
 orchestrator = Agent(
@@ -55335,6 +55383,15 @@ The Strands Agents SDK uses standard log levels:
 -   **CRITICAL**: Reserved for catastrophic failures.
     
 
+In the Python SDK, notices about *how the SDK is being used* (an unset `context_window_limit`, an unknown cache strategy, a graph built without execution limits) are emitted through Python’s [`warnings`](https://docs.python.org/3/library/warnings.html) module instead of the logger. The standard library deduplicates repeats, so each warning surfaces once rather than on every call. The TypeScript SDK reports these through its logger.
+
+Control them with `-W` or `PYTHONWARNINGS`, like any other warning:
+
+```bash
+# Promote all UserWarnings, including SDK usage warnings, to errors (useful in CI)
+python -W error::UserWarning my_agent.py
+```
+
 ## Key Logging Areas
 
 (( tab "Python" ))
@@ -56437,6 +56494,49 @@ const agent = new Agent({
 })
 ```
 (( /tab "TypeScript" ))
+
+### Baggage Propagation
+
+Use `baggage_attributes` to propagate key-value pairs across process boundaries via the W3C `baggage` header. Unlike `trace_attributes`, baggage is not stamped onto spans by default. It travels through the OTel context and is available to downstream services.
+
+(( tab "Python" ))
+```python
+agent = Agent(
+    system_prompt="You are a helpful assistant.",
+    baggage_attributes={
+        "tenant.id": "acme",
+        "env": "production",
+    },
+)
+```
+(( /tab "Python" ))
+
+If you also want baggage recorded on spans, call `setup_baggage_processor()` on `StrandsTelemetry`. Pass a predicate (or a sequence of predicates) that takes a baggage key and returns `True` to record only matching entries.
+
+(( tab "Python" ))
+```python
+from strands.telemetry import StrandsTelemetry
+
+strands_telemetry = StrandsTelemetry()
+strands_telemetry.setup_otlp_exporter()
+strands_telemetry.setup_baggage_processor(lambda key: key in {"tenant.id", "env"})
+```
+(( /tab "Python" ))
+
+If your agent runs under the AWS Distro for OpenTelemetry (ADOT), note that ADOT registers the global tracer provider before your code runs. `StrandsTelemetry()` cannot replace it, so attach the processor to the existing provider instead:
+
+(( tab "Python" ))
+```python
+from opentelemetry import trace
+from strands.telemetry import StrandsTelemetry
+
+StrandsTelemetry(tracer_provider=trace.get_tracer_provider()).setup_baggage_processor(lambda key: key in {"tenant.id", "env"})
+```
+(( /tab "Python" ))
+
+Caution
+
+Without a predicate, `setup_baggage_processor()` stamps *every* baggage entry onto every span, including values extracted from inbound `baggage` request headers. It requires the `strands-agents[otel]` extra.
 
 ### Custom Spans
 
@@ -57802,7 +57902,7 @@ flowchart LR
 
 ## Getting Started
 
-Pass a natural-language goal string. GoalLoop builds an internal judge agent (using the host agent’s model) that grades each response against the goal and returns structured feedback on failure.
+Pass a natural-language goal string. GoalLoop builds an internal judge agent (using the host agent’s `aux_model``auxModel`) that grades each response against the goal and returns structured feedback on failure.
 
 (( tab "Python" ))
 ```python
@@ -58043,7 +58143,7 @@ The snapshot excludes agent state (`state``appState`) deliberately: other plugin
 
 ### Custom Judge Configuration
 
-When `goal` is a string, GoalLoop builds a judge agent from the host agent’s model. Override the model or system prompt to tune cost and behavior:
+When `goal` is a string, GoalLoop builds a judge agent using the host agent’s `aux_model``auxModel`. Override the model or system prompt to tune cost and behavior:
 
 (( tab "Python" ))
 ```python
@@ -64098,7 +64198,7 @@ Source: https://strandsagents.com/docs/user-guide/sdk/tools/mcp-tools/index.md
 
 A transport carries messages between the agent and an MCP server. Which one you use depends on where the server runs: a local process reachable over standard I/O, or a remote server reachable over HTTP. This page covers each transport Strands supports and how to configure it, including authentication for HTTP servers.
 
-To connect an agent to a server and use its tools, see [Connect your agent to MCP tools](/docs/user-guide/sdk/tools/mcp-tools/index.md). The connection pattern is the same for every transport; only the transport object you hand to the client changes.
+To connect an agent to a server and use its tools, see [Connect your agent to MCP tools](/docs/user-guide/sdk/tools/mcp-tools/index.md). The connection pattern is the same for every transport; only how you point the client at the server changes.
 
 ## Standard I/O (stdio)
 
@@ -64159,14 +64259,13 @@ await agentStdio.invoke('What is AWS Lambda?')
 For HTTP-based MCP servers that use the Streamable HTTP transport:
 
 (( tab "Python" ))
+Pass the server `url` and `MCPClient` builds the transport from the installed `mcp` package:
+
 ```python
-from mcp.client.streamable_http import streamablehttp_client
 from strands import Agent
 from strands.tools.mcp import MCPClient
 
-streamable_http_mcp_client = MCPClient(
-    lambda: streamablehttp_client("http://localhost:8000/mcp")
-)
+streamable_http_mcp_client = MCPClient(url="http://localhost:8000/mcp")
 
 with streamable_http_mcp_client:
     tools = streamable_http_mcp_client.list_tools_sync()
@@ -64177,16 +64276,15 @@ Pass `headers` to send authentication or other request headers:
 
 ```python
 import os
-from mcp.client.streamable_http import streamablehttp_client
 from strands.tools.mcp import MCPClient
 
 github_mcp_client = MCPClient(
-    lambda: streamablehttp_client(
-        url="https://api.githubcopilot.com/mcp/",
-        headers={"Authorization": f"Bearer {os.getenv('MCP_PAT')}"}
-    )
+    url="https://api.githubcopilot.com/mcp/",
+    headers={"Authorization": f"Bearer {os.getenv('MCP_PAT')}"},
 )
 ```
+
+To configure the transport yourself, pass a callback that opens it instead, as in the stdio example; for Streamable HTTP that is `streamable_http_client` from `mcp.client.streamable_http`.
 
 #### OAuth Authentication
 
@@ -64758,7 +64856,8 @@ const agent = new Agent({
 | [Stop](#stop-experimental) | Gracefully end the agent loop when the task is complete | Python, TypeScript (Node.js, browsers) |
 | [Web Fetch](#web-fetch) | Fetch a URL and return cleaned markdown for a model to read | Python, TypeScript (Node.js) |
 | [A2A Client](#a2a-client) | Discover and send messages to remote A2A-protocol agents | Python, TypeScript (Node.js, browsers) |
-| [Subagent](#subagent) | Delegate a self-contained task to a child agent | Python |
+| [Python REPL](#python-repl) | Execute Python code through the agent’s sandbox | Python, TypeScript (Node.js, Unix/Linux/macOS) |
+| [Subagent](#subagent) | Delegate a self-contained task to a child agent | Python, TypeScript (Node.js, browsers) |
 
 ### File editor
 
@@ -65205,7 +65304,7 @@ Fetches an HTTP(S) URL and returns its content. Two modes are available, configu
 -   **`agentic`** (default): HTML is converted to markdown and passed to an analyst agent that answers a `prompt`, so the full page never enters the main agent’s context. Use when targeted answers are needed about potentially large pages.
 -   **`markdown`**: HTML is converted to clean markdown with scripts, styles, and noise stripped. Use when the agent needs full pages for reasoning.
 
-The `max_bytes` / `maxBytes` parameter caps the HTTP response size (default 5 MiB); `max_content_chars` / `maxContentChars` caps the extracted content delivered to the model or analyst (default 50,000 characters). For `mode='agentic'` / `mode: 'agentic'`, the factory also accepts a `model` for the analyst; the agent’s own model is used when none is supplied.
+The `max_bytes` / `maxBytes` parameter caps the HTTP response size (default 5 MiB); `max_content_chars` / `maxContentChars` caps the extracted content delivered to the model or analyst (default 50,000 characters). For `mode='agentic'` / `mode: 'agentic'`, the factory also accepts a `model` for the analyst; `agent.aux_model``agent.auxModel` is used when none is supplied.
 
 The Python tool delegates all networking to an `httpx.AsyncClient`. Use the `make_web_fetch` factory to supply a pre-configured client with custom timeouts, redirects, proxies, or caching.
 
@@ -65464,18 +65563,96 @@ Full API reference: [TypeScript](https://github.com/strands-agents/harness-sdk/b
 
 ---
 
+### Python REPL
+
+Runs model-generated Python through the agent’s [sandbox](/docs/user-guide/sdk/sandbox/index.md) by calling `sandbox.execute_code(code, "python3")` (`sandbox.executeCode(code, 'python3')` in TypeScript). It returns `output` (stdout), `error` (stderr, including tracebacks), and `exit_code`. Each call runs in a fresh interpreter, so variables, imports, and definitions do not persist across calls. Files written to the sandbox filesystem do persist, so the model can checkpoint intermediate results to disk and load them in a later call.
+
+*Supported in: Node.js on Unix/Linux/macOS (TypeScript), Python.*
+
+Security Warning
+
+This tool executes arbitrary Python code. Without a [Sandbox](/docs/user-guide/sdk/sandbox/index.md), code runs with the full permissions of the process. Only use with trusted input and consider running in a [sandboxed environment](/docs/user-guide/sdk/sandbox/index.md) for production.
+
+(( tab "TypeScript" ))
+```typescript
+import { Agent } from '@strands-agents/sdk'
+import { pythonRepl } from '@strands-agents/sdk/vended-tools/python-repl'
+
+const agent = new Agent({ tools: [pythonRepl] })
+await agent.invoke('Use python_repl to compute the first 10 Fibonacci numbers and print them.')
+```
+(( /tab "TypeScript" ))
+
+(( tab "Python" ))
+```python
+from strands import Agent
+from strands.vended_tools import python_repl
+
+agent = Agent(tools=[python_repl])
+agent("Use python_repl to compute the first 10 Fibonacci numbers and print them.")
+```
+(( /tab "Python" ))
+
+**Bound sandbox or custom interpreter:**
+
+(( tab "TypeScript" ))
+```typescript
+import { Agent } from '@strands-agents/sdk'
+import { DockerSandbox } from '@strands-agents/sdk/sandbox/docker'
+import { makePythonRepl } from '@strands-agents/sdk/vended-tools/python-repl'
+
+const pythonRepl = makePythonRepl(
+  new DockerSandbox({ container: 'my-container' }),
+  { language: 'python3.12' }
+)
+const agent = new Agent({ tools: [pythonRepl] })
+```
+(( /tab "TypeScript" ))
+
+(( tab "Python" ))
+```python
+from strands import Agent
+from strands.sandbox.docker import DockerSandbox
+from strands.vended_tools import make_python_repl
+
+python_repl = make_python_repl(
+    sandbox=DockerSandbox("my-container"),  # bind at creation instead of reading agent.sandbox
+    language="python3.12",  # interpreter on the sandbox's PATH
+)
+agent = Agent(tools=[python_repl])
+```
+(( /tab "Python" ))
+
+[Full API reference](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/vended-tools/python-repl/README.md)
+
+---
+
 ### Subagent
 
 Delegates a self-contained task to a child agent that runs in its own context and returns a final report. Use it when a subtask would otherwise flood the parent’s context with intermediate work and you only need the conclusion. The model writes the task each time it calls the tool; the child cannot ask follow-up questions, so the task must include all the context it needs.
 
-The `make_subagent` factory uses [axis policies](#axis-policies) to control what the model can configure on each child. The configurable axes are `instructions`, `tools`, `mcp_servers``mcpServers`, `model`, and `context`. The parent also passes a task to the child.
+The `make_subagent``makeSubagent` factory uses [axis policies](#axis-policies) to control what the model can configure on each child. The configurable axes are `instructions`, `tools`, `mcp_servers``mcpServers`, `model`, and `context`. The parent also passes a task to the child.
 
-By default, the child sees only the task (`context=Fixed("none")`), but you can share the parent’s conversation by setting `context` to a `Choice` over `"none"`, `"all"` (full history including tool calls), and `"no_tools"` (text turns only). When a non-`"none"` option is available, the model can also pass `last_messages` to limit how many parent messages to share.
+By default, the child sees only the task (`context=Fixed("none")``context: new Fixed('none')`), but you can share the parent’s conversation by setting `context` to a `Choice` over `"none"`, `"all"` (full history including tool calls), and `"no_tools"` (text turns only). When a non-`"none"` option is available, the model can also pass `last_messages` to limit how many parent messages to share.
 
-*Supported in: Python.*
+*Supported in: Python, TypeScript (Node.js, browsers).*
 
 **Example — quick start:**
 
+(( tab "TypeScript" ))
+```typescript
+import { Agent } from '@strands-agents/sdk'
+import { subagent } from '@strands-agents/sdk/vended-tools/subagent'
+
+const agent = new Agent({
+  systemPrompt: 'You are a manager.',
+  tools: [subagent],
+})
+await agent.invoke('Research the latest TypeScript 5.x features and summarize them.')
+```
+(( /tab "TypeScript" ))
+
+(( tab "Python" ))
 ```python
 from strands import Agent
 from strands.vended_tools.subagent import subagent
@@ -65486,9 +65663,41 @@ agent = Agent(
 )
 agent("Research the latest Python 3.13 features and summarize them.")
 ```
+(( /tab "Python" ))
 
-**Example — full control with `make_subagent`:**
+**Example — full control with `make_subagent``makeSubagent`:**
 
+(( tab "TypeScript" ))
+```typescript
+import { Agent } from '@strands-agents/sdk'
+import { Choice, Option, Preset } from '@strands-agents/sdk/multiagent'
+import { makeSubagent } from '@strands-agents/sdk/vended-tools/subagent'
+
+const subagent = makeSubagent({
+  presets: {
+    researcher: new Preset({
+      instructions: 'You research topics thoroughly.',
+      description: 'deep research on a topic',
+    }),
+    reviewer: new Preset({
+      instructions: 'You review code for correctness and style.',
+      description: 'code review',
+    }),
+  },
+  model: new Choice([
+    new Option('fast', 'us.anthropic.claude-sonnet-4-20250514-v1:0', 'quick tasks'),
+    new Option('deep', 'us.anthropic.claude-opus-4-20250514-v1:0', 'hard problems'),
+  ]),
+  context: new Choice(['none', 'all', 'no_tools']),
+  tools: new Choice(['read', 'shell', 'write'], true),
+  maxDepth: 3,
+})
+const agent = new Agent({ tools: [subagent] })
+await agent.invoke('Review the changes in src/main.ts for correctness.')
+```
+(( /tab "TypeScript" ))
+
+(( tab "Python" ))
 ```python
 from strands import Agent
 from strands.multiagent.spec import Choice, Option, Preset
@@ -65516,6 +65725,9 @@ subagent = make_subagent(
 agent = Agent(tools=[subagent])
 agent("Review the changes in src/main.py for correctness.")
 ```
+(( /tab "Python" ))
+
+Full API reference: [TypeScript](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/vended-tools/subagent/README.md)
 
 ---
 
@@ -65532,7 +65744,7 @@ Some vended tools let the model configure child agents at runtime. Axis policies
 
 Use `Option` inside a `Choice` to map model-facing names to runtime values. Bundle axis defaults into a `Preset` that the model selects via `agent_type`.
 
-Tools that accept axis policies use a default builder to turn resolved specs into child agents. By default, it produces child agents that inherit the parent’s tools, model, and MCP servers. Each child gets `context_manager="auto"` and accesses the parent’s long-term memory through inherited memory tools.
+Tools that accept axis policies use a default builder to turn resolved specs into child agents. By default, it produces child agents that inherit the parent’s tools, model, and MCP servers. Each child gets `context_manager="auto"``contextManager: 'auto'` (unless its model is stateful) in place of the parent’s context-management tools, and accesses the parent’s long-term memory through inherited memory tools.
 
 To replace the default builder, pass any callable that takes an `AgentSpec` and returns an `Agent`.
 
@@ -65607,6 +65819,8 @@ Tool names are stable and will not change. In minor versions, a tool’s descrip
 - [harness-sdk/strands-ts/src/vended-tools/mcp-router/mcp-router.ts](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/vended-tools/mcp-router/mcp-router.ts)
 - [harness-sdk/strands-ts/src/experimental/vended-tools/stop/stop.ts](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/experimental/vended-tools/stop/stop.ts)
 - [harness-sdk/strands-ts/src/vended-tools/a2a-client/a2a-client.ts](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/vended-tools/a2a-client/a2a-client.ts)
+- [harness-sdk/strands-ts/src/vended-tools/subagent/subagent.ts](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/vended-tools/subagent/subagent.ts)
+- [harness-sdk/strands-ts/src/vended-tools/python-repl/python-repl.ts](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/vended-tools/python-repl/python-repl.ts)
 
 ### Python
 
@@ -65620,6 +65834,7 @@ Tool names are stable and will not change. In minor versions, a tool’s descrip
 - [harness-sdk/strands-py/src/strands/vended_tools/a2a_client/a2a_client.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/a2a_client/a2a_client.py)
 - [harness-sdk/strands-py/src/strands/vended_tools/subagent/subagent.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/subagent/subagent.py)
 - [harness-sdk/strands-py/src/strands/experimental/tools/stop/stop.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/experimental/tools/stop/stop.py)
+- [harness-sdk/strands-py/src/strands/vended_tools/python_repl/python_repl.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/python_repl/python_repl.py)
 
 Source: https://strandsagents.com/docs/user-guide/sdk/tools/vended-tools/index.md
 
@@ -66811,6 +67026,90 @@ Source: https://strandsagents.com/docs/user-guide/shell/shell-language/index.md
 
 ---
 
+## We ran 94,000 trials to measure the cost of harness choice
+
+Date: 2026-10-12T00:00:00.000Z
+Tags: Strands harness, Harness SDK, Evaluation, Benchmarks, Context Management
+
+A few weeks ago, we [announced](/blog/introducing-strands-harness/index.md) Strands harness with 28% lower token cost than other leading harnesses with Claude and GPT models while maintaining accuracy. In this follow-up, we discovered the cost reduction is actually closer to 34% for Strands harness, a general purpose harness that can be customized for any task. What stood out to us was Strands harness’s defaults performed well on benchmarks ranging from coding to other knowledge work tasks.
+
+To be rigorous, we analyzed roughly 94,000 benchmark trials across 8 benchmarks, 12 models, and 6 harnesses. By comparing harnesses running the same models on the same tasks, we could measure how harness selection affected efficiency and accuracy. Two harnesses can drive the same model on the same task but do it very differently. The question is how much that difference is worth.
+
+The results showed that token usage can vary by roughly 2x depending on the harness, often with little difference in accuracy. Higher token usage did not consistently correspond to higher accuracy among frontier models. The model sets the accuracy ceiling, but the harness determines how efficiently a developer reaches it.
+
+Strands harness had the lowest estimated cost and highest accuracy in the Anthropic and OpenAI comparisons. On open-weight models, it had the second-highest accuracy at a lower estimated cost than OpenCode, the highest-scoring harness. The takeaway is that choosing the right model is important, but how a harness manages context, tools, caching, and memory can significantly impact the cost of running an agent. For Strands harness, one of the keys was its default context management, particularly with tool offloading where tool results get stored in a JSON file to avoid filling up the context window during tool invocations. In this post, we’ll walk through how we ran the benchmarks, what we found across different model families, and why harness selection deserves more attention when optimizing agents.
+
+## How we ran the benchmarks
+
+We analyzed roughly 94,000 trials across 8 benchmarks (ALFWorld, ContextBench, GAIA, LoCoMo, SWE-bench Pro, τ³-bench, Terminal-Bench 2.1, and WebShop), 12 models spanning Anthropic, OpenAI, and open-weight families, and 6 harnesses (Strands harness, OpenCode, Claude Code, oh-my-pi (OMP), Codex, and DeepSeek Harness). The tests ran on the distributed benchmarking platform Harbor, with Strands harness running through Harbor’s [Strands adapter](https://github.com/harbor-framework/harbor/blob/main/src/harbor/agents/installed/strands.py). The results reflect a snapshot taken on September 17, 2026. Of course, benchmark posts become quickly stale with newly launched models like Opus 5.5, GPT-6.1 Sol, and Muse Wonder, which may offer breakthroughs in intelligence served at reduced cost. However, our data strongly shows that a model-provider neutral, adjustable, and lightweight harness can further save on cost while achieving similar accuracy.
+
+The full dataset spans roughly 94,000 trials and 12 models; the matched subset plotted in the charts covers 82,400 trials across 9 models. For each model provider, we compared harnesses only on the model-and-dataset combinations that every harness in that comparison ran. We used high reasoning effort to reflect real-world workloads rather than to optimize for benchmark scores. This gave us 32 shared combinations for Anthropic (8,240 trials per harness across five harnesses), 24 for OpenAI (6,180 trials per harness across four harnesses), and 16 for open-weight models (4,120 trials per harness across four harnesses). No harness received credit for a combination its competitors didn’t also run. For each harness, chart accuracy is the mean of the combination-level scores, each excluding errored trials. Estimated cost per trial is total estimated cost divided by total trials in the matched subset.
+
+### Measuring tokens and estimating costs
+
+Token usage was recorded for every trial and serves as our primary metric. Billed cost data, however, was not consistently available. Several harnesses, including Strands harness and DeepSeek Harness, had no reported billed costs, while others reported costs for only a portion of their trials. For trials without billed costs, we estimated the dollar amount using the actual token usage and the per-model rate derived from trials that did report costs. This preserves the model-specific pricing reflected in the available data, but means the dollar figures throughout this post are estimates rather than directly measured costs.
+
+### Excluded results
+
+We excluded a model whose full run was still in progress when the snapshot was taken, a small number of scoring anomalies that recorded 0.0 without reporting errors, and a model wave that was scheduled to run last. The open-weight chart also excludes Kimi 2.5 because every OMP run on that model failed, leaving no combination that all four harnesses completed. Most errors in the dataset were agent timeouts and non-zero exit codes. Safety refusals and other error types accounted for a much smaller share.
+
+## Why some harnesses cost twice as much
+
+Let’s start with the Anthropic models, where five harnesses were evaluated on Claude Fable 5, Claude Opus 5, Claude Opus 4.8, and Claude Sonnet 5.
+
+The chart plots estimated cost per trial on the horizontal axis and accuracy on the vertical axis. Lower costs are to the left, and higher accuracy is toward the top. The ideal harness sits in the top-left corner.
+
+The spread along the horizontal axis demonstrates the difference in cost per trial for each harness. From the most cost-efficient harness to the priciest, cost per trial runs from about $0.74 to $1.57. That’s roughly 2.1x the cost for the same models doing the same work, depending on the harness.
+
+It’s tempting to assume that paying more buys more accurate results, but our results show that isn’t always the case. The harnesses that cost the most often aren’t the ones that score the highest accuracy. The most expensive harness on this chart (Claude Code, ~$1.57/trial) lands slightly below the most cost-efficient one on accuracy. Cache reuse, context management, and tool-loop efficiency can all contribute to cost differences; these aggregate comparisons do not isolate each factor’s contribution.
+
+At scale, the difference between the most and least cost-efficient harness works out to roughly $830 per 1,000 tasks, with comparable accuracy.
+
+## Higher token spend does not mean better accuracy
+
+We observed this decoupling of cost from accuracy beyond a single model family. The two charts below show this result across both OpenAI and open-weight model families.
+
+If spending more reliably improved accuracy, we’d expect the points to follow a pattern from the bottom-left to the top-right of each chart. Instead, the results are mixed.
+
+On OpenAI models, Strands harness has both the lowest estimated cost (~$0.20 per trial) and the highest accuracy (71.02%). The priciest harness, OMP (~$0.49), scores 69.73%. Strands harness costs about 59% less than OMP while scoring 1.29 percentage points higher. OpenCode uses slightly fewer tokens than Strands harness, but has a higher estimated cost (~$0.26) and the lowest accuracy (66.18%), showing why token usage and estimated cost should be evaluated separately.
+
+On open-weight models, the most expensive harness (OpenCode, ~$1.96) does post the top accuracy (42.93%), but it costs just over 3x the cheapest option, DeepSeek Harness (~$0.62). Against Strands harness (~$1.23, 41.82% accuracy), it costs about 59% more per trial for a 1.11-percentage-point increase in accuracy. Whether that improvement justifies the higher cost depends on the workload.
+
+The accuracy spread is 2.75 percentage points on Anthropic, 4.84 on OpenAI, and 5.00 on open-weight models. Meanwhile, estimated costs vary by about 2.1x, 2.4x, and 3.1x, respectively. For real-world workloads, this means harness selection is worth considering when looking for ways to reduce costs while maintaining the accuracy the workload requires.
+
+## The leaderboard trap
+
+One way to compare harnesses is to average each harness’s accuracy across every benchmark it ran and rank them. By that measure, Claude Code comes out on top. But that ranking doesn’t account for the fact that not every harness was evaluated against the same models.
+
+In our evaluation, Claude Code ran only on Anthropic models, while Codex ran only on OpenAI models. Claude Code can also work with non-Anthropic models through translation layers such as OpenRouter or LiteLLM, which introduce their own latency and serviceability costs. Neither Claude Code nor Codex was included in our open-weight comparisons.
+
+Strands harness, OpenCode, and OMP, on the other hand, were evaluated across all three model families. So, an overall average doesn’t necessarily provide a fair comparison between harnesses. A harness that only supports high-performing models may appear more accurate than one tested across a broader range of models, where accuracy falls into the single digits. A higher overall ranking doesn’t necessarily mean a better harness. It may simply reflect which models were included in the evaluation.
+
+That’s why we compare harnesses using the same models and tasks, evaluating each model provider separately. We also consider how broadly each harness supports different model families, something a single accuracy score can’t capture. Model support also affects the choices developers can make when building and maintaining their agents.
+
+A harness locked to a single model family locks developers in with it. So, when a stronger model arrives in another family, developers either miss out on it or rewrite their agents onto a new harness to use it. Models are improving fast, and no single family leads on every task. And maintaining separate agents per family can be an expensive and time-consuming headache. A harness that consistently delivers high accuracy at lower cost across Anthropic, OpenAI, and open-weight models gives developers much more flexibility to choose the right model they need without being stuck to a single provider.
+
+## Why the harness moves the needle
+
+Because we’re comparing harnesses running the same models on the same tasks, differences in token usage point to engineering choices within the harness itself. Several of those choices can have a significant impact on cost:
+
+-   **Context management and offloading.** A long agent run accumulates tool outputs like file dumps, search results, and command logs. A harness that keeps all of it in the prompt re-sends it on every turn, whereas one that offloads bulky results to disk and keeps a lean working context sends fewer tokens for the same work.
+-   **Cache reuse.** Prompt caching only pays off if the harness structures requests so the stable parts stay byte-identical across turns. Harnesses that cache well pay a fraction of the input-token price on everything they reuse.
+-   **Tool-loop efficiency.** Fewer, better-targeted tool calls mean fewer round-trips through the model. A tight loop reaches the same answer with less back-and-forth.
+-   **Portability by design.** Model support comes down to how a harness is built. Supporting one provider is simpler, but supporting many gives developers the freedom to switch models without changing harnesses. A harness that performs well across model families gives developers more flexibility to optimize for cost and accuracy, regardless of provider.
+
+Model choice still matters. The model sets the upper limit on accuracy, but the harness a developer chooses influences how close their agent gets to that limit.
+
+## What this means for developers building or choosing an agent
+
+When evaluating an agent harness, don’t just look at accuracy leaderboards. Test it against real workloads using the models planned for production. Measure token usage alongside accuracy and consider whether the harness gives developers the flexibility to adopt new models as they become available. As our results show, harness selection can have a significant impact on operating costs without requiring a tradeoff in accuracy.
+
+Developers should try this out themselves: [Get started with Strands harness](/docs/user-guide/harness/quickstart/index.md) and benchmark it. We’d love to hear how much of a difference a harness makes, so connect with us on [Discord](https://discord.gg/strands)!
+
+Source: https://strandsagents.com/blog/we-ran-94000-trials-to-measure-the-cost-of-harness-choice/index.md
+
+---
+
 ## Strands Box: The Big Picture
 
 Date: 2026-10-07T00:00:00.000Z
@@ -67249,7 +67548,9 @@ Today we’re releasing [Strands harness](https://github.com/strands-agents/harn
 
 Strands harness **costs 28% less** when using the same Claude or GPT models across six benchmarks. We found Strands harness showed better token-efficiency and nearly equal benchmark scores compared to Claude Code, Codex, and other popular harnesses. That’s important because we never want to sacrifice accuracy for lower cost. Deepseek Harness proved to be the most token-efficient overall, however, it typically reported the lowest accuracy scores. Our testing setup was distributed benchmarking on EC2 with Harbor.
 
-With Fable 5, Strands harness **cost 77% less** than Claude Code *and* **scored higher** on Terminal Bench 2.1. We’re also pleased to see two other open source harnesses perform similarly well on cost/accuracy against Claude Code.
+> **Explore the results:** The chart below is interactive. Hover over any point to see the model, harness, accuracy score, and cost per task.
+
+With Fable 5, Strands harness **cost 77% less** than Claude Code *and* **scored higher** on Terminal-Bench 2.1. We’re also pleased to see two other open source harnesses perform similarly well on cost/accuracy against Claude Code.
 
 Strands harness, built on the [Strands Harness SDK](https://github.com/strands-agents/harness-sdk), contains defaults for prompt caching and context management. Our default context management largely drove the token-efficiency and accuracy: tool results over ~1500 tokens get truncated, summarization (compaction) triggers when the context window hits above 85%, and context recovery runs within the loop if there’s an overflow.
 

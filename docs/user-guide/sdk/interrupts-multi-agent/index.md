@@ -2,6 +2,10 @@ Interrupts work across multi-agent orchestration, so you can pause a swarm or gr
 
 The interfaces mirror those used for [single-agent interrupts](/docs/user-guide/sdk/interrupts/index.md). Read that page first if you have not built an interrupt/resume loop before.
 
+## Agents as Tools
+
+An agent used as a tool with [Agents as Tools](/docs/user-guide/sdk/multi-agent/agents-as-tools/index.md) propagates its interrupts to the orchestrator, where they are raised and answered like any other interrupt. The interrupt ids are scoped to the orchestrator’s tool call; treat them as opaque.
+
 ## Swarm
 
 A [Swarm](/docs/user-guide/sdk/multi-agent/swarm/index.md) is a collaborative agent orchestration system where multiple agents work together as a team to solve complex tasks. The following example interrupts a swarm invocation through a `BeforeNodeCallEvent` hook.
@@ -303,6 +307,7 @@ Strands enforces the following rules for interrupts in graph:
 
 ### Python
 
+- [harness-sdk/strands-py/src/strands/agent/_agent_as_tool.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/_agent_as_tool.py)
 - [harness-sdk/strands-py/src/strands/multiagent/swarm.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/swarm.py)
 - [harness-sdk/strands-py/src/strands/multiagent/graph.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/multiagent/graph.py)
 - [harness-sdk/strands-py/src/strands/hooks/events.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/hooks/events.py)

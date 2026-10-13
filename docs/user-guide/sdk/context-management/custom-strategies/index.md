@@ -105,7 +105,7 @@ Preview modes: `"head"`, `"tail"`, `"head_tail"``"headTail"`.
 
 ### Summarize
 
-Replaces content with an LLM-generated summary. Uses the agent’s model by default.
+Replaces content with an LLM-generated summary. Uses `agent.aux_model``agent.auxModel` by default.
 
 (( tab "Python" ))
 ```python
@@ -134,14 +134,14 @@ Offload.summarize('*').when({
 (( tab "Python" ))
 | Parameter | Key | Default |
 | --- | --- | --- |
-| Model | `model` | Agent’s model |
+| Model | `model` | `agent.aux_model` |
 | System prompt | `system_prompt` | Built-in |
 (( /tab "Python" ))
 
 (( tab "TypeScript" ))
 | Parameter | Key | Default |
 | --- | --- | --- |
-| Model | `model` | Agent’s model |
+| Model | `model` | `agent.auxModel` |
 | System prompt | `systemPrompt` | Built-in |
 (( /tab "TypeScript" ))
 
