@@ -238,9 +238,14 @@ class _AgentAsTool(AgentTool):
             )
 
             result = None
+            # Captured before stream_async's finally clears it. A set signal covers both
+            # external cancel (parent-propagated) and an immediate sub.cancel() from a hook,
+            # timeout, or non-stop tool; the stop tool's deferred cancel never sets it.
+            sub_cancel_signal_set = False
             async for event in self._agent.stream_async(prompt, cancel_signal=cancel_signal):
                 if "result" in event:
                     result = event["result"]
+                    sub_cancel_signal_set = self._agent.cancel_signal.is_set()
                 else:
                     yield AgentAsToolStreamEvent(tool_use, event, self)
 
@@ -263,8 +268,7 @@ class _AgentAsTool(AgentTool):
                 yield ToolInterruptEvent(tool_use, interrupts)
                 return
 
-            # External cancel sets cancel_signal; the stop tool's deferred cancel does not.
-            if result.stop_reason == "cancelled" and cancel_signal is not None and cancel_signal.is_set():
+            if result.stop_reason == "cancelled" and sub_cancel_signal_set:
                 yield ToolResultEvent(
                     {
                         "toolUseId": tool_use_id,
