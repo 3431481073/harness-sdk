@@ -665,18 +665,18 @@ Using the same session ID and storage location does not migrate repository-based
 data to `SnapshotSessionManager`: the two formats and key layouts differ, so a snapshot
 manager pointed at an existing repository-format session simply finds no snapshot and
 starts empty. Existing sessions can continue using their current manager, or you can
-migrate them explicitly: see [Migrating from the message-log session managers](#migrating-from-the-message-log-session-managers).
+migrate them explicitly: see [Migrating from the repository-based session managers](#migrating-from-the-repository-based-session-managers).
 
-## Migrating from the message-log session managers
+## Migrating from the repository-based session managers
 
 :::note[Python only]
-Applies to the Python message-log managers (`FileSessionManager`, `S3SessionManager`,
+Applies to the Python repository-based managers (`FileSessionManager`, `S3SessionManager`,
 `RepositorySessionManager`). TypeScript has a single `SessionManager` and no equivalent
 migration.
 :::
 
 `SnapshotSessionManager` is the recommended session manager. If you have taken Strands to
-production on a message-log manager, your sessions are persisted in its format, so moving
+production on a repository-based manager, your sessions are persisted in its format, so moving
 to snapshots means migrating that existing data, not just changing the constructor.
 
 Switching to `SnapshotSessionManager` is a one-line change, but it does **not** carry
@@ -697,7 +697,7 @@ agent = Agent(
 ```
 
 The two managers use different on-disk formats, so a snapshot manager pointed at an existing
-message-log session finds no snapshot and starts with no history or state. Nothing errors,
+repository-based session finds no snapshot and starts with no history or state. Nothing errors,
 and the legacy data is left untouched on disk; it is just not read.
 
 - **Starting fresh, or fine to drop old history?** Swap the constructor; nothing more is
@@ -764,7 +764,7 @@ SYSTEM_PROMPT = "<your production system prompt>"
 
 
 async def migrate_session(session_id: str, *, agent_id: str = "default") -> None:
-    """Copy one message-log session into snapshot format; stops if already migrated.
+    """Copy one repository-based session into snapshot format; stops if already migrated.
 
     This function does not overwrite existing legacy records. Validate the source session and
     agent identifiers before calling it because repository-backed legacy managers create empty
