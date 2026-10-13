@@ -349,7 +349,7 @@ One PR per step per SDK:
 1. Should `compact()` live on `Model` or a separate capability protocol, and should `Model` also expose `supports_compaction` (as 0019 proposes)?
 2. Should the guard compare against what was sent, or against an append-only log kept by the agent? The log also survives session restore.
 3. Does Bedrock Converse return `input_transformations` anywhere? We have not seen it.
-4. Should the `compaction` block use the wire name `content` instead of `text`, and is `signature` optional?
+4. Should the `compaction` block use the wire name `content` instead of `text`, and is `signature` optional? The API also returns `encrypted_content` and `tool_changes` (both null in our runs) and rejects fields it didn't return, so the type must round-trip exactly the fields that are set. Should it model the two extra fields now?
 5. Is `reasoning_binding` the right name, and does `"model"` earn its place as a value?
 6. Should `BedrockModel` gain an InvokeModel transport so Bedrock users get compaction?
 7. If Anthropic changes the `compact-2026-09-04` or `thinking-binding-controls-2026-08-01` betas: proposed, `compact()` returns `None` on rejection, so managers fall back to part 1, which uses no beta.
