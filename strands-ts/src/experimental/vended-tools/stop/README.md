@@ -13,7 +13,7 @@ This is a cooperative stop, not an abort. Any other tools the model requested in
 Both SDKs end the loop after the current tool batch and surface the stop text as the final assistant message. They differ only in the `stopReason` label:
 
 - **TypeScript** halts via `AfterToolsEvent.endTurn`. `result.stopReason` is `"endTurn"`.
-- **Python** halts via `agent.cancel(message, after_current_tools=True)`. `result.stop_reason` is `"cancelled"`.
+- **Python** halts via `agent.cancel(message=..., after_current_tools=True)`. `result.stop_reason` is `"cancelled"`.
 
 In both cases the loop's last assistant `Message` carries the stop text in a `TextBlock`; branch on `stopReason` only if your logic needs to distinguish stop-tool exits from other end-turn/cancel paths.
 

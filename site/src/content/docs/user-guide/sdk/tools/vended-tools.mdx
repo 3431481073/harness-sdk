@@ -452,7 +452,7 @@ This is a cooperative stop, not an abort. Any other tools the model requested in
 The two SDKs shim onto different loop-termination primitives, which produces a
 small difference in the final `AgentResult`'s stop reason. TypeScript halts via
 `AfterToolsEvent.endTurn` and returns `stopReason: "endTurn"`. Python halts via
-`agent.cancel(message, after_current_tools=True)` and returns
+`agent.cancel(message=..., after_current_tools=True)` and returns
 `stop_reason: "cancelled"`. In both cases the stop text is appended as the last
 assistant message.
 

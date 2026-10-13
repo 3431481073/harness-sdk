@@ -647,16 +647,9 @@ async def _handle_model_execution(
 
             await agent.hooks.invoke_callbacks_async(after_model_call_event)
 
-            # Apply the cancel message after hooks observe the real model output,
-            # so hooks tracing model behavior still see what the model produced.
-            # Rebind to a new dict rather than mutating in place: hooks that
-            # retained a reference to the message they received would otherwise
-            # see the cancel-text overlay when they serialize later. The
-            # upstream ModelStopReason event has already been yielded, so update
-            # its tuple too — the outer event_loop_cycle re-reads ``message``
-            # from ``model_event["stop"]`` after the inner generator finishes.
-            # Non-text blocks (reasoningContent, toolUse, cachePoint) the model
-            # already emitted are preserved; only the partial text is replaced.
+            # Applied after hooks so AfterModelCallEvent observers see the real model output.
+            # Rebind to a new dict and update last_event so late-serializing hooks still see
+            # the original; preserve reasoningContent / toolUse / cachePoint blocks.
             if stop_reason == "cancelled" and agent._cancel_message is not None:
                 message = {
                     **message,
@@ -1006,9 +999,7 @@ async def _handle_tool_execution(
         )
         return
 
-    # Cancel takes precedence over structured-output stop: when both fire in the
-    # same cycle, the user's explicit cancel intent (and its terminal message)
-    # must win over the implicit stop from the structured-output tool.
+    # Explicit cancel wins over structured-output stop so its terminal message is honored.
     if agent._deferred_cancel or agent._observe_cancellation():
         if agent._cancel_message is not None:
             message = {"role": "assistant", "content": [{"text": agent._cancel_message}]}

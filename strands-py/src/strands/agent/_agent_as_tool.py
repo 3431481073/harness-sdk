@@ -263,9 +263,7 @@ class _AgentAsTool(AgentTool):
                 yield ToolInterruptEvent(tool_use, interrupts)
                 return
 
-            # Distinguish external cancel (parent's signal fired) from the sub-agent
-            # terminating itself via the stop tool. The stop tool uses deferred cancel
-            # and never sets cancel_signal; an external cancel always does.
+            # External cancel sets cancel_signal; the stop tool's deferred cancel does not.
             if result.stop_reason == "cancelled" and cancel_signal is not None and cancel_signal.is_set():
                 yield ToolResultEvent(
                     {

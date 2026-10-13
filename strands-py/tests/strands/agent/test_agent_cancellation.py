@@ -632,9 +632,6 @@ async def test_cancel_while_tool_runs_does_not_re_execute_the_tool():
     assert ran == ["executed"]
 
 
-# --- cancel(message, after_current_tools=True) ---
-
-
 def _tool_use_message(*tool_uses: tuple[str, str, dict]) -> dict:
     return {
         "role": "assistant",

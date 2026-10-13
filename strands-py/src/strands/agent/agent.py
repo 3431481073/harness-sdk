@@ -673,7 +673,7 @@ class Agent(AgentBase, LocalAgent):
 
             Cooperative stop from inside a tool:
             ```python
-            @tool
+            @tool(context=True)
             def finish(tool_context: ToolContext, summary: str) -> str:
                 tool_context.agent.cancel(message=summary, after_current_tools=True)
                 return summary
