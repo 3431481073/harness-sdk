@@ -10,19 +10,19 @@ class RetryDecision:
 
     Attributes:
         retry: Whether to retry the failed operation. When False, the error propagates to the caller.
-        delay: Seconds to wait before retrying. Required when ``retry`` is True; ignored otherwise.
+        wait: Seconds to wait before retrying. Required when ``retry`` is True; ignored otherwise.
     """
 
     retry: bool
-    delay: float | None = None
+    wait: float | None = None
 
     def __post_init__(self) -> None:
         """Validate the delay for a retry decision.
 
         Raises:
-            ValueError: If ``retry`` is True and ``delay`` is missing, negative, or not finite.
+            ValueError: If ``retry`` is True and ``wait`` is missing, negative, or not finite.
         """
         if not self.retry:
             return
-        if self.delay is None or not math.isfinite(self.delay) or self.delay < 0:
-            raise ValueError(f"RetryDecision: delay must be a non-negative finite number (got {self.delay!r})")
+        if self.wait is None or not math.isfinite(self.wait) or self.wait < 0:
+            raise ValueError(f"RetryDecision: wait must be a non-negative finite number (got {self.wait!r})")

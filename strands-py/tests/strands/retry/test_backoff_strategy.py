@@ -1,3 +1,4 @@
+import math
 from unittest.mock import patch
 
 import pytest
@@ -92,3 +93,32 @@ def test_invalid_jitter_raises(backoff_class):
 def test_invalid_attempt_raises(backoff, attempt):
     with pytest.raises(ValueError, match="attempt must be an integer >= 1"):
         backoff.next_delay(BackoffContext(attempt=attempt, elapsed=0))
+
+
+@pytest.mark.parametrize("value", [-1, math.inf, math.nan, True, "1"])
+@pytest.mark.parametrize(
+    ("backoff_class", "name"),
+    [
+        (ConstantBackoff, "delay"),
+        (LinearBackoff, "base_delay"),
+        (LinearBackoff, "max_delay"),
+        (ExponentialBackoff, "base_delay"),
+        (ExponentialBackoff, "max_delay"),
+        (ExponentialBackoff, "multiplier"),
+    ],
+)
+def test_invalid_numeric_argument_raises_at_construction(backoff_class, name, value):
+    with pytest.raises(ValueError, match=f"{backoff_class.__name__}: {name} must be a non-negative finite number"):
+        backoff_class(**{name: value})
+
+
+@pytest.mark.parametrize(
+    "backoff",
+    [
+        ConstantBackoff(delay=0),
+        LinearBackoff(base_delay=0, max_delay=0, jitter="none"),
+        ExponentialBackoff(base_delay=0, max_delay=0, multiplier=0, jitter="none"),
+    ],
+)
+def test_zero_numeric_arguments_are_accepted(backoff):
+    assert _delays(backoff, [1]) == [0]

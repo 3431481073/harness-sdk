@@ -20,6 +20,7 @@ from .retry_strategy import RetryDecision
 
 logger = logging.getLogger(__name__)
 
+_DEFAULT_MAX_ATTEMPTS = 6
 _DEFAULT_INITIAL_DELAY = 4
 _DEFAULT_MAX_DELAY = 240
 
@@ -37,6 +38,9 @@ class ModelRetryStrategy(HookProvider):
     The attempt budget counts only failures this strategy retries; retries requested by other hooks do not consume
     it.
 
+    An instance holds per-invocation retry state, so it should back a single agent at a time. Sharing one instance
+    across agents that run concurrently is unsupported; create one instance per agent.
+
     Extension points:
 
     - Override ``is_retryable`` to expand or narrow the set of retryable exceptions.
@@ -53,7 +57,7 @@ class ModelRetryStrategy(HookProvider):
     def __init__(
         self,
         *,
-        max_attempts: int = 6,
+        max_attempts: int = _DEFAULT_MAX_ATTEMPTS,
         initial_delay: float | None = None,
         max_delay: float | None = None,
         backoff: BackoffStrategy | None = None,
@@ -66,7 +70,9 @@ class ModelRetryStrategy(HookProvider):
                 then doubles. Defaults to 4.
             max_delay: Upper bound in seconds for the default exponential backoff. Defaults to 240.
             backoff: Strategy that computes the delay between retries. Defaults to a jitter-free
-                ``ExponentialBackoff`` built from ``initial_delay`` and ``max_delay``.
+                ``ExponentialBackoff`` built from ``initial_delay`` and ``max_delay``. Note that the built-in
+                backoffs default to ``jitter="full"`` when constructed directly; pass ``jitter="none"`` to keep the
+                deterministic default schedule.
 
         Raises:
             ValueError: If ``backoff`` is combined with ``initial_delay`` or ``max_delay``.
@@ -80,8 +86,10 @@ class ModelRetryStrategy(HookProvider):
         self._max_attempts = max_attempts
         self._initial_delay = _DEFAULT_INITIAL_DELAY if initial_delay is None else initial_delay
         self._max_delay = _DEFAULT_MAX_DELAY if max_delay is None else max_delay
-        self._backoff: BackoffStrategy = backoff or ExponentialBackoff(
-            base_delay=self._initial_delay, max_delay=self._max_delay, jitter="none"
+        self._backoff: BackoffStrategy = (
+            ExponentialBackoff(base_delay=self._initial_delay, max_delay=self._max_delay, jitter="none")
+            if backoff is None
+            else backoff
         )
         self._current_attempt = 0
         self._last_delay: float | None = None
@@ -105,12 +113,16 @@ class ModelRetryStrategy(HookProvider):
         Called only for failed model calls that no other hook has already marked for retry. Overrides may be
         synchronous or ``async``; the base implementation is synchronous.
 
+        Each call for a retryable exception consumes one attempt from the ``max_attempts`` budget. An override that
+        returns its own ``RetryDecision`` without calling ``super()`` neither consumes nor is bounded by that budget,
+        so it must enforce its own limit.
+
         Args:
             event: The AfterModelCallEvent for the failed model call.
 
         Returns:
-            ``RetryDecision(retry=False)`` to let the exception propagate, or ``RetryDecision(retry=True, delay=...)``
-            to retry after sleeping for ``delay`` seconds.
+            ``RetryDecision(retry=False)`` to let the exception propagate, or ``RetryDecision(retry=True, wait=...)``
+            to retry after sleeping for ``wait`` seconds.
         """
         if event.exception is None or not self.is_retryable(event.exception):
             return RetryDecision(retry=False)
@@ -144,7 +156,7 @@ class ModelRetryStrategy(HookProvider):
             self._current_attempt,
             type(event.exception).__name__,
         )
-        return RetryDecision(retry=True, delay=delay)
+        return RetryDecision(retry=True, wait=delay)
 
     def register_hooks(self, registry: HookRegistry, **kwargs: Any) -> None:
         """Register callbacks for AfterModelCallEvent and AfterInvocationEvent.
@@ -200,9 +212,10 @@ class ModelRetryStrategy(HookProvider):
         decision = self.compute_retry_decision(event)
         if inspect.isawaitable(decision):
             decision = await decision
-        if not decision.retry or decision.delay is None:
+        # RetryDecision guarantees wait is set when retry is True; the None check narrows the type.
+        if not decision.retry or decision.wait is None:
             return
 
-        self._backwards_compatible_event_to_yield = EventLoopThrottleEvent(delay=decision.delay)
-        await asyncio.sleep(decision.delay)
+        self._backwards_compatible_event_to_yield = EventLoopThrottleEvent(delay=decision.wait)
+        await asyncio.sleep(decision.wait)
         event.retry = True

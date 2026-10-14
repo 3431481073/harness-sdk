@@ -397,6 +397,19 @@ async def test_model_retry_strategy_reset_clears_backoff_state(mock_sleep):
     assert contexts[1] == BackoffContext(attempt=1, elapsed=0.0, last_delay=None)
 
 
+def test_model_retry_strategy_uses_falsy_custom_backoff():
+    class FalsyBackoff:
+        def __bool__(self):
+            return False
+
+        def next_delay(self, context):
+            return 7
+
+    backoff = FalsyBackoff()
+
+    assert ModelRetryStrategy(backoff=backoff)._backoff is backoff
+
+
 @pytest.mark.parametrize("delay_kwargs", [{"initial_delay": 2}, {"max_delay": 60}])
 def test_model_retry_strategy_rejects_backoff_with_delay_parameters(delay_kwargs):
     with pytest.raises(ValueError, match="cannot be combined with backoff"):
@@ -407,7 +420,7 @@ def test_model_retry_strategy_rejects_backoff_with_delay_parameters(delay_kwargs
 async def test_model_retry_strategy_sync_compute_retry_decision_override(mock_sleep):
     class FixedDecision(ModelRetryStrategy):
         def compute_retry_decision(self, event):
-            return RetryDecision(retry=True, delay=0.5)
+            return RetryDecision(retry=True, wait=0.5)
 
     strategy = FixedDecision()
     event = AfterModelCallEvent(agent=Mock(), exception=ValueError("not throttling"))
@@ -422,7 +435,7 @@ async def test_model_retry_strategy_sync_compute_retry_decision_override(mock_sl
 async def test_model_retry_strategy_async_compute_retry_decision_override(mock_sleep):
     class AsyncDecision(ModelRetryStrategy):
         async def compute_retry_decision(self, event):
-            return RetryDecision(retry=event.attempt_count < 2, delay=0.25)
+            return RetryDecision(retry=event.attempt_count < 2, wait=0.25)
 
     strategy = AsyncDecision()
     first = AfterModelCallEvent(agent=Mock(), exception=ValueError("x"), attempt_count=1)

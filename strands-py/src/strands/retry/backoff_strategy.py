@@ -4,6 +4,7 @@ A ``BackoffStrategy`` is pure delay math: given a ``BackoffContext``, it returns
 next attempt. Policy concerns (whether to retry, max attempts, time budgets) live in the retry strategy, not here.
 """
 
+import math
 import random
 from dataclasses import dataclass
 from typing import Literal, Protocol, get_args
@@ -64,6 +65,11 @@ def _validate_attempt(attempt: int, class_name: str) -> None:
         raise ValueError(f"{class_name}: attempt must be an integer >= 1 (got {attempt!r})")
 
 
+def _validate_non_negative(value: float, name: str, class_name: str) -> None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+        raise ValueError(f"{class_name}: {name} must be a non-negative finite number (got {value!r})")
+
+
 def _validate_jitter(jitter: str, class_name: str) -> None:
     if jitter not in _JITTER_KINDS:
         raise ValueError(f"{class_name}: jitter must be one of {_JITTER_KINDS} (got {jitter!r})")
@@ -91,7 +97,11 @@ class ConstantBackoff:
 
         Args:
             delay: Delay in seconds returned for every retry. Defaults to 1.
+
+        Raises:
+            ValueError: If ``delay`` is negative or not finite.
         """
+        _validate_non_negative(delay, "delay", type(self).__name__)
         self._delay = delay
 
     def next_delay(self, context: BackoffContext) -> float:
@@ -119,9 +129,11 @@ class LinearBackoff:
             jitter: Jitter mode. Defaults to ``"full"``.
 
         Raises:
-            ValueError: If ``jitter`` is not a supported mode.
+            ValueError: If ``jitter`` is not a supported mode, or a delay is negative or not finite.
         """
         _validate_jitter(jitter, type(self).__name__)
+        _validate_non_negative(base_delay, "base_delay", type(self).__name__)
+        _validate_non_negative(max_delay, "max_delay", type(self).__name__)
         self._base_delay = base_delay
         self._max_delay = max_delay
         self._jitter: JitterKind = jitter
@@ -163,9 +175,13 @@ class ExponentialBackoff:
             jitter: Jitter mode. Defaults to ``"full"``.
 
         Raises:
-            ValueError: If ``jitter`` is not a supported mode.
+            ValueError: If ``jitter`` is not a supported mode, or a delay or ``multiplier`` is negative or not
+                finite.
         """
         _validate_jitter(jitter, type(self).__name__)
+        _validate_non_negative(base_delay, "base_delay", type(self).__name__)
+        _validate_non_negative(max_delay, "max_delay", type(self).__name__)
+        _validate_non_negative(multiplier, "multiplier", type(self).__name__)
         self._base_delay = base_delay
         self._max_delay = max_delay
         self._multiplier = multiplier
