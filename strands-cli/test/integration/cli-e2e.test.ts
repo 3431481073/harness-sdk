@@ -41,7 +41,7 @@ describe('strands CLI e2e', () => {
       const result = await run(
         'node',
         [BIN, '--agent', archive, '--print', 'Reply with exactly: LIVE_EXPORTED_AGENT_OK'],
-        { cwd, timeout: 180_000, env: { ...process.env, HOME: home } }
+        { cwd, timeout: 180_000, env: { ...process.env, HOME: home, USERPROFILE: home } }
       )
       expect(`${result.stdout}\n${result.stderr}`).toContain('LIVE_EXPORTED_AGENT_OK')
     } finally {
@@ -65,7 +65,7 @@ describe('strands CLI e2e', () => {
         '--effort',
         'off',
       ],
-      { cwd, timeout: 120_000, env: { ...process.env, HOME: home } }
+      { cwd, timeout: 120_000, env: { ...process.env, HOME: home, USERPROFILE: home } }
     )
     const out = join(cwd, 'out.txt')
     expect(existsSync(out)).toBe(true)
