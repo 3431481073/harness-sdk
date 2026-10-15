@@ -125,16 +125,7 @@ See the [Session Diagnosis guide](/docs/user-guide/evals-sdk/detectors/diagnosis
 
 Detectors use a two-phase analysis pipeline:
 
-```mermaid
-flowchart TD
-    A[Session traces] --> B[1. Failure Detection]
-    B --> C[2. Root Cause Analysis]
-    C --> D[DiagnosisResult]
-
-    B -. "span_id, category,\nconfidence, evidence" .-> B
-    C -. "causality, propagation impact,\nfix recommendation" .-> C
-    D -. "failures[]\nroot_causes[]\nrecommendations[]" .-> D
-```
+> **Diagram:** The two-phase detector pipeline. Session traces (a Session) go to phase one, failure detection (detect_failures), which finds the failing spans. Its failures go to phase two, root cause analysis (analyze_root_cause), which explains why they happened. The failures and the root causes both land in one diagnosis result (DiagnosisResult), which also carries the deduplicated fix recommendations drawn from the root causes.
 
 Both phases handle large sessions that exceed LLM context limits through automatic chunking and merge strategies. Failure detection splits spans into overlapping chunks; root cause analysis first prunes to failure paths, then splits into per-trace windows.
 

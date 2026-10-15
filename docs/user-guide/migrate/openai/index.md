@@ -32,13 +32,7 @@ Set your `OPENAI_API_KEY` in the environment. For the model id, provider options
 
 The most common OpenAI app is a `while` loop around `chat.completions`: call the model, check for `tool_calls`, run each tool, append the results to `messages`, and call again until the model stops asking. You own the loop, the message bookkeeping, and every control that wraps it.
 
-```mermaid
-flowchart LR
-  A[Call the model] --> B{tool_calls?}
-  B -->|Yes| C[Run tools and append results]
-  C --> A
-  B -->|No| D[Return the message]
-```
+> **Diagram:** A hand-written OpenAI loop, all of which you own. The prompt goes to a call to the model with chat.completions.create(). If the response has tool_calls, your code runs the tools, appends the results to messages, and calls the model again. When the response has no tool_calls, your code returns the message.
 
 Strands *is* that loop, tested and maintained. You describe the tools and the model; the [agent loop](/docs/user-guide/sdk/agents/agent-loop/index.md) runs the call-tool-append cycle for you and returns when the model is done.
 

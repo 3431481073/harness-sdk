@@ -203,7 +203,7 @@ Defined in: [src/mcp/client.ts:535](https://github.com/strands-agents/harness-sd
 set onToolsChanged(callback): void;
 ```
 
-Defined in: [src/mcp/client.ts:753](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L753)
+Defined in: [src/mcp/client.ts:751](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L751)
 
 Sets a callback invoked when the MCP server’s tool list changes at runtime.
 
@@ -285,7 +285,7 @@ A promise that resolves when the connection is established.
 disconnect(): Promise<void>;
 ```
 
-Defined in: [src/mcp/client.ts:652](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L652)
+Defined in: [src/mcp/client.ts:650](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L650)
 
 Disconnects the MCP client from the server and cleans up resources.
 
@@ -303,7 +303,7 @@ A promise that resolves when the disconnection is complete.
 asyncDispose: Promise<void>;
 ```
 
-Defined in: [src/mcp/client.ts:669](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L669)
+Defined in: [src/mcp/client.ts:667](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L667)
 
 Enables the `await using` pattern for automatic resource cleanup. Delegates to [McpClient.disconnect](#disconnect).
 
@@ -319,7 +319,7 @@ Enables the `await using` pattern for automatic resource cleanup. Delegates to [
 listTools(options?): Promise<McpTool[]>;
 ```
 
-Defined in: [src/mcp/client.ts:685](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L685)
+Defined in: [src/mcp/client.ts:683](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L683)
 
 Lists the tools available on the server and returns them as executable McpTool instances.
 
@@ -349,7 +349,7 @@ ToolValidationError When a prefixed name exceeds the registry limit and `continu
 listPrompts(options?): Promise<ListPromptsResult>;
 ```
 
-Defined in: [src/mcp/client.ts:791](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L791)
+Defined in: [src/mcp/client.ts:789](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L789)
 
 Lists the prompts available on the server.
 
@@ -379,7 +379,7 @@ Error when an earlier connect attempt failed with `continueOnError` set. Call `c
 getPrompt(promptId, args?): Promise<GetPromptResult>;
 ```
 
-Defined in: [src/mcp/client.ts:804](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L804)
+Defined in: [src/mcp/client.ts:802](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L802)
 
 Retrieves a prompt from the server by name.
 
@@ -408,7 +408,7 @@ Error when an earlier connect attempt failed with `continueOnError` set. Call `c
 listResources(options?): Promise<ListResourcesResult>;
 ```
 
-Defined in: [src/mcp/client.ts:821](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L821)
+Defined in: [src/mcp/client.ts:819](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L819)
 
 Lists the resources available on the server.
 
@@ -438,7 +438,7 @@ Error when an earlier connect attempt failed with `continueOnError` set. Call `c
 readResource(uri): Promise<ReadResourceResult>;
 ```
 
-Defined in: [src/mcp/client.ts:833](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L833)
+Defined in: [src/mcp/client.ts:831](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L831)
 
 Reads a resource from the server.
 
@@ -466,7 +466,7 @@ Error when an earlier connect attempt failed with `continueOnError` set. Call `c
 listResourceTemplates(options?): Promise<ListResourceTemplatesResult>;
 ```
 
-Defined in: [src/mcp/client.ts:850](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L850)
+Defined in: [src/mcp/client.ts:848](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L848)
 
 Lists the resource templates available on the server.
 
@@ -500,7 +500,7 @@ callTool(
 ): Promise<JSONValue>;
 ```
 
-Defined in: [src/mcp/client.ts:869](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L869)
+Defined in: [src/mcp/client.ts:867](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L867)
 
 Invoke a tool on the connected MCP server using an McpTool instance.
 
@@ -540,7 +540,7 @@ submitTool(
 ): Promise<any>;
 ```
 
-Defined in: [src/mcp/client.ts:912](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L912)
+Defined in: [src/mcp/client.ts:910](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L910)
 
 Invokes a tool once and returns either its direct result or a server-created task handle.
 
@@ -568,7 +568,7 @@ The direct tool result or task handle returned by the server.
 getTask(taskId, options?): Promise<McpGetTaskResult>;
 ```
 
-Defined in: [src/mcp/client.ts:961](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L961)
+Defined in: [src/mcp/client.ts:959](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L959)
 
 Retrieves the current state of a SEP-2663 task.
 
@@ -597,7 +597,7 @@ updateTask(
 ): Promise<McpUpdateTaskResult>;
 ```
 
-Defined in: [src/mcp/client.ts:982](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L982)
+Defined in: [src/mcp/client.ts:980](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L980)
 
 Supplies one or more responses to outstanding task input requests.
 
@@ -625,7 +625,7 @@ The server’s validated acknowledgement.
 cancelTask(taskId, options?): Promise<McpCancelTaskResult>;
 ```
 
-Defined in: [src/mcp/client.ts:1011](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L1011)
+Defined in: [src/mcp/client.ts:1009](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L1009)
 
 Requests cooperative cancellation of a SEP-2663 task.
 

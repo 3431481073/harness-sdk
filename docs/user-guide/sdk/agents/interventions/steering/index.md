@@ -24,12 +24,7 @@ Traditional prompting requires front-loading all instructions into a single prom
 
 To give the handler something to reason about, attach a provider that observes agent activity and records it as steering context.
 
-```mermaid
-flowchart LR
-    A[Hook Events] --> B[Context Providers]
-    B --> C[Update Steering Context]
-    C --> D[Handler Access]
-```
+> **Diagram:** Context population. The agent fires hook events. Context providers registered on the steering handler, such as the tool ledger, observe those events and record structured data into the handler's steering context. The handler reads the steering context when deciding whether to intervene.
 
 **Context providers** observe agent activity and contribute structured data into the handler’s steering context. The built-in tool ledger provider (`LedgerProvider``ToolLedgerProvider`) tracks tool call history, timing, and results. Steering handlers read from this context when deciding whether to intervene.
 
@@ -39,15 +34,7 @@ flowchart LR
 
 When you want the handler to validate a tool call before it runs, return a steering action from the before-tool-call moment:
 
-```mermaid
-flowchart LR
-    A[Tool Call Attempt] --> B[BeforeToolCallEvent]
-    B --> C[Handler Evaluates Call]
-    C --> D{Steering Action}
-    D -->|Approve| E[Tool Executes]
-    D -->|Guide| F[Cancel + Feedback]
-    D -->|Pause for Human| G[Human Input]
-```
+> **Diagram:** Steering before a tool call. The model's tool call reaches the steering handler on BeforeToolCallEvent, and the handler picks one of three outcomes. Proceed: the tool runs immediately. Guide: the tool call is cancelled and the agent gets the handler's feedback. Ask a human: execution pauses until a human approves or provides input.
 
 The handler returns one of three actions:
 
@@ -67,14 +54,7 @@ The handler returns one of three actions:
 
 When you want the handler to validate the model’s output before it reaches the user, return a steering action from the after-model-call moment:
 
-```mermaid
-flowchart LR
-    A[Model Response] --> B[AfterModelCallEvent]
-    B --> C[Handler Evaluates Output]
-    C --> D{Steering Action}
-    D -->|Approve| E[Response Accepted]
-    D -->|Guide| F[Discard + Retry]
-```
+> **Diagram:** Steering after a model response. The model's response reaches the steering handler on AfterModelCallEvent, and the handler picks one of two outcomes. Proceed: the response is accepted as-is. Guide: the response is discarded and the model retries with the guidance injected into the conversation.
 
 The handler returns one of two actions:
 
@@ -164,20 +144,7 @@ await agent.invoke('Email the client about the project delay')
 ```
 (( /tab "TypeScript" ))
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant A as Agent
-    participant S as Steering Handler
-    participant T as Tool
-
-    U->>A: "Send frustrated email to client"
-    A->>A: Reason about request
-    A->>S: Evaluate send_email tool call
-    S->>S: Evaluate tone in message
-    S->>A: Guide toward cheerful tone
-    A->>U: "Let me reframe this more positively..."
-```
+> **Diagram:** A typical run of the cheerful-email example, in two phases. First attempt: the user asks the agent to send a frustrated email; the agent calls the email tool and the LLM steering handler intercepts the call. The handler evaluates the message's tone against its system prompt and returns guide, so the call is cancelled and the agent receives guidance toward a cheerful tone. Retry: the agent calls the email tool again with cheerier wording; the handler returns proceed; the email tool sends the email; and the agent gives the user its final response.
 
 For best practices on writing steering prompts, see the [Agent Standard Operating Procedures (SOP)](https://github.com/strands-agents/agent-sop) framework.
 
@@ -350,7 +317,7 @@ await agent.invoke('Find contact info for Acme Corp and send them a proposal')
 
 -   [Interventions](/docs/user-guide/sdk/agents/interventions/index.md): the typed action model, lifecycle methods, evaluation order, and error handling
 -   [Plugins](/docs/user-guide/sdk/plugins/index.md): the Python interface steering handlers build on
--   [Hooks](/docs/user-guide/sdk/agents/hooks/index.md): low-level event callbacks that context providers subscribe to
+-   [Hooks](/docs/user-guide/sdk/agents/hooks/index.md): low-level event callbacks that context providers subscribe to rs subscribe to
 
 ## Related pages
 

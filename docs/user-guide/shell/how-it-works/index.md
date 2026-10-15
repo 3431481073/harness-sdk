@@ -19,22 +19,7 @@ This is a different tradeoff, not a strictly better one. A container isolates at
 
 Your code talks to the shell through one of three surfaces: an MCP server, the Python API, or the Node.js API. Every command, file read, and network request initiated inside Strands Shell flows through the Kernel, the single mediation boundary.
 
-```mermaid
-flowchart TB
-    agent["Your agent code"]
-    agent -->|"MCP, Python, or Node.js"| shell
-
-    subgraph shell ["Strands Shell"]
-        direction TB
-        subgraph kernel ["Kernel (mediation boundary)"]
-            vfs["VFS: isolated filesystem"]
-            net["Network: SSRF guard plus allowlist"]
-            creds["Credentials: injected per URL"]
-            limits["Limits: timeout, output, fds"]
-        end
-        engine["Shell engine: parser, builtins, commands, Lua"]
-    end
-```
+> **Diagram:** Your agent code calls Strands Shell through MCP, the Python API, or the Node.js API, and reaches the shell engine, which holds the parser, builtins, commands, and Lua. Every effect the engine has goes through the Kernel, the mediation boundary, which has four parts: the VFS, an isolated filesystem; Network, an SSRF guard plus an allowlist; Credentials, injected per URL; and Limits on timeout, output, and file descriptors. All of it runs in your process, with no container or VM.
 
 The engine parses and runs shell syntax. When a command needs to touch the outside world, it asks the Kernel, and the Kernel decides. The filesystem is an in-memory VFS with explicit bind mounts; network access goes through an SSRF guard that blocks private address ranges by default; credentials are injected per request and stripped before the agent can read them.
 

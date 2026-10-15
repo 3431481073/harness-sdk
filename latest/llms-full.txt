@@ -6971,34 +6971,7 @@ A box runs one **workload**, usually an agent harness such as the [Strands CLI](
 
 Policy sees what goes through Box. An agent’s own file tools, such as a harness’s built-in Read and Write tools, open files from the agent’s process: the sandbox grants bound what they reach, but no policy rule sees those reads and writes. To have the policy decide every file change, give the agent a shell as its only file tool. The [getting started guide](/docs/user-guide/box/getting-started/index.md) does this with the Strands CLI, the [Strands harness guide](/docs/user-guide/box/guides/run-strands-harness/index.md) with an agent you build, and the [Claude Code](/docs/user-guide/box/guides/run-claude-code/index.md) and [Codex CLI](/docs/user-guide/box/guides/run-codex-cli/index.md) guides do it for those harnesses.
 
-```mermaid
-flowchart LR
-    subgraph agentbox ["Agent's sandbox (operating system enforcement)"]
-        agent["Agent harness<br/>Strands CLI"]
-    end
-
-    subgraph trusted ["The box's trusted process"]
-        policy{{"Dogwood policy engine"}}
-        shell["Strands Shell and Monty"]
-        broker["MCP broker"]
-        gateway["Egress gateway<br/>TLS, credentials"]
-        records[("Decision records")]
-    end
-
-    subgraph leaves ["Separate sandboxes"]
-        tool["Tools: git, aws, cargo"]
-        mcp["Local MCP servers"]
-    end
-
-    agent -->|"bash, python"| shell
-    agent -->|"MCP"| broker
-    agent -->|"HTTP(S)"| gateway
-    shell -->|"shell:spawn"| tool
-    broker --> mcp
-    shell & broker & gateway -.->|"ask"| policy
-    policy -.-> records
-    gateway --> internet(("Allowed<br/>destinations"))
-```
+> **Diagram:** What a box contains. The agent harness, such as the Strands CLI, runs in the agent's sandbox. It acts through three parts of the box's trusted process: Strands Shell and Monty for bash and python, the egress gateway for HTTP and HTTPS traffic, and the MCP broker for MCP requests such as tools/list and tools/call. Each of the three asks the Dogwood policy engine, which decides each action and records each decision. The egress gateway handles TLS and credentials and forwards permitted HTTP and HTTPS requests to allowed destinations outside the box. When policy permits, the shell starts tools such as git or aws, and the broker starts local MCP servers. Each tool and each local MCP server runs in its own sandbox.
 
 ## Shared actions and history
 
@@ -7447,6 +7420,7 @@ rm -rf ~/box-tutorial
 - [Strands evaluation quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) (1 shared tag)
 - [Strands Shell quickstart](/docs/user-guide/shell/quickstart/index.md) (1 shared tag)
 - [TypeScript Quickstart](/docs/user-guide/sdk/quickstart/typescript/index.md) (1 shared tag)
+- [Use Strands with AI coding agents](/docs/user-guide/build-with-ai/index.md) (1 shared tag)
 - [Red teaming quickstart](/docs/user-guide/evals-sdk/red-teaming/quickstart/index.md) (1 shared tag)
 - [Build a Voice Agent](/docs/user-guide/sdk/bidi/quickstart/index.md) (1 shared tag)
 
@@ -11311,11 +11285,11 @@ When something unwanted happens, find the control that allowed it. If a direct g
 
 For multi-tenant deployments, run each session’s box inside its own VM or microVM, so the platform keeps tenants apart and a kernel exploit stays inside one session.
 
-![In an illustrative hosted deployment, the platform separates tenant environments. Each environment contains trusted Box code outside the agent's sandbox and the sandboxes for tools and local MCP servers.](/_astro/security-platform.DpkWHWHf_Z13l73V.svg)
+> **Diagram:** An illustrative hosted deployment, in which the platform separates tenant environments. Tenant A's environment contains the trusted Box process, which runs outside every sandbox, plus the agent's sandbox, holding the agent and its native children, and the sandboxes for tools and local MCP servers, one for each. Tenant B's environment holds another box with the same layout. The platform keeps tenants apart; Box supplies no isolation between them. Verify the selected platform's guarantees.
 
 ## How Box enforces your configuration
 
-![The agent runs in its sandbox, which the operating system enforces, while Box's request handlers and policy engine run outside it. Direct file access uses OS grants. Requests through Box use policy.](/_astro/security-enforcement.BcFMrURg_guw9m.svg)
+> **Diagram:** How Box enforces your configuration on macOS. Inside the surrounding operating system, the agent process and its native children run in the agent's sandbox, which the operating system enforces. Box's request handlers (Strands Shell, Monty, and the egress gateway) and its policy engine run outside it, in the trusted Box process. The agent reaches files in the surrounding OS directly, and the operating system checks those accesses against its grants. Everything else it sends as requests through Box: the request handlers ask the policy engine and the policy engine decides each request. The handlers then carry out only permitted file operations on the surrounding OS, and send only permitted network requests through the egress gateway to a remote service. An allowed request doesn't contain the remote service.
 
 -   **Operating system enforcement.** The operating system limits each process’s own system calls to the paths `box.toml` grants it. Box prints the agent’s and each tool’s grants on stderr before the agent starts. A local MCP server’s sandbox is applied when it starts, and isn’t printed. Nor is the sandbox of a program that runs under one of the agent’s `exec` entries with no tool table.
 -   **Refusals.** Box refuses to start a box on a platform it doesn’t support, and stops the run when the policy doesn’t load. An error while evaluating a rule denies the action.
@@ -11475,6 +11449,73 @@ Prefer a tool table when a program needs files the agent shouldn’t have. Prefe
 -   [Binaries](https://github.com/strands-agents/box/blob/main/docs/design/binaries.md): `strands-box`, the trampoline, and the alias.
 
 Source: https://strandsagents.com/docs/user-guide/box/security/agent-and-tool-containment/index.md
+
+---
+
+## Use Strands with AI coding agents
+
+Use the Strands plugin when you want your AI coding agent to evaluate or implement an agent loop. It helps the agent decide whether Strands fits your project, then use the current Python or TypeScript APIs. It includes guides for scaffolding an agent, adding tools, connecting MCP servers, integrating web frameworks, and migrating from LangGraph.
+
+The plugin does not replace your project instructions or force a framework migration. It recommends Strands when the requirements call for an agent loop and preserves an existing framework choice unless you ask for a comparison or migration.
+
+## How do I install it in Claude Code?
+
+Run these commands in Claude Code:
+
+```text
+/plugin marketplace add strands-agents/harness-sdk
+/plugin install strands@strands-agents
+```
+
+The Claude Code plugin also configures the optional local Strands documentation MCP server. You need [`uv`](https://docs.astral.sh/uv/) to run that server.
+
+## How do I install it in Codex?
+
+Run:
+
+```bash
+codex plugin marketplace add strands-agents/harness-sdk
+codex plugin add strands@strands-agents
+```
+
+The Codex package installs the Strands skills without starting a local MCP server.
+
+## How do I install it in Cursor?
+
+1.  Open **Customize** in Cursor, then select **From GitHub Repository**.
+2.  Paste `https://github.com/strands-agents/harness-sdk`.
+3.  Select and install the `strands` plugin.
+
+Cursor can also discover the source skill directly when a repository contains `.agents/skills/strands/SKILL.md`.
+
+## How do I verify the install?
+
+Ask your coding agent:
+
+```text
+Should this repository use Strands for its agent loop? Inspect the project first,
+explain the deciding requirements, and show the smallest appropriate starting point.
+```
+
+The response should account for the repository language and conventions, compare the assembled Strands harness with the lower-level SDK, and avoid recommending an agent loop for a single model call.
+
+## How do I give the agent current Strands documentation?
+
+Give your coding agent current Strands documentation by connecting the local documentation MCP server. Claude Code gets it from the plugin. For Codex, Cursor, and other assistants, follow [Connect your AI coding assistant in the Python quickstart](/docs/user-guide/sdk/quickstart/python/index.md#connect-your-ai-coding-assistant) or [the TypeScript quickstart](/docs/user-guide/sdk/quickstart/typescript/index.md#connect-your-ai-coding-assistant).
+
+## Related pages
+
+- [Choosing an Agent Foundation](/docs/user-guide/migrate/choosing-an-agent-foundation/index.md) (1 shared tag)
+- [Get started](/docs/user-guide/sdk/quickstart/overview/index.md) (1 shared tag)
+- [Get started with Strands Box](/docs/user-guide/box/getting-started/index.md) (1 shared tag)
+- [Python Quickstart](/docs/user-guide/sdk/quickstart/python/index.md) (1 shared tag)
+- [Strands evaluation quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) (1 shared tag)
+- [Strands Shell quickstart](/docs/user-guide/shell/quickstart/index.md) (1 shared tag)
+- [TypeScript Quickstart](/docs/user-guide/sdk/quickstart/typescript/index.md) (1 shared tag)
+- [Red teaming quickstart](/docs/user-guide/evals-sdk/red-teaming/quickstart/index.md) (1 shared tag)
+- [Build a Voice Agent](/docs/user-guide/sdk/bidi/quickstart/index.md) (1 shared tag)
+
+Source: https://strandsagents.com/docs/user-guide/build-with-ai/index.md
 
 ---
 
@@ -12640,16 +12681,7 @@ See the [Session Diagnosis guide](/docs/user-guide/evals-sdk/detectors/diagnosis
 
 Detectors use a two-phase analysis pipeline:
 
-```mermaid
-flowchart TD
-    A[Session traces] --> B[1. Failure Detection]
-    B --> C[2. Root Cause Analysis]
-    C --> D[DiagnosisResult]
-
-    B -. "span_id, category,\nconfidence, evidence" .-> B
-    C -. "causality, propagation impact,\nfix recommendation" .-> C
-    D -. "failures[]\nroot_causes[]\nrecommendations[]" .-> D
-```
+> **Diagram:** The two-phase detector pipeline. Session traces (a Session) go to phase one, failure detection (detect_failures), which finds the failing spans. Its failures go to phase two, root cause analysis (analyze_root_cause), which explains why they happened. The failures and the root causes both land in one diagnosis result (DiagnosisResult), which also carries the deduplicated fix recommendations drawn from the root causes.
 
 Both phases handle large sessions that exceed LLM context limits through automatic chunking and merge strategies. Failure detection splits spans into overlapping chunks; root cause analysis first prunes to failure paths, then splits into per-trace windows.
 
@@ -19994,13 +20026,7 @@ Two pieces sit on either side of scoring.
 
 For a single case, the flow runs left to right: the task produces output and a trajectory, evaluators score them, and detectors diagnose any failures.
 
-```mermaid
-flowchart LR
-    A[Cases] --> B[Task runs the agent]
-    B --> C[Output and trajectory]
-    C --> D[Evaluators score]
-    C --> E[Detectors diagnose failures]
-```
+> **Diagram:** How one case flows through an experiment, which repeats it for every case. The case (an input and what you expect back) goes to the task, which runs your agent. The task's result (its output and, optionally, its trajectory) goes to the evaluators, which score it. When a case fails, the optional detectors read the task's trajectory and diagnose why it failed.
 
 The experiment repeats this for every case, then aggregates the scores into a report you can print, save, and compare against a later run.
 
@@ -21198,6 +21224,7 @@ You have a running evaluation. From here, a natural path forward:
 - [Python Quickstart](/docs/user-guide/sdk/quickstart/python/index.md) (1 shared tag)
 - [Strands Shell quickstart](/docs/user-guide/shell/quickstart/index.md) (1 shared tag)
 - [TypeScript Quickstart](/docs/user-guide/sdk/quickstart/typescript/index.md) (1 shared tag)
+- [Use Strands with AI coding agents](/docs/user-guide/build-with-ai/index.md) (1 shared tag)
 - [Red teaming quickstart](/docs/user-guide/evals-sdk/red-teaming/quickstart/index.md) (1 shared tag)
 - [Build a Voice Agent](/docs/user-guide/sdk/bidi/quickstart/index.md) (1 shared tag)
 
@@ -21303,15 +21330,7 @@ The [Quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) walks through e
 
 ## How it works
 
-```mermaid
-flowchart TD
-    A[RedTeamCase: risk category + actor goal] --> B[RedTeamExperiment]
-    G[Your Agent or MultiAgentBase] --> B
-    S[AttackStrategy: a published jailbreak technique] --> B
-    B --> C[Strategy drives the attack via TargetSession.invoke]
-    C --> D[AttackSuccessEvaluator scores the conversation 0.0-1.0]
-    D --> E[RedTeamReport: breaches by risk category and strategy]
-```
+> **Diagram:** How a red-team attack runs. For each case and strategy pair in a RedTeamExperiment, an adversarial case (a RedTeamCase with a risk category and an actor goal) is handed to an attack strategy (an AttackStrategy). Inside the attack loop, the strategy sends attack turns to your agent (an Agent or MultiAgentBase, reached through TargetSession.invoke) and reads its replies, and the strategy decides when to stop. The full conversation and tool trace then go to an LLM judge, the AttackSuccessEvaluator, which scores it from 0.0 to 1.0. The scores feed a breach report, the RedTeamReport, grouped by risk category and strategy.
 
 A strategy runs against the target one case at a time when you call `run_evaluations()`, and against the case x strategy cross-product in parallel (default `max_workers=5`) when you call `run_evaluations_async()`. Each strategy carries its own cheap in-loop “should I stop?” gate, but the authoritative breach verdict always comes from the `AttackSuccessEvaluator` over the full conversation and tool trace.
 
@@ -21841,9 +21860,9 @@ report.display()
 - [Strands evaluation quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) (1 shared tag)
 - [Strands Shell quickstart](/docs/user-guide/shell/quickstart/index.md) (1 shared tag)
 - [TypeScript Quickstart](/docs/user-guide/sdk/quickstart/typescript/index.md) (1 shared tag)
+- [Use Strands with AI coding agents](/docs/user-guide/build-with-ai/index.md) (1 shared tag)
 - [Attack strategies](/docs/user-guide/evals-sdk/red-teaming/strategies/index.md) (1 shared tag)
 - [Harmfulness evaluator](/docs/user-guide/evals-sdk/evaluators/harmfulness_evaluator/index.md) (1 shared tag)
-- [Reading the report](/docs/user-guide/evals-sdk/red-teaming/reading_the_report/index.md) (1 shared tag)
 
 Source: https://strandsagents.com/docs/user-guide/evals-sdk/red-teaming/quickstart/index.md
 
@@ -26030,10 +26049,706 @@ If you are moving off another framework rather than starting fresh, the [migrati
 - [Strands evaluation quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) (1 shared tag)
 - [Strands Shell quickstart](/docs/user-guide/shell/quickstart/index.md) (1 shared tag)
 - [TypeScript Quickstart](/docs/user-guide/sdk/quickstart/typescript/index.md) (1 shared tag)
+- [Use Strands with AI coding agents](/docs/user-guide/build-with-ai/index.md) (1 shared tag)
 - [Red teaming quickstart](/docs/user-guide/evals-sdk/red-teaming/quickstart/index.md) (1 shared tag)
 - [Build a Voice Agent](/docs/user-guide/sdk/bidi/quickstart/index.md) (1 shared tag)
 
 Source: https://strandsagents.com/docs/user-guide/migrate/choosing-an-agent-foundation/index.md
+
+---
+
+## Migrate from LangGraph
+
+If you currently have a LangGraph application, you can migrate it to Strands Agents without rewriting the code that calls your graph (your callers), and keep the same external IDs for persistence and resumption.
+
+This guide maps the two models concept for concept, then migrates a small example graph (three stages that research, analyze, and review a request) from its LangGraph form to a Strands equivalent. You’ll keep the same public entrypoint and external IDs, and port interrupts, run limits, and tracing to their Strands equivalents, with traces going to an existing OpenTelemetry backend.
+
+This guide assumes you are comfortable with LangGraph’s `StateGraph` and checkpointer model. For the Strands graph model itself, read the [Graph pattern](/docs/user-guide/sdk/multi-agent/graph/index.md) first.
+
+## How LangGraph concepts map to Strands
+
+A LangGraph agent is built from a few moving parts, and this migration guide maps each one onto its Strands counterpart. The sections that follow walk through the important changes to be aware of, ending with a full comparison table.
+
+Before getting started, let’s discuss two important differences for Strands: what a node is, and where state lives.
+
+### A node is an agent, not a function
+
+In LangGraph, a node is a plain function you write. It takes the state, does one thing (e.g., call a model, transform data, check a condition), returns an update, and control goes back to the graph. The reasoning, if any, is code you wrote.
+
+> **Diagram:** In LangGraph, each node is a function you write. Three nodes run in a line, research, then analysis, then review, and each is a plain function that takes the state, such as research(state), does one thing, returns an update, and hands control back to the graph. There is no loop inside a node.
+
+In Strands, a node is an agent that runs its own agent loop. When the node executes, it can reason, call tools, and iterate until it’s done, before handing off to the next node. A single Strands node therefore contains the kind of loop you would have written inside a LangGraph function.
+
+> **Diagram:** In Strands, each node is an agent. The same three nodes, research, then analysis, then review, are each an Agent, and each one loops on its own, reasoning and calling tools until it is done, before handing off to the next node.
+
+The practical rule when migrating: a LangGraph node that called a model becomes an agent, and a node that only did deterministic work (validating input, reshaping state) becomes a [custom node](/docs/user-guide/sdk/multi-agent/graph/index.md#custom-node-types), a callable added to the graph with no agent loop around it, so you don’t wrap pure logic in an unnecessary agent loop.
+
+### State is passed along edges, not shared
+
+State works differently. In LangGraph you define one shared state object, and every node reads from it and returns a partial update that a reducer merges back in. State is a single structure threaded through the entire graph, and the checkpointer snapshots that structure to persist it.
+
+> **Diagram:** In LangGraph, state is one shared object. The research, analysis, and review functions each read the state and return updates that are merged back into a single shared CaseState object, and a checkpointer such as SqliteSaver snapshots that object to persist it.
+
+Strands has no shared state object that nodes write to. Each node passes its output to the nodes that depend on it, and a session manager attached to the graph persists the run separately. Instead of one graph-wide state dict, each agent holds its own conversation for the duration of the run, and the session manager records the graph’s progress so an interrupted run can resume.
+
+> **Diagram:** In Strands, output flows along the edges and there is no shared state object. Research passes its output to analysis, and analysis passes its output to review; each agent keeps its own conversation. A session manager attached to the graph, keyed by the case ID, persists the graph's run state separately.
+
+In practice, you stop modeling state as a single typed object and let each agent carry its own context. The cutover requires no data migration: your public entrypoint and external IDs stay the same, and there is no checkpoint format to translate. Point the new session store at a fresh location and let it fill as cases run.
+
+Note
+
+Once your graph has a join (a node with more than one incoming edge), the Strands SDK behaves differently depending on the language. The Python SDK uses OR semantics, firing a node when any incoming edge from the completed batch is satisfied; TypeScript uses AND semantics, waiting for all incoming edges. See [Waiting for All Dependencies](/docs/user-guide/sdk/multi-agent/graph/index.md#waiting-for-all-dependencies) to make a Python join wait for every branch.
+
+With those in mind, most other LangGraph concepts have a direct Strands counterpart.
+
+| Concept | LangGraph | Strands |
+| --- | --- | --- |
+| Graph construction | `StateGraph`, `add_node``addNode`, `add_edge``addEdge`, `add_conditional_edges``addConditionalEdges` | `GraphBuilder``new Graph({ nodes, edges })` |
+| Entry point | `set_entry_point``setEntryPoint`, edge from `START` | `set_entry_point()``sources` |
+| Persistence | Checkpointer (`SqliteSaver`, `InMemorySaver``MemorySaver`) | session manager on the graph |
+| Tools | `@tool`, LangChain `bind_tools``bindTools`, `ToolNode`, `tools_condition``toolsCondition` | `Agent(tools=[...])``new Agent({ tools: [...] })` |
+| Interrupts | `interrupt()`, `interrupt_before``interruptBefore` | interrupts raised from a hook or a tool |
+| Run limits | `recursion_limit``recursionLimit` | invocation limits plus node caps (`set_max_node_executions()``maxSteps`) |
+| Streaming | `.stream()`, `astream_events` | `stream_async()``stream()` |
+| Tracing | LangSmith | OpenTelemetry via `StrandsTelemetry``setupTracer()` |
+
+## Set up the Strands SDK
+
+Before starting the migration, install the SDK:
+
+(( tab "Python" ))
+```bash
+pip install strands-agents
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```bash
+npm install @strands-agents/sdk
+```
+(( /tab "TypeScript" ))
+
+## Migrating an example graph
+
+The example for this guide is a small three-stage graph for handling a legal case: a research stage that gathers the facts, an analysis stage that weighs the options, and a review stage that recommends a decision. Each stage feeds the next. The snippets below are abbreviated; complete, runnable versions of both the LangGraph and the Strands programs are in the samples repository, for [Python](https://github.com/strands-agents/samples/tree/main/python/migration/langgraph) and [TypeScript](https://github.com/strands-agents/samples/tree/main/typescript/migration/langgraph). The pipeline is linear, so the migration is easier to follow, and the stages are the same in both frameworks.
+
+> **Diagram:** The example graph. A case prompt goes to the research stage, which gathers the facts. Research feeds the analysis stage, which weighs the options, and analysis feeds the review stage, which recommends a decision.
+
+The LangGraph version wires three node functions into a `StateGraph` and compiles it with a checkpointer, keyed per case by `thread_id`:
+
+(( tab "Python" ))
+```python
+import sqlite3
+from typing import Annotated, TypedDict
+
+from langchain_core.messages import AnyMessage
+from langchain_core.tools import tool
+from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph.graph import END, START, StateGraph
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode, tools_condition
+
+
+@tool
+def fetch_case_record(case_id: str) -> str:
+    """Fetch the filed record for a case."""
+    ...
+
+
+@tool
+def search_precedent(question: str) -> str:
+    """Search prior decisions for relevant precedent."""
+    ...
+
+
+class CaseState(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
+    prompt: str
+    research: str
+    analysis: str
+    review: str
+
+
+def research(state: CaseState) -> dict: ...
+def analysis(state: CaseState) -> dict: ...
+def review(state: CaseState) -> dict: ...
+
+
+builder = StateGraph(CaseState)
+builder.add_node("research", research)
+builder.add_node("research_tools", ToolNode([fetch_case_record]))
+builder.add_node("analysis", analysis)
+builder.add_node("analysis_tools", ToolNode([search_precedent]))
+builder.add_node("review", review)
+builder.add_edge(START, "research")
+builder.add_conditional_edges("research", tools_condition,
+                              {"tools": "research_tools", END: "analysis"})
+builder.add_edge("research_tools", "research")
+builder.add_conditional_edges("analysis", tools_condition,
+                              {"tools": "analysis_tools", END: "review"})
+builder.add_edge("analysis_tools", "analysis")
+builder.add_edge("review", END)
+
+conn = sqlite3.connect("cases.db", check_same_thread=False)
+graph = builder.compile(checkpointer=SqliteSaver(conn))
+
+
+# Entrypoint: this signature is what your callers use, and it stays the same
+def run_case(case_id: str, prompt: str):
+    # External ID: case_id keys the conversation, and becomes the Strands session id
+    config = {"configurable": {"thread_id": case_id}}
+    return graph.invoke({"prompt": prompt}, config)
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```typescript
+import { tool } from '@langchain/core/tools'
+import {
+  END,
+  MessagesValue,
+  START,
+  StateGraph,
+  StateSchema,
+  type GraphNode,
+} from '@langchain/langgraph'
+import { SqliteSaver } from '@langchain/langgraph-checkpoint-sqlite'
+import { ToolNode, toolsCondition } from '@langchain/langgraph/prebuilt'
+import { z } from 'zod'
+
+const fetchCaseRecord = tool(async ({ caseId }) => '...', {
+  name: 'fetch_case_record',
+  description: 'Fetch the filed record for a case.',
+  schema: z.object({ caseId: z.string() }),
+})
+
+const searchPrecedent = tool(async ({ question }) => '...', {
+  name: 'search_precedent',
+  description: 'Search prior decisions for relevant precedent.',
+  schema: z.object({ question: z.string() }),
+})
+
+const CaseState = new StateSchema({
+  messages: MessagesValue,
+  prompt: z.string(),
+  researchText: z.string(),
+  analysisText: z.string(),
+  reviewText: z.string(),
+})
+
+const research: GraphNode<typeof CaseState> = async (state) => ({/* ... */})
+const analysis: GraphNode<typeof CaseState> = async (state) => ({/* ... */})
+const review: GraphNode<typeof CaseState> = async (state) => ({/* ... */})
+
+const builder = new StateGraph(CaseState)
+  .addNode('research', research)
+  .addNode('research_tools', new ToolNode([fetchCaseRecord]))
+  .addNode('analysis', analysis)
+  .addNode('analysis_tools', new ToolNode([searchPrecedent]))
+  .addNode('review', review)
+  .addEdge(START, 'research')
+  .addConditionalEdges('research', toolsCondition, {
+    tools: 'research_tools',
+    [END]: 'analysis',
+  })
+  .addEdge('research_tools', 'research')
+  .addConditionalEdges('analysis', toolsCondition, {
+    tools: 'analysis_tools',
+    [END]: 'review',
+  })
+  .addEdge('analysis_tools', 'analysis')
+  .addEdge('review', END)
+
+const graph = builder.compile({ checkpointer: SqliteSaver.fromConnString('cases.db') })
+
+// Entrypoint: this signature is what your callers use, and it stays the same
+export async function runCase(caseId: string, prompt: string) {
+  // External ID: caseId keys the conversation, and becomes the Strands session id
+  const config = { configurable: { thread_id: caseId } }
+  return graph.invoke({ prompt }, config)
+}
+```
+(( /tab "TypeScript" ))
+
+Pay close attention to the highlighted lines above. Migrating without breaking your callers means holding both of them stable while you swap the internals:
+
+1.  Public function: keep the function your callers invoke unchanged. `run_case(case_id, prompt)``runCase(caseId, prompt)` keeps that exact signature, and only its body changes. Nothing that calls it has to change.
+    
+2.  External ID: keep the ID your callers already pass. Both frameworks use an ID to recognize that a call belongs to existing persisted state. LangGraph calls this a `thread_id`; Strands calls it a session ID. Pass the same `case_id``caseId` to Strands as the session ID, so callers do not change and a run interrupted in Strands resumes under the same ID. Strands session IDs must use only lowercase letters, digits, `_` and `-`. The TypeScript SDK rejects anything else; Python rejects only path separators. A `thread_id` outside that set has to be mapped before it becomes a session ID.
+    
+
+The Strands version keeps `run_case(case_id, prompt)``runCase(caseId, prompt)` intact. Each node becomes an agent with a system prompt, the pipeline edges stay the same, and the checkpointer becomes a session manager keyed by the case ID:
+
+(( tab "Python" ))
+```python
+from strands import Agent, tool
+from strands.multiagent import GraphBuilder
+from strands.session import FileSessionManager
+
+@tool
+def fetch_case_record(case_id: str) -> str:
+    """Fetch the filed record for a case.
+
+    Args:
+        case_id: Identifier of the case to fetch
+    """
+    return f"...filed record for {case_id}..."
+
+
+@tool
+def search_precedent(question: str) -> str:
+    """Search prior decisions for relevant precedent.
+
+    Args:
+        question: What to look for in prior decisions
+    """
+    return "...matching prior decisions..."
+
+
+# Entrypoint: same signature as the LangGraph version
+def run_case(case_id: str, prompt: str):
+    researcher = Agent(
+        name="research",
+        system_prompt="You gather the facts of the case.",
+        tools=[fetch_case_record],
+    )
+    analyst = Agent(
+        name="analysis",
+        system_prompt="You weigh the options.",
+        tools=[search_precedent],
+    )
+    reviewer = Agent(name="review", system_prompt="You recommend a decision.")
+
+    builder = GraphBuilder()
+    builder.add_node(researcher, "research")
+    builder.add_node(analyst, "analysis")
+    builder.add_node(reviewer, "review")
+    builder.add_edge("research", "analysis")
+    builder.add_edge("analysis", "review")
+    builder.set_entry_point("research")
+    builder.set_max_node_executions(10)
+
+    # case_id is the session id: an interrupted graph resumes from it on the next call
+    builder.set_session_manager(
+        FileSessionManager(session_id=case_id, storage_dir="./cases/")
+    )
+    # The task text is what the model sees, so the case id is prefixed onto it.
+    return builder.build()(f"Case {case_id}: {prompt}")
+
+
+result = run_case("case-4127", "Assess the dispute and recommend a decision.")
+print(f"Status: {result.status}")
+print(f"Order: {[node.node_id for node in result.execution_order]}")
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```typescript
+import { Agent, Graph, SessionManager, tool } from '@strands-agents/sdk'
+import { LocalFileStorage } from '@strands-agents/sdk/storage'
+import { z } from 'zod'
+
+const fetchCaseRecord = tool({
+  name: 'fetch_case_record',
+  description: 'Fetch the filed record for a case',
+  inputSchema: z.object({
+    caseId: z.string().describe('Identifier of the case to fetch'),
+  }),
+  callback: (input) => `...filed record for ${input.caseId}...`,
+})
+
+const searchPrecedent = tool({
+  name: 'search_precedent',
+  description: 'Search prior decisions for relevant precedent',
+  inputSchema: z.object({
+    question: z.string().describe('What to look for in prior decisions'),
+  }),
+  callback: () => '...matching prior decisions...',
+})
+
+// Same public entrypoint your callers already use
+async function runCase(caseId: string, prompt: string) {
+  const researcher = new Agent({
+    id: 'research',
+    systemPrompt: 'You gather the facts of the case.',
+    tools: [fetchCaseRecord],
+  })
+  const analyst = new Agent({
+    id: 'analysis',
+    systemPrompt: 'You weigh the options.',
+    tools: [searchPrecedent],
+  })
+  const reviewer = new Agent({
+    id: 'review',
+    systemPrompt: 'You recommend a decision.',
+  })
+
+  const graph = new Graph({
+    nodes: [researcher, analyst, reviewer],
+    edges: [
+      ['research', 'analysis'],
+      ['analysis', 'review'],
+    ],
+    sources: ['research'],
+    maxSteps: 10,
+    // caseId is the session id: an interrupted graph resumes from it on the next call
+    sessionManager: new SessionManager({
+      sessionId: caseId,
+      storage: new LocalFileStorage('./cases/'),
+    }),
+  })
+  // The task text is what the model sees, so the case id is prefixed onto it.
+  return graph.invoke(`Case ${caseId}: ${prompt}`)
+}
+
+const result = await runCase(
+  'case-4127',
+  'Assess the dispute and recommend a decision.'
+)
+console.log('Status:', result.status)
+console.log('Order:', result.results.map((r) => r.nodeId).join(' -> '))
+```
+(( /tab "TypeScript" ))
+
+The result object reports the run status and which nodes ran, through `execution_order``results`, so you can assert the pipeline ran end to end. For conditional routing, give an edge a condition function, the equivalent of LangGraph’s `add_conditional_edges``addConditionalEdges`. For more information, see the [conditional edges documentation](/docs/user-guide/sdk/multi-agent/graph/index.md#conditional-edges).
+
+## Port your tools
+
+In LangGraph, tools sit outside the model call: you bind them to the model, execute them in a `ToolNode`, and route back with a `tools_condition``toolsCondition` edge, which adds a cycle to the graph. A Strands agent runs that loop itself, so the tools move onto the agent and both the tool node and its edges disappear.
+
+| Concept | LangGraph | Strands |
+| --- | --- | --- |
+| Define a tool | plain function, or `@tool from langchain_core.tools``tool() from @langchain/core/tools` | `@tool``tool()` |
+| Attach it | `bind_tools([...])``bindTools([...])` | `Agent(tools=[...])``new Agent({ tools: [...] })` |
+| Execute the call | `ToolNode` | the agent loop |
+| Route back to the model | `tools_condition``toolsCondition` edge | automatic |
+
+Not every node needs tools. The review stage above works from what the earlier stages produced, so it has none.
+
+(( tab "Python" ))
+Parameter descriptions start reaching the model
+
+LangChain parses a docstring’s `Args:` section only when you pass `parse_docstring=True`, and it defaults to `False`. Strands always parses it, so parameter descriptions your LangGraph tool never sent to the model will start being sent. That changes the tool schema the model sees.
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+Parameter descriptions reach the model the same way
+
+Both frameworks take the tool’s parameter schema from zod, so a `.describe()` on a field reaches the model the same way in each. The schema the model sees does not change.
+(( /tab "TypeScript" ))
+
+For class-based and module-format tools, see [Create custom tools](/docs/user-guide/sdk/tools/custom-tools/index.md).
+
+## Managing state and persistence
+
+LangGraph’s checkpointer serializes the shared state object per super-step, and because a node is a function that writes its messages into that state, saving the state saves the conversation with it. A Strands node is an agent running its own loop, so its messages belong to the agent rather than to the graph. Strands uses a session manager attached to the graph, so what it persists is the run: which nodes completed, what each one returned, and which are still pending. The conversation of a completed node is not kept. A node that stopped on an interrupt is the exception: its messages are saved with the run so that the node can pick up where it left off when the run resumes.
+
+In the migrated example above, we attached a session manager directly to the graph:
+
+(( tab "Python" ))
+```python
+builder.set_session_manager(
+    FileSessionManager(session_id=case_id, storage_dir="./cases/")
+)
+```
+
+Attach a `FileSessionManager`, `S3SessionManager` or `SnapshotSessionManager` (with a `storage` argument) to the graph with `set_session_manager`. An agent inside the graph must **not** carry its own session manager; `add_node` raises `ValueError` if it does.
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```typescript
+import { LocalFileStorage } from '@strands-agents/sdk/storage'
+
+const graph = new Graph({
+  // ...nodes, edges, and sources
+  sessionManager: new SessionManager({
+    sessionId: caseId,
+    storage: new LocalFileStorage('./cases/'),
+  }),
+})
+```
+
+One `SessionManager` covers both single agents and graphs, and it is passed to the graph through the `sessionManager` field. A node agent may also carry its own `SessionManager`, in which case its conversation is persisted alongside the graph’s run. By default a graph node restores the agent to its pre-run state when it completes, so `agent.messages` is unchanged in memory and the persisted conversation lives only in the session store. Pass `preserveContext: true` on the node to let the agent accumulate state across executions instead.
+(( /tab "TypeScript" ))
+
+What that session manager saves decides what a repeat call sees. Take the same case run twice:
+
+(( tab "Python" ))
+```python
+run_case("case-4127", "Assess the dispute and recommend a decision.")
+run_case("case-4127", "Assess the dispute and recommend a decision.")
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```typescript
+await runCase('case-4127', 'Assess the dispute and recommend a decision.')
+await runCase('case-4127', 'Assess the dispute and recommend a decision.')
+```
+(( /tab "TypeScript" ))
+
+In LangGraph the second call starts with the first call’s `messages` already in `CaseState`, because the checkpointer restored them. In Strands the second call assesses the case again from research through review. The session store holds what each node returned last time, not the conversation that produced it, so every agent starts empty (in TypeScript, unless the node agent carries its own `SessionManager`). If a caller needs those earlier messages, keep them yourself and pass them in with `Agent(messages=...)``new Agent({ messages: ... })` when `run_case``runCase` rebuilds the graph.
+
+The two SDKs differ in what the second call keeps from the first. Python resets the stored run, so each call reports three node results. TypeScript restarts at the source nodes without clearing the restored run, so the step count and the results array carry over: for this three-node graph the second call reports six results, the third nine, and the fourth call with `maxSteps: 10` fails with `max steps reached`. A failed node result from an earlier call also stays in the array, and because the aggregate status reports failed when any result is failed, the run keeps reporting failed. For a clean repeat in TypeScript, use a new session ID for each call or delete the stored session first.
+
+The stored run does matter when the first call did not finish. If the process dies after research completes, the next call with that case ID reuses research’s result and runs only analysis and review. The restored node still appears in the result’s node list (`execution_order``results`), so check its tool calls rather than that list to confirm it was not re-run. Resumption works from a separate process, which is what lets an approval gate be answered elsewhere.
+
+Both frameworks leave concurrency to you. Neither takes a distributed lock. Strands’ built-in stores write without a lock and without a version check, so a write never detects that another writer has changed the same record. Two writers on the same session ID can overwrite each other’s turns, the last write wins, and neither call errors. Give each case its own session ID, run one live writer per case, and add locking in the backend or the caller if concurrent writers are possible. See [Sessions, agents, and concurrency](/docs/user-guide/sdk/agents/session-management/index.md#sessions-agents-and-concurrency) and [Storage](/docs/user-guide/sdk/storage/index.md) for backend configuration and tradeoffs.
+
+## Add approval gates with interrupts
+
+LangGraph pauses a run with `interrupt()` or `interrupt_before``interruptBefore`. Strands raises an interrupt from a hook or a tool, hands control back with the pending interrupt, and resumes when you pass a response. To gate a node in a graph, raise the interrupt from a `BeforeNodeCallEvent` hook and loop until the run stops interrupting:
+
+```python
+import json
+
+from strands import Agent
+from strands.hooks import BeforeNodeCallEvent, HookProvider, HookRegistry
+from strands.multiagent import GraphBuilder, Status
+
+
+class ReviewApproval(HookProvider):
+    def register_hooks(self, registry: HookRegistry, **kwargs) -> None:
+        registry.add_callback(BeforeNodeCallEvent, self.approve)
+
+    def approve(self, event: BeforeNodeCallEvent) -> None:
+        if event.node_id != "review":
+            return
+        # Pauses the run here and returns the caller's answer when it resumes
+        approval = event.interrupt("review-approval", reason={"node": event.node_id})
+        if approval.lower() != "y":
+            event.cancel_node = "Reviewer declined to proceed"
+
+
+builder = GraphBuilder()
+builder.add_node(Agent(name="analysis"), "analysis")
+builder.add_node(Agent(name="review"), "review")
+builder.add_edge("analysis", "review")
+builder.set_entry_point("analysis")
+builder.set_hook_providers([ReviewApproval()])
+graph = builder.build()
+
+result = graph("Assess the tenant dispute in the record.")
+while result.status == Status.INTERRUPTED:
+    responses = []
+    for interrupt in result.interrupts:
+        answer = input(f"Approve {interrupt.reason['node']}? (y/N): ")
+        responses.append(
+            {"interruptResponse": {"interruptId": interrupt.id, "response": answer}}
+        )
+    result = graph(responses)
+
+print(json.dumps(result.results["review"].result.message, indent=2))
+```
+
+TypeScript follows the same shape. You raise from a `BeforeNodeCallEvent` hook, check for the interrupted status, and resume with the responses. However the API differs in a few areas: hooks attach via `graph.addHook()` rather than a `HookProvider`, `event.interrupt()` takes an options object, cancelling a node is `event.cancel`, responses resume through `graph.invoke()` as `InterruptResponseContent` instances, and `result.results` is an array of node results carrying a `nodeId` rather than a dictionary keyed by node ID. For runnable examples in both languages, see [Interrupts in multi-agent systems](/docs/user-guide/sdk/interrupts-multi-agent/index.md).
+
+## Bound a run
+
+LangGraph gives you `recursion_limit``recursionLimit` to cap a run. Strands has no single setting that does the same, because a Strands node is an agent that runs its own loop. The graph counts the nodes it runs, but it cannot see what happens inside them, so one node execution can use any number of turns. That means there are two places to set a limit: on the graph, with a node cap and a timeout, and on agent calls you make yourself, with turn and token budgets. Agents inside a graph are bounded by the graph’s cap and timeout; the graph does not pass invocation limits to its nodes.
+
+### Node caps
+
+The main example above sets a node cap when it builds the graph. A timeout goes in the same place:
+
+(( tab "Python" ))
+```python
+# ...nodes and edges
+builder.set_max_node_executions(10)
+builder.set_execution_timeout(300)  # seconds, checked between batches
+builder.set_node_timeout(60)  # seconds, cancels a node that is still running
+```
+
+Python checks the execution timeout between batches of nodes, so it does not stop an agent that is already running. Set a node timeout as well to bound each node while it runs.
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```typescript
+const graph = new Graph({
+  // ...nodes, edges, and sources
+  maxSteps: 10,
+  timeout: 300_000, // milliseconds
+})
+```
+(( /tab "TypeScript" ))
+
+Without a node cap or an execution timeout, the SDK logs a warning that the graph has no execution limit.
+
+Because LangGraph executes a graph in super-steps, where every node scheduled together runs in parallel within a single step, the two counts are not equivalent. A node cap counts every node that runs, while `recursion_limit``recursionLimit` counts the steps. Reusing the same number will not give the same bound. TypeScript checks `maxSteps` as each node is scheduled. Python checks its cap between batches, so a parallel batch can carry the run past the configured value before it stops.
+
+When a run reaches the limit, LangGraph and Strands report it differently. LangGraph raises `GraphRecursionError`. Strands in Python completes the run and reports a failed status on the result when it next checks the cap; if the batch that exceeded the cap is the last one, the run reports completed. Strands in TypeScript throws a plain `Error` whose message reads `steps=<10> | max steps reached`, with no dedicated type to catch.
+
+### Invocation limits
+
+Invocation limits apply to a single agent call. Pass a budget for turns, output tokens, and total tokens:
+
+(( tab "Python" ))
+```python
+from strands import Agent
+
+agent = Agent()
+
+result = agent(
+    "Summarize the case file",
+    limits={"turns": 5, "output_tokens": 2000, "total_tokens": 10000},
+)
+
+if result.stop_reason == "limit_turns":
+    print("Hit turn budget")
+elif result.stop_reason == "limit_output_tokens":
+    print("Hit output budget")
+elif result.stop_reason == "limit_total_tokens":
+    print("Hit token budget")
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```typescript
+import { Agent } from '@strands-agents/sdk'
+
+const agent = new Agent()
+
+const result = await agent.invoke('Summarize the case file', {
+  limits: {
+    turns: 5,
+    outputTokens: 2000,
+    totalTokens: 10000,
+  },
+})
+
+if (result.stopReason === 'limitTurns') {
+  console.log('Hit turn budget')
+} else if (result.stopReason === 'limitOutputTokens') {
+  console.log('Hit output budget')
+} else if (result.stopReason === 'limitTotalTokens') {
+  console.log('Hit token budget')
+}
+```
+(( /tab "TypeScript" ))
+
+These are checked at turn boundaries rather than mid-response, so treat them as soft ceilings: tools already in flight finish, and a run can overshoot its token budget by one turn.
+
+### Cancellation
+
+To stop a run from outside, such as on a client disconnect or a timeout, pass a cancellation signal:
+
+(( tab "Python" ))
+```python
+import threading
+
+from strands import Agent
+
+agent = Agent()
+
+cancel_signal = threading.Event()
+threading.Timer(30.0, cancel_signal.set).start()  # fire the signal after 30s, bounding the run
+
+result = agent("Assess the case file", cancel_signal=cancel_signal)
+
+if result.stop_reason == "cancelled":
+    print("Run cancelled: exceeded time budget")
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```typescript
+import { Agent } from '@strands-agents/sdk'
+
+const agent = new Agent()
+
+// Cancel the run if it exceeds the time budget
+const result = await agent.invoke('Assess the case file', {
+  cancelSignal: AbortSignal.timeout(30_000),
+})
+
+if (result.stopReason === 'cancelled') {
+  console.log('Run cancelled: exceeded time budget')
+}
+```
+(( /tab "TypeScript" ))
+
+Every result carries a typed `result.stop_reason``result.stopReason` that tells you why the run ended. You compare it directly instead of matching on an error message. Python defines the values as a closed set; TypeScript names the same values but the type also admits other strings, so handle an unknown value rather than assuming the list is complete.
+
+Beyond the limit and cancellation values above, common reasons include `end_turn``endTurn` (the agent finished) and `guardrail_intervened``guardrailIntervened`. The three limit values mean the run used up the turns or tokens you allowed in `limits`. Nothing is raised and the run stops at a turn boundary. You can call the agent again with larger numbers. A single model response that hits the provider’s output cap is not reported as a stop reason: it raises `MaxTokensReachedException``MaxTokensError`. See [Stop reasons](/docs/user-guide/sdk/agents/agent-loop/index.md#stop-reasons).
+
+## Tracing
+
+If your LangGraph app reports to LangSmith, point Strands at the same OpenTelemetry backend instead. Strands emits spans predominantly under the OpenTelemetry GenAI semantic conventions (`gen_ai.*`), so any OTLP-compatible collector receives them.
+
+Install the tracing dependencies:
+
+(( tab "Python" ))
+```bash
+pip install 'strands-agents[otel]'
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```bash
+npm install @opentelemetry/api @opentelemetry/sdk-trace-node @opentelemetry/sdk-trace-base @opentelemetry/sdk-metrics @opentelemetry/resources @opentelemetry/exporter-trace-otlp-http @opentelemetry/exporter-metrics-otlp-http
+```
+
+Install the SDK before these packages. The SDK declares the versions it accepts, and installing them first can resolve to a newer release than the SDK allows.
+(( /tab "TypeScript" ))
+
+Point the exporter at your collector with the standard OpenTelemetry variables, the same ones a LangSmith OTLP setup uses:
+
+```bash
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://collector.example.com:4318"
+export OTEL_EXPORTER_OTLP_HEADERS="key1=value1,key2=value2"
+```
+
+Register a tracer provider once at startup. Tracing then turns on automatically. Attributes you pass to an agent are added to the spans that agent starts: in Python every span, in TypeScript the agent span, with graph and node spans carrying the attributes passed to the graph as a separate setting:
+
+(( tab "Python" ))
+```python
+from strands import Agent
+from strands.telemetry import StrandsTelemetry
+
+telemetry = StrandsTelemetry()
+telemetry.setup_otlp_exporter()     # export to your OTLP endpoint
+telemetry.setup_console_exporter()  # print spans to the console
+
+agent = Agent(
+    system_prompt="You review casework.",
+    trace_attributes={"case.id": "case-4127"},
+)
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```typescript
+import { Agent } from '@strands-agents/sdk'
+import { setupTracer } from '@strands-agents/sdk/telemetry'
+
+// Register a tracer provider once at startup
+setupTracer({
+  exporters: { otlp: true, console: true },
+})
+
+// Tracing turns on automatically; these attributes are added to this agent's span
+const agent = new Agent({
+  systemPrompt: 'You review casework.',
+  traceAttributes: { 'case.id': 'case-4127' },
+})
+```
+(( /tab "TypeScript" ))
+
+If a global tracer provider already exists in your process, Strands uses it and you can skip the setup call. See [Traces](/docs/user-guide/sdk/observability-evaluation/traces/index.md) for the full span structure and attribute list.
+
+## Verify the migration
+
+Before finalizing the migration, confirm the port preserved behavior:
+
+-   **The public API is unchanged.** Callers invoke the same entrypoint with the same arguments and the same external IDs.
+-   **Resumption works.** Stop a run partway, then call the entrypoint again with the same case ID. A restored node still appears in the result’s node list, so confirm resumption by checking that the completed node made no new tool calls. Calling twice after a successful run does not demonstrate resumption, because a completed graph starts again from the beginning.
+-   **Transcripts are equivalent.** Run representative cases through both systems and compare outputs for parity. Responses are non-deterministic, so check that each stage does its job rather than expecting identical text.
+-   **Bounds hold.** Trip a turn or token limit and confirm the run stops with the expected stop reason instead of running away.
+-   **Traces arrive.** Run one case and confirm spans reach your collector with the attributes you attached.
+
+The complete before and after programs for the example in this guide are in the samples repository, for [Python](https://github.com/strands-agents/samples/tree/main/python/migration/langgraph) and [TypeScript](https://github.com/strands-agents/samples/tree/main/typescript/migration/langgraph). Each pair runs the same two cases, so you can use them to try the checks above before applying them to your own graph.
+
+Source: https://strandsagents.com/docs/user-guide/migrate/langgraph/index.md
 
 ---
 
@@ -26073,13 +26788,7 @@ Set your `OPENAI_API_KEY` in the environment. For the model id, provider options
 
 The most common OpenAI app is a `while` loop around `chat.completions`: call the model, check for `tool_calls`, run each tool, append the results to `messages`, and call again until the model stops asking. You own the loop, the message bookkeeping, and every control that wraps it.
 
-```mermaid
-flowchart LR
-  A[Call the model] --> B{tool_calls?}
-  B -->|Yes| C[Run tools and append results]
-  C --> A
-  B -->|No| D[Return the message]
-```
+> **Diagram:** A hand-written OpenAI loop, all of which you own. The prompt goes to a call to the model with chat.completions.create(). If the response has tool_calls, your code runs the tools, appends the results to messages, and calls the model again. When the response has no tool_calls, your code returns the message.
 
 Strands *is* that loop, tested and maintained. You describe the tools and the model; the [agent loop](/docs/user-guide/sdk/agents/agent-loop/index.md) runs the call-tool-append cycle for you and returns when the model is done.
 
@@ -26511,19 +27220,7 @@ This is the foundational concept in the Strands Agents SDK, installed as `strand
 
 The agent loop operates on a simple principle: invoke the model, check if it wants to use a tool, execute the tool if so, then invoke the model again with the result. Repeat until the model produces a final response.
 
-```mermaid
-flowchart LR
-    A[Input & Context] --> Loop
-
-    subgraph Loop[" "]
-        direction TB
-        B["Reasoning (LLM)"] --> C["Tool Selection"]
-        C --> D["Tool Execution"]
-        D --> B
-    end
-
-    Loop --> E[Response]
-```
+> **Diagram:** The agent loop. A request goes to the model. While the model asks for tools, the agent runs them and sends the results back to the model; every pass adds to the conversation history. When the model makes no tool calls, its message becomes the response.
 
 The diagram shows the recursive structure at the heart of the loop. The model reasons, selects a tool, the tool executes, and the result feeds back into the model for another round of reasoning. This cycle continues until the model decides it has enough information to respond.
 
@@ -27530,10 +28227,10 @@ See the [SlidingWindowConversationManager](https://github.com/strands-agents/har
 - [Custom Strategies](/docs/user-guide/sdk/context-management/custom-strategies/index.md) (2 shared tags)
 - [Strategy Presets](/docs/user-guide/sdk/context-management/presets/index.md) (2 shared tags)
 - [Context Offloader](/docs/user-guide/sdk/plugins/context-offloader/index.md) (2 shared tags)
+- [Search Strategies](/docs/user-guide/sdk/storage/search-strategies/index.md) (1 shared tag)
 - [Storage](/docs/user-guide/sdk/storage/index.md) (1 shared tag)
 - [Context Injector](/docs/user-guide/sdk/plugins/context-injector/index.md) (1 shared tag)
 - [Coherence evaluator](/docs/user-guide/evals-sdk/evaluators/coherence_evaluator/index.md) (1 shared tag)
-- [Conciseness evaluator](/docs/user-guide/evals-sdk/evaluators/conciseness_evaluator/index.md) (1 shared tag)
 
 
 ## Implementation
@@ -28987,95 +29684,11 @@ A hook callback subscribes to a specific event type and runs when that event fir
 The following diagram shows when hook events are emitted during a typical agent invocation where tools are invoked:
 
 (( tab "Python" ))
-```mermaid
-flowchart LR
- subgraph Start["Request Start Events"]
-    direction TB
-        BeforeInvocationEvent["BeforeInvocationEvent"]
-        StartMessage["MessageAddedEvent"]
-        BeforeInvocationEvent --> StartMessage
-  end
- subgraph Model["Model Events"]
-    direction TB
-        BeforeModelCallEvent["BeforeModelCallEvent"]
-        AfterModelCallEvent["AfterModelCallEvent"]
-        ModelMessage["MessageAddedEvent"]
-        BeforeModelCallEvent --> AfterModelCallEvent
-        AfterModelCallEvent --> ModelMessage
-  end
-  subgraph Tool["Tool Events"]
-    direction TB
-        BeforeToolsEvent["BeforeToolsEvent"]
-        BeforeToolCallEvent["BeforeToolCallEvent"]
-        AfterToolCallEvent["AfterToolCallEvent"]
-        AfterToolsEvent["AfterToolsEvent"]
-        ToolMessage["MessageAddedEvent"]
-        BeforeToolsEvent --> BeforeToolCallEvent
-        BeforeToolCallEvent --> AfterToolCallEvent
-        AfterToolCallEvent --> AfterToolsEvent
-        AfterToolsEvent --> ToolMessage
-  end
-  subgraph End["Request End Events"]
-    direction TB
-        AfterInvocationEvent["AfterInvocationEvent"]
-  end
-Start --> Model
-Model <--> Tool
-Tool --> End
-```
+> **Diagram:** Hook events in a single-agent invocation, in Python. Each stage groups its events in firing order. Request start: BeforeInvocationEvent, then MessageAddedEvent for the user's prompt. Then the agent loop. Model call: BeforeModelCallEvent, AfterModelCallEvent, then MessageAddedEvent for the model's message. If the model makes tool calls, tool execution runs: BeforeToolsEvent; then, for each tool call, BeforeToolCallEvent and AfterToolCallEvent; then AfterToolsEvent and MessageAddedEvent for the tool results, which go back to the model for the next model call. When the model makes no tool calls, the loop exits to request end: AfterInvocationEvent.
 (( /tab "Python" ))
 
 (( tab "TypeScript" ))
-```mermaid
-flowchart LR
- subgraph Start["Request Start Events"]
-    direction TB
-        BeforeInvocationEvent["BeforeInvocationEvent"]
-        StartMessage["MessageAddedEvent"]
-        BeforeInvocationEvent --> StartMessage
-  end
- subgraph Model["Model Events"]
-    direction TB
-        BeforeModelCallEvent["BeforeModelCallEvent"]
-        ModelStreamUpdateEvent["ModelStreamUpdateEvent"]
-        ContentBlockEvent["ContentBlockEvent"]
-        ModelMessageEvent["ModelMessageEvent"]
-        AfterModelCallEvent["AfterModelCallEvent"]
-        ModelMessage["MessageAddedEvent"]
-        BeforeModelCallEvent --> ModelStreamUpdateEvent
-        ModelStreamUpdateEvent --> ContentBlockEvent
-        ContentBlockEvent --> ModelMessageEvent
-        ModelMessageEvent --> AfterModelCallEvent
-        AfterModelCallEvent --> ModelMessage
-  end
-  subgraph Tool["Tool Events"]
-    direction TB
-        BeforeToolsEvent["BeforeToolsEvent"]
-        BeforeToolCallEvent["BeforeToolCallEvent"]
-        ToolStreamUpdateEvent["ToolStreamUpdateEvent"]
-        ToolResultEvent["ToolResultEvent"]
-        AfterToolCallEvent["AfterToolCallEvent"]
-        AfterToolsEvent["AfterToolsEvent"]
-        ToolMessage["MessageAddedEvent"]
-        BeforeToolsEvent --> BeforeToolCallEvent
-        BeforeToolCallEvent --> ToolStreamUpdateEvent
-        ToolStreamUpdateEvent --> ToolResultEvent
-        ToolResultEvent --> AfterToolCallEvent
-        AfterToolCallEvent --> AfterToolsEvent
-        AfterToolsEvent --> ToolMessage
-  end
-  subgraph End["Request End Events"]
-    direction TB
-        AgentResultEvent["AgentResultEvent"]
-        AfterInvocationEvent["AfterInvocationEvent"]
-        InterruptEvent["InterruptEvent"]
-        AgentResultEvent --> AfterInvocationEvent
-        InterruptEvent --> AfterInvocationEvent
-  end
-Start --> Model
-Model <--> Tool
-Tool --> End
-```
+> **Diagram:** Hook events in a single-agent invocation, in TypeScript. Each stage groups its events in firing order. Request start: BeforeInvocationEvent, then MessageAddedEvent for the user's prompt. Then the agent loop. Model call: BeforeModelCallEvent, then ModelStreamUpdateEvent and ContentBlockEvent while the response streams, ModelMessageEvent, and AfterModelCallEvent. If the model makes tool calls, tool execution runs: BeforeToolsEvent; then, for each tool call, BeforeToolCallEvent, ToolStreamUpdateEvent, AfterToolCallEvent, and ToolResultEvent; then AfterToolsEvent, MessageAddedEvent for the model's message, and MessageAddedEvent for the tool results, which go back to the model for the next model call. When the model makes no tool calls, MessageAddedEvent fires for the model's message as the loop exits, and the request ends: AfterInvocationEvent, then AgentResultEvent. If tool execution is interrupted, InterruptEvent fires once per unanswered interrupt before the request ends.
 (( /tab "TypeScript" ))
 
 ### Multi-Agent Lifecycle
@@ -29083,59 +29696,11 @@ Tool --> End
 The following diagram shows when multi-agent hook events are emitted during orchestrator execution:
 
 (( tab "Python" ))
-```mermaid
-flowchart LR
-subgraph Init["Initialization"]
-    direction TB
-    MultiAgentInitializedEvent["MultiAgentInitializedEvent"]
-end
-subgraph Invocation["Invocation Lifecycle"]
-    direction TB
-    BeforeMultiAgentInvocationEvent["BeforeMultiAgentInvocationEvent"]
-    AfterMultiAgentInvocationEvent["AfterMultiAgentInvocationEvent"]
-    BeforeMultiAgentInvocationEvent --> NodeExecution
-    NodeExecution --> AfterMultiAgentInvocationEvent
-end
-subgraph NodeExecution["Node Execution (Repeated)"]
-    direction TB
-    BeforeNodeCallEvent["BeforeNodeCallEvent"]
-    AfterNodeCallEvent["AfterNodeCallEvent"]
-    BeforeNodeCallEvent --> AfterNodeCallEvent
-end
-Init --> Invocation
-```
+> **Diagram:** Multi-agent hook events, in Python. Each stage groups its events in firing order. Initialization, once when the orchestrator is initialized: MultiAgentInitializedEvent. Then, for each invocation: invocation start, BeforeMultiAgentInvocationEvent; node execution, BeforeNodeCallEvent and AfterNodeCallEvent for every node the orchestrator runs, repeating for the next node; and invocation end, AfterMultiAgentInvocationEvent.
 (( /tab "Python" ))
 
 (( tab "TypeScript" ))
-```mermaid
-flowchart LR
-subgraph Init["Initialization"]
-    direction TB
-    MultiAgentInitializedEvent["MultiAgentInitializedEvent"]
-end
-subgraph Invocation["Invocation Lifecycle"]
-    direction TB
-    BeforeMultiAgentInvocationEvent["BeforeMultiAgentInvocationEvent"]
-    AfterMultiAgentInvocationEvent["AfterMultiAgentInvocationEvent"]
-    MultiAgentResultEvent["MultiAgentResultEvent"]
-    BeforeMultiAgentInvocationEvent --> NodeExecution
-    NodeExecution --> AfterMultiAgentInvocationEvent
-    AfterMultiAgentInvocationEvent --> MultiAgentResultEvent
-end
-subgraph NodeExecution["Node Execution (Repeated)"]
-    direction TB
-    BeforeNodeCallEvent["BeforeNodeCallEvent"]
-    NodeStreamUpdateEvent["NodeStreamUpdateEvent"]
-    AfterNodeCallEvent["AfterNodeCallEvent"]
-    NodeResultEvent["NodeResultEvent"]
-    MultiAgentHandoffEvent["MultiAgentHandoffEvent"]
-    BeforeNodeCallEvent --> NodeStreamUpdateEvent
-    NodeStreamUpdateEvent --> AfterNodeCallEvent
-    AfterNodeCallEvent --> NodeResultEvent
-    NodeResultEvent --> MultiAgentHandoffEvent
-end
-Init --> Invocation
-```
+> **Diagram:** Multi-agent hook events, in TypeScript. Each stage groups its events in firing order. Initialization, once when the orchestrator is initialized: MultiAgentInitializedEvent. Then, for each invocation: invocation start, BeforeMultiAgentInvocationEvent; node execution, BeforeNodeCallEvent, NodeStreamUpdateEvent while the node streams, NodeResultEvent, and AfterNodeCallEvent for every node the orchestrator runs; when execution moves on to the next node, MultiAgentHandoffEvent fires and node execution repeats; and invocation end, AfterMultiAgentInvocationEvent, then MultiAgentResultEvent.
 (( /tab "TypeScript" ))
 
 ### Available Events
@@ -30607,18 +31172,7 @@ Pause the agent before it acts and let a person approve, edit, or reject a tool 
 
 The handler uses the [`confirm` action](/docs/user-guide/sdk/agents/interventions/index.md) to pause for human input. It builds on the SDK’s [interrupt mechanism](/docs/user-guide/sdk/interrupts/index.md) but abstracts away the manual interrupt/resume loop when you provide an `ask` option.
 
-```mermaid
-flowchart LR
-    A[Tool call] --> B{Allowed?}
-    B -->|Yes| C[Execute]
-    B -->|No| D{Trusted?}
-    D -->|Yes| C
-    D -->|No| G{Classifier?}
-    G -->|Safe| C
-    G -->|Risky/None| E{Human approves?}
-    E -->|Yes| C
-    E -->|No| F[Cancel]
-```
+> **Diagram:** How the handler decides on a tool call. If the tool is allowed or already trusted, it executes. Otherwise, if a classifier is configured and rates the call safe, it executes. If the classifier rates it risky, or there is no classifier, a human is asked: if they approve, the tool executes; if not, the call is cancelled. Negated tools (!name) always ask a human, and, when trust is enabled, a trust response approves the tool for the rest of the session.
 
 ## Usage
 
@@ -31122,12 +31676,7 @@ Traditional prompting requires front-loading all instructions into a single prom
 
 To give the handler something to reason about, attach a provider that observes agent activity and records it as steering context.
 
-```mermaid
-flowchart LR
-    A[Hook Events] --> B[Context Providers]
-    B --> C[Update Steering Context]
-    C --> D[Handler Access]
-```
+> **Diagram:** Context population. The agent fires hook events. Context providers registered on the steering handler, such as the tool ledger, observe those events and record structured data into the handler's steering context. The handler reads the steering context when deciding whether to intervene.
 
 **Context providers** observe agent activity and contribute structured data into the handler’s steering context. The built-in tool ledger provider (`LedgerProvider``ToolLedgerProvider`) tracks tool call history, timing, and results. Steering handlers read from this context when deciding whether to intervene.
 
@@ -31137,15 +31686,7 @@ flowchart LR
 
 When you want the handler to validate a tool call before it runs, return a steering action from the before-tool-call moment:
 
-```mermaid
-flowchart LR
-    A[Tool Call Attempt] --> B[BeforeToolCallEvent]
-    B --> C[Handler Evaluates Call]
-    C --> D{Steering Action}
-    D -->|Approve| E[Tool Executes]
-    D -->|Guide| F[Cancel + Feedback]
-    D -->|Pause for Human| G[Human Input]
-```
+> **Diagram:** Steering before a tool call. The model's tool call reaches the steering handler on BeforeToolCallEvent, and the handler picks one of three outcomes. Proceed: the tool runs immediately. Guide: the tool call is cancelled and the agent gets the handler's feedback. Ask a human: execution pauses until a human approves or provides input.
 
 The handler returns one of three actions:
 
@@ -31165,14 +31706,7 @@ The handler returns one of three actions:
 
 When you want the handler to validate the model’s output before it reaches the user, return a steering action from the after-model-call moment:
 
-```mermaid
-flowchart LR
-    A[Model Response] --> B[AfterModelCallEvent]
-    B --> C[Handler Evaluates Output]
-    C --> D{Steering Action}
-    D -->|Approve| E[Response Accepted]
-    D -->|Guide| F[Discard + Retry]
-```
+> **Diagram:** Steering after a model response. The model's response reaches the steering handler on AfterModelCallEvent, and the handler picks one of two outcomes. Proceed: the response is accepted as-is. Guide: the response is discarded and the model retries with the guidance injected into the conversation.
 
 The handler returns one of two actions:
 
@@ -31262,20 +31796,7 @@ await agent.invoke('Email the client about the project delay')
 ```
 (( /tab "TypeScript" ))
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant A as Agent
-    participant S as Steering Handler
-    participant T as Tool
-
-    U->>A: "Send frustrated email to client"
-    A->>A: Reason about request
-    A->>S: Evaluate send_email tool call
-    S->>S: Evaluate tone in message
-    S->>A: Guide toward cheerful tone
-    A->>U: "Let me reframe this more positively..."
-```
+> **Diagram:** A typical run of the cheerful-email example, in two phases. First attempt: the user asks the agent to send a frustrated email; the agent calls the email tool and the LLM steering handler intercepts the call. The handler evaluates the message's tone against its system prompt and returns guide, so the call is cancelled and the agent receives guidance toward a cheerful tone. Retry: the agent calls the email tool again with cheerier wording; the handler returns proceed; the email tool sends the email; and the agent gives the user its final response.
 
 For best practices on writing steering prompts, see the [Agent Standard Operating Procedures (SOP)](https://github.com/strands-agents/agent-sop) framework.
 
@@ -31448,7 +31969,7 @@ await agent.invoke('Find contact info for Acme Corp and send them a proposal')
 
 -   [Interventions](/docs/user-guide/sdk/agents/interventions/index.md): the typed action model, lifecycle methods, evaluation order, and error handling
 -   [Plugins](/docs/user-guide/sdk/plugins/index.md): the Python interface steering handlers build on
--   [Hooks](/docs/user-guide/sdk/agents/hooks/index.md): low-level event callbacks that context providers subscribe to
+-   [Hooks](/docs/user-guide/sdk/agents/hooks/index.md): low-level event callbacks that context providers subscribe to rs subscribe to
 
 ## Related pages
 
@@ -33087,6 +33608,7 @@ When implementing session persistence in your applications, consider these best 
 
 - [State Management](/docs/user-guide/sdk/agents/state/index.md) (3 shared tags)
 - [Session Management](/docs/user-guide/sdk/bidi/session-management/index.md) (2 shared tags)
+- [Search Strategies](/docs/user-guide/sdk/storage/search-strategies/index.md) (1 shared tag)
 - [Storage](/docs/user-guide/sdk/storage/index.md) (1 shared tag)
 - [OpenAI Responses API](/docs/user-guide/sdk/model-providers/openai-responses/index.md) (1 shared tag)
 - [Conversation Management](/docs/user-guide/sdk/agents/conversation-management/index.md) (1 shared tag)
@@ -33911,6 +34433,7 @@ For automatic persistence of agent state and conversation history across applica
 
 - [Persist state across sessions](/docs/user-guide/sdk/agents/session-management/index.md) (3 shared tags)
 - [Session Management](/docs/user-guide/sdk/bidi/session-management/index.md) (2 shared tags)
+- [Search Strategies](/docs/user-guide/sdk/storage/search-strategies/index.md) (1 shared tag)
 - [Storage](/docs/user-guide/sdk/storage/index.md) (1 shared tag)
 - [OpenAI Responses API](/docs/user-guide/sdk/model-providers/openai-responses/index.md) (1 shared tag)
 - [Conversation Management](/docs/user-guide/sdk/agents/conversation-management/index.md) (1 shared tag)
@@ -33935,23 +34458,7 @@ Source: https://strandsagents.com/docs/user-guide/sdk/agents/state/index.md
 
 Use structured output when your application needs an object with specific fields. Define a schema, pass it to the agent, and read the validated object from the result.
 
-(( tab "Python" ))
-```mermaid
-flowchart LR
-    A[Schema Definition] --> B[Agent Invocation]
-    B --> C[LLM] --> D[Validated Object]
-    D --> E["result.structured_output"]
-```
-(( /tab "Python" ))
-
-(( tab "TypeScript" ))
-```mermaid
-flowchart LR
-    A[Schema Definition] --> B[Agent Invocation]
-    B --> C[LLM] --> D[Validated Object]
-    D --> E["result.structuredOutput"]
-```
-(( /tab "TypeScript" ))
+> **Diagram:** How structured output works. Your schema is given to the model as a tool, inside the agent loop. The model calls the structured output tool, which validates the call's arguments against the schema. If validation fails, the errors go back to the model so it can retry. When the arguments are valid, the validated object is placed on the agent result.
 
 ## Basic Usage
 
@@ -34508,22 +35015,7 @@ In Strands, you build these applications with `BidiAgent`. It holds a persistent
 
 Here’s how the pieces connect:
 
-```mermaid
-flowchart LR
-    User((User))
-    Input[Input stream<br/>microphone, keyboard, app]
-    Output[Output stream<br/>speakers, screen, app]
-    Agent[BidiAgent]
-    Model[Realtime model]
-    Tools[Your tools]
-
-    User -- "speaks, types, sends" --> Input
-    Input --> Agent
-    Agent <--> Model
-    Agent <--> Tools
-    Agent --> Output
-    Output -- "hears, reads" --> User
-```
+> **Diagram:** How a BidiAgent conversation flows. The user speaks, types, or sends input into the input stream (microphone, keyboard, or app), which passes it to the BidiAgent. The BidiAgent sends that input to the realtime model, and the model streams its reply back to the agent. The agent passes the reply to the output stream (speakers, screen, or app), which delivers it to the user. The agent also sends tool calls to your tools, which run in the background and return results to the agent while the conversation continues in both directions, and it records the conversation history.
 
 -   **The input stream** captures what the user says, types, or sends and passes it to the agent.
 -   **The agent** sits in the middle, routing input to the model and replies to the output stream. It also runs your tools and records the conversation history.
@@ -35993,20 +36485,7 @@ export OTEL_EXPORTER_OTLP_HEADERS="key1=value1,key2=value2"
 
 The session span is the parent of the response, connection, restart, and tool spans. It starts a new trace when no recording span is active. When `BidiAgent` runs inside an instrumented request or a custom span, the session span joins that existing trace:
 
-```mermaid
-flowchart TB
-    S["bidi_session"]
-    C["bidi_connect"]
-    R1["bidi_response"]
-    T["execute_tool"]
-    R2["bidi_response"]
-    RS["bidi_connection_restart"]
-    S --> C
-    S --> R1
-    S --> T
-    S --> R2
-    S --> RS
-```
+> **Diagram:** A bidirectional streaming trace laid out over time. The bidi_session span, named with the agent name, covers the whole session. Every other span is its direct child: bidi_connect at the start, then a bidi_response and an execute_tool span named with the tool name that starts during that response and runs on into the next bidi_response. The trace then shows a bidi_connection_restart, which can happen mid-session; after a restart, bidi_response spans continue on the new connection. Because tool spans are children of the session rather than of a response, a tool span can overlap the responses around it.
 
 | Span | Covers |
 | --- | --- |
@@ -36493,9 +36972,9 @@ model = OpenAIRealtimeModel(
 - [Strands evaluation quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) (1 shared tag)
 - [Strands Shell quickstart](/docs/user-guide/shell/quickstart/index.md) (1 shared tag)
 - [TypeScript Quickstart](/docs/user-guide/sdk/quickstart/typescript/index.md) (1 shared tag)
+- [Use Strands with AI coding agents](/docs/user-guide/build-with-ai/index.md) (1 shared tag)
 - [BidiAgent](/docs/user-guide/sdk/bidi/agent/index.md) (1 shared tag)
 - [Bidirectional Streaming](/docs/user-guide/sdk/bidi/index.md) (1 shared tag)
-- [Bidirectional Streaming Models](/docs/user-guide/sdk/bidi/models/index.md) (1 shared tag)
 
 
 ## Implementation
@@ -36635,6 +37114,7 @@ For more on saving and restoring checkpoints, see [Immutable snapshots](/docs/us
 
 - [Persist state across sessions](/docs/user-guide/sdk/agents/session-management/index.md) (2 shared tags)
 - [State Management](/docs/user-guide/sdk/agents/state/index.md) (2 shared tags)
+- [Search Strategies](/docs/user-guide/sdk/storage/search-strategies/index.md) (1 shared tag)
 - [Storage](/docs/user-guide/sdk/storage/index.md) (1 shared tag)
 - [BidiAgent](/docs/user-guide/sdk/bidi/agent/index.md) (1 shared tag)
 - [Bidirectional Streaming](/docs/user-guide/sdk/bidi/index.md) (1 shared tag)
@@ -36642,7 +37122,6 @@ For more on saving and restoring checkpoints, see [Immutable snapshots](/docs/us
 - [Google Gemini Live](/docs/user-guide/sdk/bidi/models/google/index.md) (1 shared tag)
 - [I/O Streams](/docs/user-guide/sdk/bidi/io/index.md) (1 shared tag)
 - [Input Content](/docs/user-guide/sdk/bidi/content/index.md) (1 shared tag)
-- [Interrupts](/docs/user-guide/sdk/bidi/interrupts/index.md) (1 shared tag)
 
 
 ## Implementation
@@ -43036,19 +43515,7 @@ Source: https://strandsagents.com/docs/user-guide/sdk/experimental/agent-config/
 
 When your agent needs human approval or input before it continues, raise an interrupt. The agent stops its loop and hands control back to you along with the pending interrupt. You provide a response, and the agent resumes from the point where it stopped. You can raise interrupts from hook callbacks or from tool definitions. The general flow looks as follows:
 
-```mermaid
-flowchart TD
-    A[Invoke Agent] --> B[Execute Hook/Tool]
-    B --> C{Interrupts Raised?}
-    C -->|No| D[Continue Agent Loop]
-    C -->|Yes| E[Stop Agent Loop]
-    E --> F[Return Interrupts]
-    F --> G[Respond to Interrupts]
-    G --> H[Execute Hook/Tool with Responses]
-    H --> I{New Interrupts?}
-    I -->|Yes| E
-    I -->|No| D
-```
+> **Diagram:** Interrupt and resume. Your application sends a request to the agent, where a hook or tool runs. If it raises interrupts, the agent stops and returns them to your application, which collects a response for each one and resumes the agent with them. The hook or tool runs again with those responses; if it raises new interrupts, the cycle repeats. When no interrupts are raised, the agent loop continues.
 
 ## Hooks
 
@@ -52676,17 +53143,7 @@ This mirrors how a manager coordinates specialists on a team, each bringing focu
 
 Strands provides three ways to implement agents as tools: pass agents directly in the `tools` array for the simplest setup, use `.as_tool()``.asTool()` to customize tool name, description, or context behavior, and use the `@tool` decorator or `tool()` function for full control over how the agent is invoked.
 
-```mermaid
-flowchart TD
-    User([User]) <--> Orchestrator["Orchestrator Agent"]
-    Orchestrator --> RA["Research Assistant"]
-    Orchestrator --> PA["Product Recommendation Assistant"]
-    Orchestrator --> TA["Trip Planning Assistant"]
-
-    RA --> Orchestrator
-    PA --> Orchestrator
-    TA --> Orchestrator
-```
+> **Diagram:** Agents as tools. A user talks to an orchestrator agent, which calls three specialist agents as tools: research_assistant, product_recommendation_assistant, and trip_planning_assistant. Each specialist's answer returns to the orchestrator as a tool result; the orchestrator may call several specialists before it combines their answers and replies to the user.
 
 ### Passing agents directly
 
@@ -53228,13 +53685,7 @@ In a graph:
 5.  Entry points receive the original task as input
 6.  Nodes can be revisited in cyclic patterns with proper exit conditions
 
-```mermaid
-graph TD
-    A[Research Agent] --> B[Analysis Agent]
-    A --> C[Fact-Checking Agent]
-    B --> D[Report Agent]
-    C --> D
-```
+> **Diagram:** A graph with four agent nodes. The task goes to the entry point, the researcher node (research). Its output flows along two edges to the analyst node (analysis) and the fact checker node (fact_check). Both of their outputs flow along edges into the report writer node (report).
 
 ## Creating a Graph
 
@@ -53540,13 +53991,7 @@ console.log(result)
 
 Graphs support remote A2A agents as nodes through the [`A2AAgent`](/docs/user-guide/sdk/multi-agent/agent-to-agent/index.md#consuming-remote-agents) class. You can add it directly to a graph just like a local agent. This enables distributed architectures where orchestration happens locally while specialized tasks run on remote services.
 
-```mermaid
-graph TD
-    A[Local: Data Prep] --> B[Remote: ML Analysis]
-    A --> C[Remote: NLP Processing]
-    B --> D[Local: Report Writer]
-    C --> D
-```
+> **Diagram:** A graph that mixes local and remote nodes. The local data prep node (prep) feeds two remote A2A agents, ML analysis (ml) and NLP processing (nlp), which run on their own services. Both remote nodes feed the local report writer node (report).
 
 (( tab "Python" ))
 ```python
@@ -53943,10 +54388,7 @@ For detailed information about shared state, including examples and best practic
 
 ### 1\. Sequential Pipeline
 
-```mermaid
-graph LR
-    A[Research] --> B[Analysis] --> C[Review] --> D[Report]
-```
+> **Diagram:** A sequential pipeline of four nodes in a row: researcher (research), then analyst (analysis), then reviewer (review), then report writer (report). Each node runs after the one before it and receives its output.
 
 (( tab "Python" ))
 ```python
@@ -53977,15 +54419,7 @@ const graph = new Graph({
 
 ### 2\. Parallel Processing with Aggregation
 
-```mermaid
-graph TD
-    A[Coordinator] --> B[Worker 1]
-    A --> C[Worker 2]
-    A --> D[Worker 3]
-    B --> E[Aggregator]
-    C --> E
-    D --> E
-```
+> **Diagram:** Parallel processing with aggregation. The coordinator node (coordinator) has edges to three worker nodes (worker1, worker2, worker3), which run in parallel. Each worker has an edge to the aggregator node (aggregator), which combines their results.
 
 (( tab "Python" ))
 ```python
@@ -54023,13 +54457,7 @@ const graph = new Graph({
 
 ### 3\. Branching Logic
 
-```mermaid
-graph TD
-    A[Classifier] --> B[Technical Branch]
-    A --> C[Business Branch]
-    B --> D[Technical Report]
-    C --> E[Business Report]
-```
+> **Diagram:** Branching logic. The classifier node (classifier) has two conditional edges. If its output mentions 'technical', the graph runs the technical specialist (tech_specialist) and then the technical report (tech_report). If it mentions 'business', it runs the business specialist (business_specialist) and then the business report (business_report).
 
 (( tab "Python" ))
 ```python
@@ -54093,13 +54521,7 @@ const graph = new Graph({
 
 ### 4\. Feedback Loop
 
-```mermaid
-graph TD
-    A[Draft Writer] --> B[Reviewer]
-    B --> C{Quality Check}
-    C -->|Needs Revision| A
-    C -->|Approved| D[Publisher]
-```
+> **Diagram:** A feedback loop. The draft writer node (draft_writer) has an edge to the reviewer node (reviewer). The reviewer has two conditional edges: if the draft needs revision, it loops back to the draft writer; if it is approved, it goes on to the publisher node (publisher). The draft writer is the entry point, set explicitly because the loop gives every node an incoming edge. Execution limits stop the loop if the draft is never approved.
 
 (( tab "Python" ))
 ```python
@@ -54125,6 +54547,9 @@ builder.add_node(publisher, "publisher")
 builder.add_edge("draft_writer", "reviewer")
 builder.add_edge("reviewer", "draft_writer", condition=needs_revision)
 builder.add_edge("reviewer", "publisher", condition=is_approved)
+
+# The loop gives draft_writer an incoming edge, so set the entry point explicitly
+builder.set_entry_point("draft_writer")
 
 # Set execution limits to prevent infinite loops
 builder.set_max_node_executions(10)  # Maximum 10 node executions total
@@ -54160,6 +54585,8 @@ const graph = new Graph({
     { source: 'reviewer', target: 'draft_writer', handler: needsRevision },
     { source: 'reviewer', target: 'publisher', handler: isApproved },
   ],
+  // The loop gives draft_writer an incoming edge, so set the source explicitly
+  sources: ['draft_writer'],
   // Set execution limits to prevent infinite loops
   maxSteps: 10,
 })
@@ -54656,15 +55083,7 @@ A group of specialized agents handing work between themselves can cover a proble
 3.  Can access shared knowledge contributed by other agents
 4.  Can decide when to hand off to another agent with different expertise
 
-```mermaid
-graph TD
-    Researcher <--> Reviewer
-    Researcher <--> Architect
-    Reviewer <--> Architect
-    Coder <--> Researcher
-    Coder <--> Reviewer
-    Coder <--> Architect
-```
+> **Diagram:** One possible run of a swarm with four agents: researcher, architect, coder, and reviewer. The user's task goes to the researcher, the entry point. The researcher hands off to the architect, the architect hands off to the coder, and the coder hands off to the reviewer. Any agent can hand off to any other, and each handoff carries a message and optional context. The reviewer then replies without handing off, so the swarm ends and its message becomes the final response to the user.
 
 ## Creating a Swarm
 
@@ -55171,10 +55590,7 @@ Strands Agents SDK allows you to create workflows using existing Agent objects, 
 
 #### Sequential Workflow Architecture
 
-```mermaid
-graph LR
-    Agent1[Research Agent] --> Agent2[Analysis Agent] --> Agent3[Report Agent]
-```
+> **Diagram:** A sequential workflow. Your code takes a topic and calls three agents in turn: the research agent (researcher) finds key information, its findings go into the prompt for the analysis agent (analyst), which extracts insights, and those insights go into the prompt for the report writing agent (writer), which produces the final report.
 
 In a sequential workflow, agents process tasks in a defined order, with each agent’s output becoming the input for the next:
 
@@ -57581,32 +57997,24 @@ const debugPrintTool = new FunctionTool({
 
 ### What Happens on Attach
 
-When you attach a plugin to an agent, the following happens:
+When you create a plugin and attach it to an agent, the following happens:
 
 (( tab "Python" ))
-1.  **Discovery**: The `Plugin` base class scans for methods decorated with `@hook` and `@tool`
-2.  **Hook Registration**: Each `@hook` method is registered with the agent’s hook registry based on its event type hint
-3.  **Tool Registration**: Each `@tool` method is added to the agent’s tools list
-4.  **Initialization**: The `init_agent(agent)` method is called for any custom setup
+1.  **Discovery**: When the plugin is constructed, the `Plugin` base class scans for methods decorated with `@hook` and `@tool`
+2.  **Initialization**: The `init_agent(agent)` method is called for any custom setup
+3.  **Hook Registration**: Each `@hook` method is registered with the agent’s hook registry based on its event type hint
+4.  **Tool Registration**: Each `@tool` method is added to the agent’s tools list
 (( /tab "Python" ))
 
 (( tab "TypeScript" ))
-1.  **Tool Registration**: The `getTools()` method is called to get tools provided by the plugin
-2.  **Initialization**: The `initAgent(agent)` method is called for hook registration and setup
-3.  **Hook Registration**: In `initAgent`, use `agent.addHook()` to register event callbacks manually
+1.  **Initialization**: The `initAgent(agent)` method is called for hook registration and setup
+2.  **Hook Registration**: In `initAgent`, use `agent.addHook()` to register event callbacks manually
+3.  **Tool Registration**: The `getTools()` method is called to get tools provided by the plugin
 
 **Note**: TypeScript does not use `@hook` or `@tool` decorators. Instead, tools are returned from `getTools()` and hooks are registered manually in `initAgent()`.
 (( /tab "TypeScript" ))
 
-```mermaid
-flowchart TD
-    A[Plugin Attached] --> B["Discover Tools\n(@tool / getTools)"]
-    A --> C["Initialize\n(init_agent / initAgent)"]
-    B --> D[Add Tools]
-    C --> E["Register Hooks\n(@hook / addHook)"]
-    D --> F[Plugin Ready]
-    E --> F
-```
+> **Diagram:** What happens when you attach a plugin to an agent. The plugin's init method runs first and can set up the agent's primitives: its model, system prompt, and messages. The plugin's hooks go into the agent's hook registry, which fires them on lifecycle events, and its tools go last into the agent's tool registry, where the model can call them. In TypeScript there is no separate hook step: the init method registers hooks itself with agent.addHook().
 
 ### Registering Hooks in Plugins
 
@@ -57885,14 +58293,7 @@ GoalLoop handles all of that as a plugin. Define what “done” means, attach i
 
 ## How It Works
 
-```mermaid
-flowchart LR
-    A[invoke] --> B[Agent responds]
-    B --> C{Validate}
-    C -->|pass| D[Done]
-    C -->|fail| E[Inject feedback]
-    E --> B
-```
+> **Diagram:** The GoalLoop retry cycle. Your prompt goes to the agent, which produces a response. GoalLoop passes the response to the validator, either the built-in judge agent or your own function. If the validator fails the response and budget remains, its feedback goes back to the agent as a new user message and the agent responds again. The loop ends when the validator passes, or when the attempt limit or timeout runs out; either way, the last response is returned. The timeout is checked when each attempt finishes, before validation, so a late response is returned without being validated.
 
 1.  The agent processes the prompt and produces a response.
 2.  GoalLoop extracts the last assistant message and runs the validator.
@@ -58339,24 +58740,7 @@ Skills solve this by breaking instructions into self-contained packages. The age
 
 The `AgentSkills` plugin operates in three phases:
 
-```mermaid
-sequenceDiagram
-    participant D as Developer
-    participant P as AgentSkills Plugin
-    participant A as Agent
-    participant S as Skills Tool
-
-    D->>P: AgentSkills(skills=["./skills/pdf-processing"])
-    P->>P: Load skill metadata (name + description)
-    D->>A: Agent(plugins=[plugin])
-    P->>A: Inject metadata XML into system prompt
-
-    Note over A: Agent sees available skills<br/>in system prompt
-
-    A->>S: skills(skill_name="pdf-processing")
-    S->>A: Return full instructions + resource listing
-    Note over A: Agent follows skill instructions
-```
+> **Diagram:** How skills load. Discovery: the developer configures skill sources and registers the AgentSkills plugin, which injects only each skill's name and description into the agent's system prompt. Activation: when a task needs a skill, the agent calls the skills tool, which returns the full instructions and resource listing. Execution: the agent uses the skill.
 
 1.  **Discovery**: On initialization, the plugin reads skill metadata (name and description) and injects it as an XML block into the agent’s system prompt. The agent can see what skills are available without loading their full instructions.
     
@@ -58978,6 +59362,7 @@ The table below compares feature availability between the Python and TypeScript 
 - [Strands evaluation quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) (1 shared tag)
 - [Strands Shell quickstart](/docs/user-guide/shell/quickstart/index.md) (1 shared tag)
 - [TypeScript Quickstart](/docs/user-guide/sdk/quickstart/typescript/index.md) (1 shared tag)
+- [Use Strands with AI coding agents](/docs/user-guide/build-with-ai/index.md) (1 shared tag)
 - [Red teaming quickstart](/docs/user-guide/evals-sdk/red-teaming/quickstart/index.md) (1 shared tag)
 - [Build a Voice Agent](/docs/user-guide/sdk/bidi/quickstart/index.md) (1 shared tag)
 
@@ -59180,19 +59565,7 @@ Run it again. The model works out that counting letters is what `letter_counter`
 
 The agent decides when to call a tool based on the request, loops until it has an answer, and streams the response to your console.
 
-```mermaid
-flowchart LR
-    A[Input & Context] --> Loop
-
-    subgraph Loop[" "]
-        direction TB
-        B["Reasoning (LLM)"] --> C["Tool Selection"]
-        C --> D["Tool Execution"]
-        D --> B
-    end
-
-    Loop --> E[Response]
-```
+> **Diagram:** The agent loop behind the quickstart. Your prompt and the conversation history go to the model. While the model asks for tools, such as the letter counter you wrote or the file editor that ships with the SDK, the agent runs them and sends the results back to the model; every pass adds to the conversation history. When the model makes no more tool calls, its message becomes the response streamed to your console.
 
 Every invocation returns an [`AgentResult`](/docs/api/python/strands.agent.agent_result#AgentResult) carrying the run’s messages, metrics, and traces, so you can see which tools the agent called and why. The [Agent Loop](/docs/user-guide/sdk/agents/agent-loop/index.md) explains the cycle above, and [Observability](/docs/user-guide/sdk/observability-evaluation/observability/index.md) covers reading traces and metrics. To silence the streamed console output, pass `callback_handler=None` to the `Agent`.
 
@@ -59315,6 +59688,7 @@ You have a running agent with a tool. From here:
 - [Strands evaluation quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) (1 shared tag)
 - [Strands Shell quickstart](/docs/user-guide/shell/quickstart/index.md) (1 shared tag)
 - [TypeScript Quickstart](/docs/user-guide/sdk/quickstart/typescript/index.md) (1 shared tag)
+- [Use Strands with AI coding agents](/docs/user-guide/build-with-ai/index.md) (1 shared tag)
 - [Red teaming quickstart](/docs/user-guide/evals-sdk/red-teaming/quickstart/index.md) (1 shared tag)
 - [Build a Voice Agent](/docs/user-guide/sdk/bidi/quickstart/index.md) (1 shared tag)
 
@@ -59530,19 +59904,7 @@ The `tool()` function also accepts plain JSON Schema objects instead of Zod. See
 
 The agent decides when to call a tool based on the request, loops until it has an answer, and streams the response to your console.
 
-```mermaid
-flowchart LR
-    A[Input & Context] --> Loop
-
-    subgraph Loop[" "]
-        direction TB
-        B["Reasoning (LLM)"] --> C["Tool Selection"]
-        C --> D["Tool Execution"]
-        D --> B
-    end
-
-    Loop --> E[Response]
-```
+> **Diagram:** The agent loop behind the quickstart. Your prompt and the conversation history go to the model. While the model asks for tools, such as the letter counter you wrote or the file editor that ships with the SDK, the agent runs them and sends the results back to the model; every pass adds to the conversation history. When the model makes no more tool calls, its message becomes the response streamed to your console.
 
 Every invocation returns an `AgentResult` carrying the run’s messages, metrics, and traces. The [Agent Loop](/docs/user-guide/sdk/agents/agent-loop/index.md) explains the cycle above, and [Observability](/docs/user-guide/sdk/observability-evaluation/observability/index.md) covers reading traces and metrics. To silence the streamed console output, pass `printer: false` when creating the agent.
 
@@ -59664,6 +60026,7 @@ You have a running agent with a tool. From here:
 - [Python Quickstart](/docs/user-guide/sdk/quickstart/python/index.md) (1 shared tag)
 - [Strands evaluation quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) (1 shared tag)
 - [Strands Shell quickstart](/docs/user-guide/shell/quickstart/index.md) (1 shared tag)
+- [Use Strands with AI coding agents](/docs/user-guide/build-with-ai/index.md) (1 shared tag)
 - [Red teaming quickstart](/docs/user-guide/evals-sdk/red-teaming/quickstart/index.md) (1 shared tag)
 - [Build a Voice Agent](/docs/user-guide/sdk/bidi/quickstart/index.md) (1 shared tag)
 
@@ -60523,20 +60886,7 @@ There are two ways to think about sandboxed agents: running the entire agent *in
 
 Strands implements the second pattern. The agent process runs on your host and handles model calls, tools, hooks, and state. The sandbox is a pluggable backend that receives only execution operations via a standard interface.
 
-```mermaid
-flowchart LR
-    subgraph runtime["Agent runtime (your infrastructure)"]
-        L[Agent loop]
-        M[Model]
-        T["sandbox_shell /<br/>sandbox_file_editor"]
-        L --> M --> T
-    end
-    subgraph sb["Sandbox (execution environment you provision)"]
-        E[Command / file operation]
-    end
-    T -->|"execute, read_file, write_file"| E
-    E -->|"stdout, stderr, exit code"| T
-```
+> **Diagram:** The agent runtime and the sandbox. On your infrastructure, the agent handles model calls, hooks, and state, and calls the sandbox tools, such as the shell and file editor tools that the Docker and SSH sandboxes vend. Only execution operations, meaning shell commands, code, and file reads and writes, cross into the sandbox, an environment you provision such as Docker, SSH, or a custom backend. The sandbox sends the output back to the tools: stdout, stderr, and the exit code.
 
 All Sandbox implementations share the same abstract interface:
 
@@ -61129,6 +61479,10 @@ The simplest approach: pass a single storage backend to the Agent and let subsys
 
 (( tab "Python" ))
 ```python
+from strands import Agent
+from strands.session import SnapshotSessionManager
+from strands.storage import S3Storage
+
 storage = S3Storage("my-bucket", prefix="agents/prod/")
 
 agent = Agent(
@@ -61166,6 +61520,11 @@ When different subsystems need different backends, pass storage directly to the 
 
 (( tab "Python" ))
 ```python
+from strands import Agent
+from strands.session import SnapshotSessionManager
+from strands.storage import InMemoryStorage, S3Storage
+from strands.vended_plugins.context_offloader import ContextOffloader
+
 agent = Agent(
     session_manager=SnapshotSessionManager(
         "my-session", storage=S3Storage("my-bucket")
@@ -61211,10 +61570,12 @@ Python `SessionManager` is deprecated, and does not use the provided `Storage` p
 
 ### InMemoryStorage
 
-Data lives in process memory. No constructor arguments. Fast, zero-config, gone when the process exits.
+Data lives in process memory. No required constructor arguments. Fast, zero-config, gone when the process exits.
 
 (( tab "Python" ))
 ```python
+from strands.storage import InMemoryStorage
+
 storage = InMemoryStorage()
 ```
 (( /tab "Python" ))
@@ -61238,6 +61599,8 @@ Each key becomes a file under a base directory. Writes are atomic (temp file + r
 
 (( tab "Python" ))
 ```python
+from strands.storage import LocalFileStorage
+
 storage = LocalFileStorage("./my-data/")
 ```
 (( /tab "Python" ))
@@ -61265,6 +61628,8 @@ Stores data as objects in an S3 bucket. The AWS SDK loads lazily, so application
 
 (( tab "Python" ))
 ```python
+from strands.storage import S3Storage
+
 storage = S3Storage("my-bucket", prefix="agents/prod/")
 ```
 (( /tab "Python" ))
@@ -61324,12 +61689,14 @@ to claim your own prefix and avoid overlapping with other subsystems.
 
 ## Next steps
 
+-   [Search Strategies](/docs/user-guide/sdk/storage/search-strategies/index.md): plug in keyword, BM25, or custom search over stored content
 -   [Context Offloader](/docs/user-guide/sdk/plugins/context-offloader/index.md): offload large tool results
 -   [Session Management](/docs/user-guide/sdk/agents/session-management/index.md): persist conversations across restarts
 -   [Sandbox](/docs/user-guide/sdk/sandbox/index.md): route Storage I/O through a sandboxed environment
 
 ## Related pages
 
+- [Search Strategies](/docs/user-guide/sdk/storage/search-strategies/index.md) (1 shared tag)
 - [Conversation Management](/docs/user-guide/sdk/agents/conversation-management/index.md) (1 shared tag)
 - [Session Management](/docs/user-guide/sdk/bidi/session-management/index.md) (1 shared tag)
 - [Persist state across sessions](/docs/user-guide/sdk/agents/session-management/index.md) (1 shared tag)
@@ -61353,6 +61720,260 @@ to claim your own prefix and avoid overlapping with other subsystems.
 - [harness-sdk/strands-ts/src/storage/s3-storage.ts](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/storage/s3-storage.ts)
 
 Source: https://strandsagents.com/docs/user-guide/sdk/storage/index.md
+
+---
+
+## Search Strategies
+
+Storage backends expose a `search()``search()` method that delegates to a pluggable search strategy. A strategy implements the
+
+`SearchStrategy``SearchStrategy`
+
+protocol/interface: given a storage backend and a query string, it returns a ranked list of matching keys with relevance scores. Strategies that maintain an index use `index()``index()` to update incrementally on each write; strategies that search on the fly implement it as a no-opstrategies that search on the fly omit it.
+
+All shipped backends default to `KeywordSearchStrategy`. Pass a different strategy via the `search_strategy``searchStrategy` parameter on any built-in backend to override it.
+
+## KeywordSearchStrategy
+
+The default strategy shipped with both SDKs. Tokenizes the query into lowercased words, reads every key in storage, and scores each entry by the number of distinct query tokens that appear in the key and content. No index, embedding model, or external dependency required.
+
+(( tab "Python" ))
+```python
+from strands.storage import LocalFileStorage
+from strands.storage.search import KeywordSearchStrategy
+
+strategy = KeywordSearchStrategy()
+storage = LocalFileStorage("./my-data/")
+results = await strategy.search(
+    storage, "dark mode toggle"
+)
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```typescript
+import { KeywordSearchStrategy } from '@strands-agents/sdk/storage/search'
+import { LocalFileStorage } from '@strands-agents/sdk/storage'
+
+const storage = new LocalFileStorage('./my-data/')
+const results = await KeywordSearchStrategy.search(
+  storage,
+  'dark mode toggle',
+)
+```
+(( /tab "TypeScript" ))
+
+Because it reads every entry on each search, keyword search is best suited for small-to-medium stores (up to a few thousand keys). For larger stores, use the BM25 strategy.
+
+## BM25 search
+
+BM25 full-text search backed by a SQLite inverted index. Scores results by term frequency, inverse document frequency, and document length normalization, producing significantly better relevance ranking than keyword overlap for large stores. It works only with `LocalFileStorage`, because it keeps its index file on the host filesystem next to the storage directory. For the same reason it can’t be used with a sandboxed `LocalFileStorage`; use keyword search there, which works with every backend.
+
+(( tab "Python" ))
+`Bm25SearchStrategy` uses the built-in `sqlite3` FTS5 module, with no external dependencies. It indexes entries at write time and never re-scans storage, so only content written after the strategy is attached is searchable (there is no backfill).
+
+```python
+from strands.storage import LocalFileStorage
+from strands.storage.search import Bm25SearchStrategy
+
+strategy = Bm25SearchStrategy()
+storage = LocalFileStorage(
+    "./memory/", search_strategy=strategy
+)
+
+await storage.write(
+    "auth.md",
+    b"OAuth2 authentication flow",
+)
+results = await storage.search("authentication")
+
+await strategy.close()
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+`QmdSearchStrategy` uses [QMD](https://github.com/tobi/qmd) and re-indexes the storage directory on each search, so existing content is always searchable. It requires `@tobilu/qmd` as a peer dependency:
+
+```bash
+npm install @tobilu/qmd
+```
+
+```typescript
+import { QmdSearchStrategy } from '@strands-agents/sdk/storage/search/qmd'
+import { LocalFileStorage } from '@strands-agents/sdk/storage'
+
+const search = new QmdSearchStrategy()
+const storage = new LocalFileStorage('./memory/', {
+  searchStrategy: search,
+})
+
+await storage.write(
+  'auth.md',
+  new TextEncoder().encode(
+    'OAuth2 authentication flow',
+  ),
+)
+const results = await storage.search(
+  'authentication',
+)
+
+await search.close()
+```
+(( /tab "TypeScript" ))
+
+The strategy persists a SQLite database alongside the storage directory. Call `close()``close()` when the strategy is no longer needed to release the database connection.
+
+## Passing a strategy to a storage backend
+
+Every built-in backend (`InMemoryStorage`, `LocalFileStorage`, `S3Storage`) accepts a `search_strategy``searchStrategy` parameter. When set, writes automatically call the strategy’s `index()``index()` method, and `search()``search()` delegates to the strategy instead of the default keyword scan.
+
+(( tab "Python" ))
+```python
+from strands.storage import LocalFileStorage
+from strands.storage.search import Bm25SearchStrategy
+
+storage = LocalFileStorage(
+    "./memory/",
+    search_strategy=Bm25SearchStrategy(),
+)
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```typescript
+import { QmdSearchStrategy } from '@strands-agents/sdk/storage/search/qmd'
+import { LocalFileStorage } from '@strands-agents/sdk/storage'
+
+const storage = new LocalFileStorage('./memory/', {
+  searchStrategy: new QmdSearchStrategy(),
+})
+```
+(( /tab "TypeScript" ))
+
+## Writing a custom strategy
+
+To rank results your own way, implement
+
+`SearchStrategy``SearchStrategy`
+
+yourself. Its `search()``search()` method receives the storage backend and the query, and returns
+
+`StorageSearchResult``StorageSearchResult`
+
+entries (key, score, and optionally the stored bytes), best match first. Read entries through the storage passed in, using `list()``list()` and `read()``read()`, so the strategy works with every backend. When the search already read an entry’s bytes, include them in the result as `data` so callers don’t have to read the entry again.
+
+If your strategy keeps its own index, such as a vector store or a full-text index, update it in `index()``index()`. The backend calls it on every write with the key and the stored bytes.
+
+The example below ranks entries by how often the exact query phrase appears.
+
+(( tab "Python" ))
+`SearchStrategy` is a protocol, so any class with async `index()` and `search()` methods works without subclassing. `index()` is required; a strategy that searches on the fly implements it as a no-op.
+
+```python
+from typing import Any
+
+from strands.storage import InMemoryStorage, Storage
+from strands.storage.search import StorageSearchResult
+
+
+class PhraseSearchStrategy:
+    """Rank entries by how often the exact query phrase appears."""
+
+    async def index(
+        self, storage: Storage, key: str, data: bytes, **kwargs: Any
+    ) -> None:
+        pass  # Searches on the fly, so there is nothing to index.
+
+    async def search(
+        self, storage: Storage, query: str, **kwargs: Any
+    ) -> list[StorageSearchResult]:
+        phrase = query.strip().lower()
+        if not phrase:
+            return []
+        results = []
+        for key in await storage.list(""):
+            data = await storage.read(key)
+            if data is None:
+                continue
+            text = data.decode("utf-8", errors="replace")
+            count = text.lower().count(phrase)
+            if count:
+                results.append(
+                    StorageSearchResult(key=key, score=count, data=data)
+                )
+        results.sort(key=lambda result: result.score, reverse=True)
+        return results
+
+
+storage = InMemoryStorage(search_strategy=PhraseSearchStrategy())
+```
+
+To pass a strategy to a sandboxed `LocalFileStorage`, declare `requires_host_fs: Literal[False] = False` on the class, as `KeywordSearchStrategy` does. The type checker rejects a sandboxed `LocalFileStorage` with a strategy that doesn’t declare it. If your strategy reads or writes the host filesystem directly, declare `requires_host_fs: Literal[True] = True` instead, as `Bm25SearchStrategy` does, and `LocalFileStorage` raises `ValueError` when a sandbox is set.
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+Any object or class with a `search()` method works. `index()` is optional; a strategy that searches on the fly omits it.
+
+```typescript
+import { InMemoryStorage } from '@strands-agents/sdk/storage'
+import type { Storage } from '@strands-agents/sdk/storage'
+import type {
+  SearchStrategy,
+  StorageSearchResult,
+} from '@strands-agents/sdk/storage/search'
+
+// Rank entries by how often the exact query phrase appears.
+const phraseSearch: SearchStrategy = {
+  async search(
+    storage: Storage,
+    query: string,
+  ): Promise<StorageSearchResult[]> {
+    const phrase = query.trim().toLowerCase()
+    if (!phrase) return []
+    const results: StorageSearchResult[] = []
+    for (const key of await storage.list('')) {
+      const data = await storage.read(key)
+      if (!data) continue
+      const text = new TextDecoder().decode(data)
+      const count = text.toLowerCase().split(phrase).length - 1
+      if (count > 0) results.push({ key, score: count, data })
+    }
+    return results.sort((a, b) => b.score - a.score)
+  },
+}
+
+const storage = new InMemoryStorage({
+  searchStrategy: phraseSearch,
+})
+```
+
+If your strategy reads or writes the host filesystem directly instead of going through the storage, declare `readonly requiresHostFs = true` on it. `LocalFileStorage` then throws when a sandbox is set, as it does for `QmdSearchStrategy`.
+(( /tab "TypeScript" ))
+
+## Related pages
+
+- [Storage](/docs/user-guide/sdk/storage/index.md) (1 shared tag)
+- [Conversation Management](/docs/user-guide/sdk/agents/conversation-management/index.md) (1 shared tag)
+- [Session Management](/docs/user-guide/sdk/bidi/session-management/index.md) (1 shared tag)
+- [Persist state across sessions](/docs/user-guide/sdk/agents/session-management/index.md) (1 shared tag)
+- [State Management](/docs/user-guide/sdk/agents/state/index.md) (1 shared tag)
+
+
+## Implementation
+
+### Python
+
+- [harness-sdk/strands-py/src/strands/storage/search/types.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/types.py)
+- [harness-sdk/strands-py/src/strands/storage/search/keyword.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/keyword.py)
+- [harness-sdk/strands-py/src/strands/storage/search/bm25.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/bm25.py)
+
+### TypeScript
+
+- [harness-sdk/strands-ts/src/storage/search/types.ts](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/storage/search/types.ts)
+- [harness-sdk/strands-ts/src/storage/search/keyword.ts](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/storage/search/keyword.ts)
+- [harness-sdk/strands-ts/src/storage/search/qmd.ts](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/storage/search/qmd.ts)
+
+Source: https://strandsagents.com/docs/user-guide/sdk/storage/search-strategies/index.md
 
 ---
 
@@ -66377,22 +66998,7 @@ This is a different tradeoff, not a strictly better one. A container isolates at
 
 Your code talks to the shell through one of three surfaces: an MCP server, the Python API, or the Node.js API. Every command, file read, and network request initiated inside Strands Shell flows through the Kernel, the single mediation boundary.
 
-```mermaid
-flowchart TB
-    agent["Your agent code"]
-    agent -->|"MCP, Python, or Node.js"| shell
-
-    subgraph shell ["Strands Shell"]
-        direction TB
-        subgraph kernel ["Kernel (mediation boundary)"]
-            vfs["VFS: isolated filesystem"]
-            net["Network: SSRF guard plus allowlist"]
-            creds["Credentials: injected per URL"]
-            limits["Limits: timeout, output, fds"]
-        end
-        engine["Shell engine: parser, builtins, commands, Lua"]
-    end
-```
+> **Diagram:** Your agent code calls Strands Shell through MCP, the Python API, or the Node.js API, and reaches the shell engine, which holds the parser, builtins, commands, and Lua. Every effect the engine has goes through the Kernel, the mediation boundary, which has four parts: the VFS, an isolated filesystem; Network, an SSRF guard plus an allowlist; Credentials, injected per URL; and Limits on timeout, output, and file descriptors. All of it runs in your process, with no container or VM.
 
 The engine parses and runs shell syntax. When a command needs to touch the outside world, it asks the Kernel, and the Kernel decides. The filesystem is an in-memory VFS with explicit bind mounts; network access goes through an SSRF guard that blocks private address ranges by default; credentials are injected per request and stripped before the agent can read them.
 
@@ -66808,6 +67414,7 @@ You created a sandbox with exactly one host directory visible to it and ran a co
 - [Python Quickstart](/docs/user-guide/sdk/quickstart/python/index.md) (1 shared tag)
 - [Strands evaluation quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) (1 shared tag)
 - [TypeScript Quickstart](/docs/user-guide/sdk/quickstart/typescript/index.md) (1 shared tag)
+- [Use Strands with AI coding agents](/docs/user-guide/build-with-ai/index.md) (1 shared tag)
 - [Red teaming quickstart](/docs/user-guide/evals-sdk/red-teaming/quickstart/index.md) (1 shared tag)
 - [Build a Voice Agent](/docs/user-guide/sdk/bidi/quickstart/index.md) (1 shared tag)
 
@@ -67026,9 +67633,96 @@ Source: https://strandsagents.com/docs/user-guide/shell/shell-language/index.md
 
 ---
 
+## Strands Decider adds four Gemma 4 models
+
+Date: 2026-10-15T00:00:00.000Z
+Tags: Open Source, Announcement
+
+You’ve probably noticed a wave of smaller, purpose-built models appearing across the industry. That’s because not every agent decision needs a large, general-purpose LLM. For focused decisions like routing work, checking tool arguments, and applying guardrails, teams can choose a model size that fits their accuracy, latency, and deployment needs.
+
+That was the idea behind [Strands Decider 2B](/blog/introducing-strands-decider/index.md), the small, open source decision model we released earlier this month. That first release led to a practical question: how much model do you need for the decisions in your workflow? Today, we’re announcing E2B, E4B, 12B, and 26B-A4B, giving you four sizes within the Gemma 4 family to compare. The models and their evaluation artifacts are available now on [Hugging Face](https://huggingface.co/StrandsAgents).
+
+## Ask the same questions at every size
+
+All four models accept the same three question types, so you can switch sizes without rewriting the questions. Give the model some state, then ask:
+
+-   `noul` returns the probability that the answer is true
+-   `choice` selects one option and returns confidence and a probability for each option
+-   `score` returns an expected value, confidence, and a probability for each ordered label
+
+## How do the models compare?
+
+| Model | Gemma 4 base | JevBench v1 accuracy (231 tasks) | Brier | H100 median latency |
+| --- | --- | --- | --- | --- |
+| [E2B](https://huggingface.co/StrandsAgents/strands-decider-E2B-gemma4-v1-2610) | `google/gemma-4-E2B-it` | 180/231 (77.9%) | 0.313 | 102 ms |
+| [E4B](https://huggingface.co/StrandsAgents/strands-decider-E4B-gemma4-v1-2610) | `google/gemma-4-E4B-it` | 187/231 (81.0%) | 0.243 | 139 ms |
+| [12B](https://huggingface.co/StrandsAgents/strands-decider-12B-gemma4-v1-2610) | `google/gemma-4-12B-it` | 200/231 (86.6%) | 0.173 | 136 ms |
+| [26B-A4B](https://huggingface.co/StrandsAgents/strands-decider-26B-A4B-gemma4-v1-2610) | `google/gemma-4-26B-A4B-it` | 207/231 (89.6%) | 0.162 | 245 ms |
+
+Gemma 4 uses `E` for effective parameters. The [26B-A4B mixture-of-experts model](https://huggingface.co/google/gemma-4-26B-A4B-it) activates about 4B of its 26B parameters during inference. E4B and 12B use different architectures. Their H100 medians in this release run were close: 139 ms and 136 ms. Compare both on your own serving stack before drawing a general latency conclusion.
+
+![Scatter plot comparing JevBench accuracy and H100 median latency across the
+four Gemma 4 Decider
+models.](/_astro/gemma4-accuracy-latency.B0DYLJ6b_Z28eT7b.svg)
+
+*Figure 1: JevBench v1 accuracy and median latency per question on one NVIDIA H100 80 GB, as reported in the Strands Decider release results.*
+
+We evaluated all four models on [JevBench](https://benchmarkheaven.com/jev-models) v1’s 231 public tasks, using a 4,096-token window. JevBench now uses newer releases, so compare these numbers only with runs on the same task set. Higher accuracy and lower Brier scores are better. The [evaluation results](https://github.com/strands-labs/strands-decider/blob/0ac22a97e584f3ccf87cc9b8cc5fdbad57cdf534/evaluation/results.md#gemma-4-v1) and [Gemma 4 serving notes](https://github.com/strands-labs/strands-decider/blob/0ac22a97e584f3ccf87cc9b8cc5fdbad57cdf534/docs/inference.md#gemma-4-models) include the measurements and settings. Results vary with hardware, runtime, input length, and the number of questions per request.
+
+## Which model should you start with?
+
+Start by testing E2B on your workload. If it misses your target, try E4B and 12B before 26B-A4B.
+
+On JevBench, 12B scored 86.6%, about three points behind 26B-A4B at 89.6%. Its median latency in this run was 136 ms, compared with 245 ms for 26B-A4B. It also matched or beat the larger model on several other release evaluation sets. Measure end-to-end latency on your serving stack.
+
+## What changed from the first release
+
+The Gemma 4 models keep the first release’s three question types and LoRA-plus-pointer-head architecture. Each size has its own trained adapter and readout heads, while the loader downloads the corresponding Gemma base weights separately.
+
+The training set combines 123,339 rows from the [Hobson v21](https://huggingface.co/StrandsAgents/strands-decider-2B-hobson-v21) data recipe with 12,263 code-task rows. For each model, we trained three runs with different seeds and averaged their LoRA updates. At inference, each option score averages the three readout heads. We calibrated the resulting checkpoint.
+
+We used `Qwen/Qwen3.5-4B` output distributions as training targets when the teacher agreed with the gold label. Each model card lists the teacher, data inventory, training settings, provenance, and evaluation results.
+
+## Try a Gemma 4 Decider model
+
+Install version 0.2.0 or later of the `strands-decider` command line interface from PyPI. You’ll need Python 3.10 or later:
+
+```bash
+pip install "strands-decider>=0.2.0"
+```
+
+Ask `choice` and `noul` questions about the same customer message:
+
+```bash
+strands-decider ask StrandsAgents/strands-decider-E4B-gemma4-v1-2610 \
+  --state "Help! My payouts have been failing for 3 days!" \
+  --choice "Which team should handle this?=billing,sales,retail" \
+  --noul "Does this convey urgency?"
+```
+
+Swap the model ID to run the same decision with E2B, 12B, or 26B-A4B. The [inference guide](https://github.com/strands-labs/strands-decider/blob/main/docs/inference.md) covers Python loading and the local HTTP server.
+
+## Validate the decision on your workload
+
+Build a test set from your own decisions before choosing a model or threshold. Results depend on how you frame the state and question, which options you offer, and where you set the action threshold.
+
+The models may return the same answer when you change the question but keep the state and options fixed. They also struggle with long documents that require several reasoning steps. We fit the calibration temperatures on short, held-out classification tasks, so test confidence thresholds on your own traffic.
+
+For decisions that can block actions or route sensitive work, track their inputs and outputs and review incorrect results.
+
+## Get the models and code
+
+Download the adapters and readout heads for all four models from the [StrandsAgents organization on Hugging Face](https://huggingface.co/StrandsAgents). Find the training and inference code in the [Strands Decider repository](https://github.com/strands-labs/strands-decider). The Strands Decider adapters, readout heads, and code use Apache 2.0; the data inventory records the source-specific terms.
+
+Try the family on one real agent decision and share the task, hardware, and results. We’ll use those comparisons to choose what to train and measure next.
+
+Source: https://strandsagents.com/blog/strands-decider-gemma-4-models/index.md
+
+---
+
 ## We ran 94,000 trials to measure the cost of harness choice
 
-Date: 2026-10-12T00:00:00.000Z
+Date: 2026-10-13T00:00:00.000Z
 Tags: Strands harness, Harness SDK, Evaluation, Benchmarks, Context Management
 
 A few weeks ago, we [announced](/blog/introducing-strands-harness/index.md) Strands harness with 28% lower token cost than other leading harnesses with Claude and GPT models while maintaining accuracy. In this follow-up, we discovered the cost reduction is actually closer to 34% for Strands harness, a general purpose harness that can be customized for any task. What stood out to us was Strands harness’s defaults performed well on benchmarks ranging from coding to other knowledge work tasks.

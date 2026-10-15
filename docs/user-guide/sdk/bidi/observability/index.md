@@ -57,20 +57,7 @@ export OTEL_EXPORTER_OTLP_HEADERS="key1=value1,key2=value2"
 
 The session span is the parent of the response, connection, restart, and tool spans. It starts a new trace when no recording span is active. When `BidiAgent` runs inside an instrumented request or a custom span, the session span joins that existing trace:
 
-```mermaid
-flowchart TB
-    S["bidi_session"]
-    C["bidi_connect"]
-    R1["bidi_response"]
-    T["execute_tool"]
-    R2["bidi_response"]
-    RS["bidi_connection_restart"]
-    S --> C
-    S --> R1
-    S --> T
-    S --> R2
-    S --> RS
-```
+> **Diagram:** A bidirectional streaming trace laid out over time. The bidi_session span, named with the agent name, covers the whole session. Every other span is its direct child: bidi_connect at the start, then a bidi_response and an execute_tool span named with the tool name that starts during that response and runs on into the next bidi_response. The trace then shows a bidi_connection_restart, which can happen mid-session; after a restart, bidi_response spans continue on the new connection. Because tool spans are children of the session rather than of a response, a tool span can overlap the responses around it.
 
 | Span | Covers |
 | --- | --- |

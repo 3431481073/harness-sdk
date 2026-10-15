@@ -189,7 +189,7 @@ def format_request_messages(cls,
                             **kwargs: Any) -> list[dict[str, Any]]
 ```
 
-Defined in: [src/strands/models/openai.py:459](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L459)
+Defined in: [src/strands/models/openai.py:460](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L460)
 
 Format an OpenAI compatible messages array.
 
@@ -218,7 +218,7 @@ def format_request(messages: Messages,
                    **kwargs: Any) -> dict[str, Any]
 ```
 
-Defined in: [src/strands/models/openai.py:483](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L483)
+Defined in: [src/strands/models/openai.py:484](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L484)
 
 Format an OpenAI compatible chat streaming request.
 
@@ -246,7 +246,7 @@ An OpenAI compatible chat streaming request.
 def format_chunk(event: dict[str, Any], **kwargs: Any) -> StreamEvent
 ```
 
-Defined in: [src/strands/models/openai.py:544](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L544)
+Defined in: [src/strands/models/openai.py:545](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L545)
 
 Format an OpenAI response event into a standardized message chunk.
 
@@ -276,7 +276,7 @@ async def stream(messages: Messages,
                  **kwargs: Any) -> AsyncGenerator[StreamEvent, None]
 ```
 
-Defined in: [src/strands/models/openai.py:699](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L699)
+Defined in: [src/strands/models/openai.py:700](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L700)
 
 Stream conversation with the OpenAI model.
 
@@ -309,7 +309,7 @@ async def structured_output(
         **kwargs: Any) -> AsyncGenerator[dict[str, T | Any], None]
 ```
 
-Defined in: [src/strands/models/openai.py:842](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L842)
+Defined in: [src/strands/models/openai.py:843](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L843)
 
 Get structured output from the model.
 

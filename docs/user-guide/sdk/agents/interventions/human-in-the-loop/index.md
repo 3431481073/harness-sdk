@@ -4,18 +4,7 @@ Pause the agent before it acts and let a person approve, edit, or reject a tool 
 
 The handler uses the [`confirm` action](/docs/user-guide/sdk/agents/interventions/index.md) to pause for human input. It builds on the SDK’s [interrupt mechanism](/docs/user-guide/sdk/interrupts/index.md) but abstracts away the manual interrupt/resume loop when you provide an `ask` option.
 
-```mermaid
-flowchart LR
-    A[Tool call] --> B{Allowed?}
-    B -->|Yes| C[Execute]
-    B -->|No| D{Trusted?}
-    D -->|Yes| C
-    D -->|No| G{Classifier?}
-    G -->|Safe| C
-    G -->|Risky/None| E{Human approves?}
-    E -->|Yes| C
-    E -->|No| F[Cancel]
-```
+> **Diagram:** How the handler decides on a tool call. If the tool is allowed or already trusted, it executes. Otherwise, if a classifier is configured and rates the call safe, it executes. If the classifier rates it risky, or there is no classifier, a human is asked: if they approve, the tool executes; if not, the call is cancelled. Negated tools (!name) always ask a human, and, when trust is enabled, a trust response approves the tool for the rest of the session.
 
 ## Usage
 

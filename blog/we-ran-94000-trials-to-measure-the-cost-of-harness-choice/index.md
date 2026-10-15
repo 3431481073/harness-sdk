@@ -1,6 +1,6 @@
 ---
 title: "We ran 94,000 trials to measure the cost of harness choice"
-date: 2026-10-12T00:00:00.000Z
+date: 2026-10-13T00:00:00.000Z
 description: "We analyzed 94,000 benchmark trials to measure how harness choice affects token usage, estimated costs, and accuracy with Claude, GPT, and open-weight models."
 tags: ["Strands harness", "Harness SDK", "Evaluation", "Benchmarks", "Context Management"]
 ---

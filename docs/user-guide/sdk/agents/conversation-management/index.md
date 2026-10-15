@@ -583,10 +583,10 @@ See the [SlidingWindowConversationManager](https://github.com/strands-agents/har
 - [Custom Strategies](/docs/user-guide/sdk/context-management/custom-strategies/index.md) (2 shared tags)
 - [Strategy Presets](/docs/user-guide/sdk/context-management/presets/index.md) (2 shared tags)
 - [Context Offloader](/docs/user-guide/sdk/plugins/context-offloader/index.md) (2 shared tags)
+- [Search Strategies](/docs/user-guide/sdk/storage/search-strategies/index.md) (1 shared tag)
 - [Storage](/docs/user-guide/sdk/storage/index.md) (1 shared tag)
 - [Context Injector](/docs/user-guide/sdk/plugins/context-injector/index.md) (1 shared tag)
 - [Coherence evaluator](/docs/user-guide/evals-sdk/evaluators/coherence_evaluator/index.md) (1 shared tag)
-- [Conciseness evaluator](/docs/user-guide/evals-sdk/evaluators/conciseness_evaluator/index.md) (1 shared tag)
 
 
 ## Implementation

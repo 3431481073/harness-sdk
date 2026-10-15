@@ -33,11 +33,11 @@ When something unwanted happens, find the control that allowed it. If a direct g
 
 For multi-tenant deployments, run each session’s box inside its own VM or microVM, so the platform keeps tenants apart and a kernel exploit stays inside one session.
 
-![In an illustrative hosted deployment, the platform separates tenant environments. Each environment contains trusted Box code outside the agent's sandbox and the sandboxes for tools and local MCP servers.](/_astro/security-platform.DpkWHWHf_Z13l73V.svg)
+> **Diagram:** An illustrative hosted deployment, in which the platform separates tenant environments. Tenant A's environment contains the trusted Box process, which runs outside every sandbox, plus the agent's sandbox, holding the agent and its native children, and the sandboxes for tools and local MCP servers, one for each. Tenant B's environment holds another box with the same layout. The platform keeps tenants apart; Box supplies no isolation between them. Verify the selected platform's guarantees.
 
 ## How Box enforces your configuration
 
-![The agent runs in its sandbox, which the operating system enforces, while Box's request handlers and policy engine run outside it. Direct file access uses OS grants. Requests through Box use policy.](/_astro/security-enforcement.BcFMrURg_guw9m.svg)
+> **Diagram:** How Box enforces your configuration on macOS. Inside the surrounding operating system, the agent process and its native children run in the agent's sandbox, which the operating system enforces. Box's request handlers (Strands Shell, Monty, and the egress gateway) and its policy engine run outside it, in the trusted Box process. The agent reaches files in the surrounding OS directly, and the operating system checks those accesses against its grants. Everything else it sends as requests through Box: the request handlers ask the policy engine and the policy engine decides each request. The handlers then carry out only permitted file operations on the surrounding OS, and send only permitted network requests through the egress gateway to a remote service. An allowed request doesn't contain the remote service.
 
 -   **Operating system enforcement.** The operating system limits each process’s own system calls to the paths `box.toml` grants it. Box prints the agent’s and each tool’s grants on stderr before the agent starts. A local MCP server’s sandbox is applied when it starts, and isn’t printed. Nor is the sandbox of a program that runs under one of the agent’s `exec` entries with no tool table.
 -   **Refusals.** Box refuses to start a box on a platform it doesn’t support, and stops the run when the policy doesn’t load. An error while evaluating a rule denies the action.

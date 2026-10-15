@@ -36,13 +36,7 @@ Two pieces sit on either side of scoring.
 
 For a single case, the flow runs left to right: the task produces output and a trajectory, evaluators score them, and detectors diagnose any failures.
 
-```mermaid
-flowchart LR
-    A[Cases] --> B[Task runs the agent]
-    B --> C[Output and trajectory]
-    C --> D[Evaluators score]
-    C --> E[Detectors diagnose failures]
-```
+> **Diagram:** How one case flows through an experiment, which repeats it for every case. The case (an input and what you expect back) goes to the task, which runs your agent. The task's result (its output and, optionally, its trajectory) goes to the evaluators, which score it. When a case fails, the optional detectors read the task's trajectory and diagnose why it failed.
 
 The experiment repeats this for every case, then aggregates the scores into a report you can print, save, and compare against a later run.
 

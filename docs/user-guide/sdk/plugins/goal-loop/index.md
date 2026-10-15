@@ -8,14 +8,7 @@ GoalLoop handles all of that as a plugin. Define what “done” means, attach i
 
 ## How It Works
 
-```mermaid
-flowchart LR
-    A[invoke] --> B[Agent responds]
-    B --> C{Validate}
-    C -->|pass| D[Done]
-    C -->|fail| E[Inject feedback]
-    E --> B
-```
+> **Diagram:** The GoalLoop retry cycle. Your prompt goes to the agent, which produces a response. GoalLoop passes the response to the validator, either the built-in judge agent or your own function. If the validator fails the response and budget remains, its feedback goes back to the agent as a new user message and the agent responds again. The loop ends when the validator passes, or when the attempt limit or timeout runs out; either way, the last response is returned. The timeout is checked when each attempt finishes, before validation, so a late response is returned without being validated.
 
 1.  The agent processes the prompt and produces a response.
 2.  GoalLoop extracts the last assistant message and runs the validator.

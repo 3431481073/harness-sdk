@@ -94,15 +94,7 @@ The [Quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) walks through e
 
 ## How it works
 
-```mermaid
-flowchart TD
-    A[RedTeamCase: risk category + actor goal] --> B[RedTeamExperiment]
-    G[Your Agent or MultiAgentBase] --> B
-    S[AttackStrategy: a published jailbreak technique] --> B
-    B --> C[Strategy drives the attack via TargetSession.invoke]
-    C --> D[AttackSuccessEvaluator scores the conversation 0.0-1.0]
-    D --> E[RedTeamReport: breaches by risk category and strategy]
-```
+> **Diagram:** How a red-team attack runs. For each case and strategy pair in a RedTeamExperiment, an adversarial case (a RedTeamCase with a risk category and an actor goal) is handed to an attack strategy (an AttackStrategy). Inside the attack loop, the strategy sends attack turns to your agent (an Agent or MultiAgentBase, reached through TargetSession.invoke) and reads its replies, and the strategy decides when to stop. The full conversation and tool trace then go to an LLM judge, the AttackSuccessEvaluator, which scores it from 0.0 to 1.0. The scores feed a breach report, the RedTeamReport, grouped by risk category and strategy.
 
 A strategy runs against the target one case at a time when you call `run_evaluations()`, and against the case x strategy cross-product in parallel (default `max_workers=5`) when you call `run_evaluations_async()`. Each strategy carries its own cheap in-loop “should I stop?” gate, but the authoritative breach verdict always comes from the `AttackSuccessEvaluator` over the full conversation and tool trace.
 

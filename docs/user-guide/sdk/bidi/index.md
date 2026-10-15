@@ -8,22 +8,7 @@ In Strands, you build these applications with `BidiAgent`. It holds a persistent
 
 Here’s how the pieces connect:
 
-```mermaid
-flowchart LR
-    User((User))
-    Input[Input stream<br/>microphone, keyboard, app]
-    Output[Output stream<br/>speakers, screen, app]
-    Agent[BidiAgent]
-    Model[Realtime model]
-    Tools[Your tools]
-
-    User -- "speaks, types, sends" --> Input
-    Input --> Agent
-    Agent <--> Model
-    Agent <--> Tools
-    Agent --> Output
-    Output -- "hears, reads" --> User
-```
+> **Diagram:** How a BidiAgent conversation flows. The user speaks, types, or sends input into the input stream (microphone, keyboard, or app), which passes it to the BidiAgent. The BidiAgent sends that input to the realtime model, and the model streams its reply back to the agent. The agent passes the reply to the output stream (speakers, screen, or app), which delivers it to the user. The agent also sends tool calls to your tools, which run in the background and return results to the agent while the conversation continues in both directions, and it records the conversation history.
 
 -   **The input stream** captures what the user says, types, or sends and passes it to the agent.
 -   **The agent** sits in the middle, routing input to the model and replies to the output stream. It also runs your tools and records the conversation history.

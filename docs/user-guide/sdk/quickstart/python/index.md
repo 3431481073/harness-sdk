@@ -191,19 +191,7 @@ Run it again. The model works out that counting letters is what `letter_counter`
 
 The agent decides when to call a tool based on the request, loops until it has an answer, and streams the response to your console.
 
-```mermaid
-flowchart LR
-    A[Input & Context] --> Loop
-
-    subgraph Loop[" "]
-        direction TB
-        B["Reasoning (LLM)"] --> C["Tool Selection"]
-        C --> D["Tool Execution"]
-        D --> B
-    end
-
-    Loop --> E[Response]
-```
+> **Diagram:** The agent loop behind the quickstart. Your prompt and the conversation history go to the model. While the model asks for tools, such as the letter counter you wrote or the file editor that ships with the SDK, the agent runs them and sends the results back to the model; every pass adds to the conversation history. When the model makes no more tool calls, its message becomes the response streamed to your console.
 
 Every invocation returns an [`AgentResult`](/docs/api/python/strands.agent.agent_result#AgentResult) carrying the run’s messages, metrics, and traces, so you can see which tools the agent called and why. The [Agent Loop](/docs/user-guide/sdk/agents/agent-loop/index.md) explains the cycle above, and [Observability](/docs/user-guide/sdk/observability-evaluation/observability/index.md) covers reading traces and metrics. To silence the streamed console output, pass `callback_handler=None` to the `Agent`.
 
@@ -326,5 +314,6 @@ You have a running agent with a tool. From here:
 - [Strands evaluation quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) (1 shared tag)
 - [Strands Shell quickstart](/docs/user-guide/shell/quickstart/index.md) (1 shared tag)
 - [TypeScript Quickstart](/docs/user-guide/sdk/quickstart/typescript/index.md) (1 shared tag)
+- [Use Strands with AI coding agents](/docs/user-guide/build-with-ai/index.md) (1 shared tag)
 - [Red teaming quickstart](/docs/user-guide/evals-sdk/red-teaming/quickstart/index.md) (1 shared tag)
 - [Build a Voice Agent](/docs/user-guide/sdk/bidi/quickstart/index.md) (1 shared tag)

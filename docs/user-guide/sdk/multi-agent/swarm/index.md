@@ -16,15 +16,7 @@ A group of specialized agents handing work between themselves can cover a proble
 3.  Can access shared knowledge contributed by other agents
 4.  Can decide when to hand off to another agent with different expertise
 
-```mermaid
-graph TD
-    Researcher <--> Reviewer
-    Researcher <--> Architect
-    Reviewer <--> Architect
-    Coder <--> Researcher
-    Coder <--> Reviewer
-    Coder <--> Architect
-```
+> **Diagram:** One possible run of a swarm with four agents: researcher, architect, coder, and reviewer. The user's task goes to the researcher, the entry point. The researcher hands off to the architect, the architect hands off to the coder, and the coder hands off to the reviewer. Any agent can hand off to any other, and each handoff carries a message and optional context. The reviewer then replies without handing off, so the swarm ends and its message becomes the final response to the user.
 
 ## Creating a Swarm
 

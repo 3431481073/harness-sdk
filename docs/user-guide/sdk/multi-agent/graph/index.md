@@ -22,13 +22,7 @@ In a graph:
 5.  Entry points receive the original task as input
 6.  Nodes can be revisited in cyclic patterns with proper exit conditions
 
-```mermaid
-graph TD
-    A[Research Agent] --> B[Analysis Agent]
-    A --> C[Fact-Checking Agent]
-    B --> D[Report Agent]
-    C --> D
-```
+> **Diagram:** A graph with four agent nodes. The task goes to the entry point, the researcher node (research). Its output flows along two edges to the analyst node (analysis) and the fact checker node (fact_check). Both of their outputs flow along edges into the report writer node (report).
 
 ## Creating a Graph
 
@@ -334,13 +328,7 @@ console.log(result)
 
 Graphs support remote A2A agents as nodes through the [`A2AAgent`](/docs/user-guide/sdk/multi-agent/agent-to-agent/index.md#consuming-remote-agents) class. You can add it directly to a graph just like a local agent. This enables distributed architectures where orchestration happens locally while specialized tasks run on remote services.
 
-```mermaid
-graph TD
-    A[Local: Data Prep] --> B[Remote: ML Analysis]
-    A --> C[Remote: NLP Processing]
-    B --> D[Local: Report Writer]
-    C --> D
-```
+> **Diagram:** A graph that mixes local and remote nodes. The local data prep node (prep) feeds two remote A2A agents, ML analysis (ml) and NLP processing (nlp), which run on their own services. Both remote nodes feed the local report writer node (report).
 
 (( tab "Python" ))
 ```python
@@ -737,10 +725,7 @@ For detailed information about shared state, including examples and best practic
 
 ### 1\. Sequential Pipeline
 
-```mermaid
-graph LR
-    A[Research] --> B[Analysis] --> C[Review] --> D[Report]
-```
+> **Diagram:** A sequential pipeline of four nodes in a row: researcher (research), then analyst (analysis), then reviewer (review), then report writer (report). Each node runs after the one before it and receives its output.
 
 (( tab "Python" ))
 ```python
@@ -771,15 +756,7 @@ const graph = new Graph({
 
 ### 2\. Parallel Processing with Aggregation
 
-```mermaid
-graph TD
-    A[Coordinator] --> B[Worker 1]
-    A --> C[Worker 2]
-    A --> D[Worker 3]
-    B --> E[Aggregator]
-    C --> E
-    D --> E
-```
+> **Diagram:** Parallel processing with aggregation. The coordinator node (coordinator) has edges to three worker nodes (worker1, worker2, worker3), which run in parallel. Each worker has an edge to the aggregator node (aggregator), which combines their results.
 
 (( tab "Python" ))
 ```python
@@ -817,13 +794,7 @@ const graph = new Graph({
 
 ### 3\. Branching Logic
 
-```mermaid
-graph TD
-    A[Classifier] --> B[Technical Branch]
-    A --> C[Business Branch]
-    B --> D[Technical Report]
-    C --> E[Business Report]
-```
+> **Diagram:** Branching logic. The classifier node (classifier) has two conditional edges. If its output mentions 'technical', the graph runs the technical specialist (tech_specialist) and then the technical report (tech_report). If it mentions 'business', it runs the business specialist (business_specialist) and then the business report (business_report).
 
 (( tab "Python" ))
 ```python
@@ -887,13 +858,7 @@ const graph = new Graph({
 
 ### 4\. Feedback Loop
 
-```mermaid
-graph TD
-    A[Draft Writer] --> B[Reviewer]
-    B --> C{Quality Check}
-    C -->|Needs Revision| A
-    C -->|Approved| D[Publisher]
-```
+> **Diagram:** A feedback loop. The draft writer node (draft_writer) has an edge to the reviewer node (reviewer). The reviewer has two conditional edges: if the draft needs revision, it loops back to the draft writer; if it is approved, it goes on to the publisher node (publisher). The draft writer is the entry point, set explicitly because the loop gives every node an incoming edge. Execution limits stop the loop if the draft is never approved.
 
 (( tab "Python" ))
 ```python
@@ -919,6 +884,9 @@ builder.add_node(publisher, "publisher")
 builder.add_edge("draft_writer", "reviewer")
 builder.add_edge("reviewer", "draft_writer", condition=needs_revision)
 builder.add_edge("reviewer", "publisher", condition=is_approved)
+
+# The loop gives draft_writer an incoming edge, so set the entry point explicitly
+builder.set_entry_point("draft_writer")
 
 # Set execution limits to prevent infinite loops
 builder.set_max_node_executions(10)  # Maximum 10 node executions total
@@ -954,6 +922,8 @@ const graph = new Graph({
     { source: 'reviewer', target: 'draft_writer', handler: needsRevision },
     { source: 'reviewer', target: 'publisher', handler: isApproved },
   ],
+  // The loop gives draft_writer an incoming edge, so set the source explicitly
+  sources: ['draft_writer'],
   // Set execution limits to prevent infinite loops
   maxSteps: 10,
 })

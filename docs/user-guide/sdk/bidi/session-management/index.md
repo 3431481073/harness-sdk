@@ -120,6 +120,7 @@ For more on saving and restoring checkpoints, see [Immutable snapshots](/docs/us
 
 - [Persist state across sessions](/docs/user-guide/sdk/agents/session-management/index.md) (2 shared tags)
 - [State Management](/docs/user-guide/sdk/agents/state/index.md) (2 shared tags)
+- [Search Strategies](/docs/user-guide/sdk/storage/search-strategies/index.md) (1 shared tag)
 - [Storage](/docs/user-guide/sdk/storage/index.md) (1 shared tag)
 - [BidiAgent](/docs/user-guide/sdk/bidi/agent/index.md) (1 shared tag)
 - [Bidirectional Streaming](/docs/user-guide/sdk/bidi/index.md) (1 shared tag)
@@ -127,7 +128,6 @@ For more on saving and restoring checkpoints, see [Immutable snapshots](/docs/us
 - [Google Gemini Live](/docs/user-guide/sdk/bidi/models/google/index.md) (1 shared tag)
 - [I/O Streams](/docs/user-guide/sdk/bidi/io/index.md) (1 shared tag)
 - [Input Content](/docs/user-guide/sdk/bidi/content/index.md) (1 shared tag)
-- [Interrupts](/docs/user-guide/sdk/bidi/interrupts/index.md) (1 shared tag)
 
 
 ## Implementation

@@ -36,8 +36,10 @@
   - [Overview](https://strandsagents.com/docs/user-guide/sdk/index.md): Build a production agent harness with the Strands Harness SDK and control it end to end: the loop, the tools, the model, the memory, and the context management.
   - [Quickstart](https://strandsagents.com/docs/user-guide/sdk/quickstart/python/index.md): Get an AI agent running in Python in under 5 minutes. Install the SDK, pick a model provider, run the agent, then give it a tool.
   - [Quickstart](https://strandsagents.com/docs/user-guide/sdk/quickstart/typescript/index.md): Get an AI agent running in TypeScript in under 5 minutes. Install the SDK, pick a model provider, run the agent, then give it a tool.
+  - [build-with-ai](https://strandsagents.com/docs/user-guide/build-with-ai/index.md): Install the Strands plugin in Claude Code, Codex, or Cursor so your coding agent can choose Strands, use current APIs, and add agents to your project.
 - Migrate
   - [Choosing an agent foundation](https://strandsagents.com/docs/user-guide/migrate/choosing-an-agent-foundation/index.md): Framework or your own agent loop? How Strands compares to a hand-written loop, OpenAI Agents SDK, LangGraph, Vercel AI SDK, and Pydantic AI.
+  - [Migrate from LangGraph](https://strandsagents.com/docs/user-guide/migrate/langgraph/index.md): Move a LangGraph app to Strands Agents: map StateGraph to a Strands graph, swap checkpointers for session managers, and port interrupts, limits, and tracing.
   - [Migrate from OpenAI](https://strandsagents.com/docs/user-guide/migrate/openai/index.md): Move an OpenAI app to Strands Agents: turn a hand-written chat.completions tool loop into an Agent, and map the OpenAI Agents SDK (Runner, handoffs, guardrails, sessions) concept for concept, all while keeping your OpenAI models.
 - Build guides
   - Tools
@@ -90,7 +92,9 @@
   - [Agent loop](https://strandsagents.com/docs/user-guide/sdk/agents/agent-loop/index.md): How Strands agents reason, plan, and act. Understand the model-driven loop that orchestrates tool use, reflection, and goal completion.
   - [Production lifecycle controls](https://strandsagents.com/docs/user-guide/sdk/agents/lifecycle-controls/index.md): Turn limits, token budgets, timeouts, cancellation, and stop reasons that keep a production Strands agent bounded, recoverable, and safe to run at scale.
   - [State](https://strandsagents.com/docs/user-guide/sdk/agents/state/index.md): Maintain state in Strands agents across turns and sessions: conversation history, key-value agent state, and per-request invocation state.
-  - [Storage](https://strandsagents.com/docs/user-guide/sdk/storage/index.md): Choose a storage backend and pass it to the Agent for automatic subsystem resolution, or to individual plugins for fine-grained control.
+  - Storage
+    - [Overview](https://strandsagents.com/docs/user-guide/sdk/storage/index.md): Choose a storage backend and pass it to the Agent for automatic subsystem resolution, or to individual plugins for fine-grained control.
+    - [search-strategies](https://strandsagents.com/docs/user-guide/sdk/storage/search-strategies/index.md): Plug in keyword, BM25, or custom search algorithms to find relevant content across storage backends.
   - [Snapshots](https://strandsagents.com/docs/user-guide/sdk/agents/snapshots/index.md): Capture and restore agent state at any point in time. Use snapshots for checkpointing, undo/redo, branching conversations, and custom persistence.
   - [Prompts](https://strandsagents.com/docs/user-guide/sdk/agents/prompts/index.md): Write system prompts and user messages for Strands agents. Covers multi-modal prompting, direct tool calls, and prompt engineering with agent SOPs.
   - [Hooks](https://strandsagents.com/docs/user-guide/sdk/agents/hooks/index.md): Intercept and customize agent behavior at every step. Hooks let you add logging, validation, guardrails, and custom logic to the agent loop.
@@ -868,6 +872,7 @@
 
 ## Blog
 
+- [Strands Decider adds four Gemma 4 models](https://strandsagents.com/blog/strands-decider-gemma-4-models/index.md): Four new Strands Decider models built on Gemma 4 let developers compare sizes for routing, guardrails, evaluation, and other agent decisions.
 - [We ran 94,000 trials to measure the cost of harness choice](https://strandsagents.com/blog/we-ran-94000-trials-to-measure-the-cost-of-harness-choice/index.md): We analyzed 94,000 benchmark trials to measure how harness choice affects token usage, estimated costs, and accuracy with Claude, GPT, and open-weight models.
 - [Strands Box: The Big Picture](https://strandsagents.com/blog/strands-box-the-big-picture/index.md): Strands Box, now in developer preview, is an open source local sandbox for AI agents that pairs operating-system isolation with Dogwood semantic policy. Here's why semantic policy matters, and how Box's design follows from it.
 - [Bidi Agents now GA](https://strandsagents.com/blog/bidi-agents-now-ga/index.md): The easiest way to create voice agents with direct support for Amazon Nova Sonic, OpenAI, and Gemini models.

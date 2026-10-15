@@ -8,20 +8,7 @@ There are two ways to think about sandboxed agents: running the entire agent *in
 
 Strands implements the second pattern. The agent process runs on your host and handles model calls, tools, hooks, and state. The sandbox is a pluggable backend that receives only execution operations via a standard interface.
 
-```mermaid
-flowchart LR
-    subgraph runtime["Agent runtime (your infrastructure)"]
-        L[Agent loop]
-        M[Model]
-        T["sandbox_shell /<br/>sandbox_file_editor"]
-        L --> M --> T
-    end
-    subgraph sb["Sandbox (execution environment you provision)"]
-        E[Command / file operation]
-    end
-    T -->|"execute, read_file, write_file"| E
-    E -->|"stdout, stderr, exit code"| T
-```
+> **Diagram:** The agent runtime and the sandbox. On your infrastructure, the agent handles model calls, hooks, and state, and calls the sandbox tools, such as the shell and file editor tools that the Docker and SSH sandboxes vend. Only execution operations, meaning shell commands, code, and file reads and writes, cross into the sandbox, an environment you provision such as Docker, SSH, or a custom backend. The sandbox sends the output back to the tools: stdout, stderr, and the exit code.
 
 All Sandbox implementations share the same abstract interface:
 

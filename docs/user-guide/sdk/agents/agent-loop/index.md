@@ -14,19 +14,7 @@ This is the foundational concept in the Strands Agents SDK, installed as `strand
 
 The agent loop operates on a simple principle: invoke the model, check if it wants to use a tool, execute the tool if so, then invoke the model again with the result. Repeat until the model produces a final response.
 
-```mermaid
-flowchart LR
-    A[Input & Context] --> Loop
-
-    subgraph Loop[" "]
-        direction TB
-        B["Reasoning (LLM)"] --> C["Tool Selection"]
-        C --> D["Tool Execution"]
-        D --> B
-    end
-
-    Loop --> E[Response]
-```
+> **Diagram:** The agent loop. A request goes to the model. While the model asks for tools, the agent runs them and sends the results back to the model; every pass adds to the conversation history. When the model makes no tool calls, its message becomes the response.
 
 The diagram shows the recursive structure at the heart of the loop. The model reasons, selects a tool, the tool executes, and the result feeds back into the model for another round of reasoning. This cycle continues until the model decides it has enough information to respond.
 

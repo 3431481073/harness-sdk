@@ -16,6 +16,10 @@ The simplest approach: pass a single storage backend to the Agent and let subsys
 
 (( tab "Python" ))
 ```python
+from strands import Agent
+from strands.session import SnapshotSessionManager
+from strands.storage import S3Storage
+
 storage = S3Storage("my-bucket", prefix="agents/prod/")
 
 agent = Agent(
@@ -53,6 +57,11 @@ When different subsystems need different backends, pass storage directly to the 
 
 (( tab "Python" ))
 ```python
+from strands import Agent
+from strands.session import SnapshotSessionManager
+from strands.storage import InMemoryStorage, S3Storage
+from strands.vended_plugins.context_offloader import ContextOffloader
+
 agent = Agent(
     session_manager=SnapshotSessionManager(
         "my-session", storage=S3Storage("my-bucket")
@@ -98,10 +107,12 @@ Python `SessionManager` is deprecated, and does not use the provided `Storage` p
 
 ### InMemoryStorage
 
-Data lives in process memory. No constructor arguments. Fast, zero-config, gone when the process exits.
+Data lives in process memory. No required constructor arguments. Fast, zero-config, gone when the process exits.
 
 (( tab "Python" ))
 ```python
+from strands.storage import InMemoryStorage
+
 storage = InMemoryStorage()
 ```
 (( /tab "Python" ))
@@ -125,6 +136,8 @@ Each key becomes a file under a base directory. Writes are atomic (temp file + r
 
 (( tab "Python" ))
 ```python
+from strands.storage import LocalFileStorage
+
 storage = LocalFileStorage("./my-data/")
 ```
 (( /tab "Python" ))
@@ -152,6 +165,8 @@ Stores data as objects in an S3 bucket. The AWS SDK loads lazily, so application
 
 (( tab "Python" ))
 ```python
+from strands.storage import S3Storage
+
 storage = S3Storage("my-bucket", prefix="agents/prod/")
 ```
 (( /tab "Python" ))
@@ -211,12 +226,14 @@ to claim your own prefix and avoid overlapping with other subsystems.
 
 ## Next steps
 
+-   [Search Strategies](/docs/user-guide/sdk/storage/search-strategies/index.md): plug in keyword, BM25, or custom search over stored content
 -   [Context Offloader](/docs/user-guide/sdk/plugins/context-offloader/index.md): offload large tool results
 -   [Session Management](/docs/user-guide/sdk/agents/session-management/index.md): persist conversations across restarts
 -   [Sandbox](/docs/user-guide/sdk/sandbox/index.md): route Storage I/O through a sandboxed environment
 
 ## Related pages
 
+- [Search Strategies](/docs/user-guide/sdk/storage/search-strategies/index.md) (1 shared tag)
 - [Conversation Management](/docs/user-guide/sdk/agents/conversation-management/index.md) (1 shared tag)
 - [Session Management](/docs/user-guide/sdk/bidi/session-management/index.md) (1 shared tag)
 - [Persist state across sessions](/docs/user-guide/sdk/agents/session-management/index.md) (1 shared tag)

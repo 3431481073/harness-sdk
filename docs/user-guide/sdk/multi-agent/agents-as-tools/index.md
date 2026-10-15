@@ -11,17 +11,7 @@ This mirrors how a manager coordinates specialists on a team, each bringing focu
 
 Strands provides three ways to implement agents as tools: pass agents directly in the `tools` array for the simplest setup, use `.as_tool()``.asTool()` to customize tool name, description, or context behavior, and use the `@tool` decorator or `tool()` function for full control over how the agent is invoked.
 
-```mermaid
-flowchart TD
-    User([User]) <--> Orchestrator["Orchestrator Agent"]
-    Orchestrator --> RA["Research Assistant"]
-    Orchestrator --> PA["Product Recommendation Assistant"]
-    Orchestrator --> TA["Trip Planning Assistant"]
-
-    RA --> Orchestrator
-    PA --> Orchestrator
-    TA --> Orchestrator
-```
+> **Diagram:** Agents as tools. A user talks to an orchestrator agent, which calls three specialist agents as tools: research_assistant, product_recommendation_assistant, and trip_planning_assistant. Each specialist's answer returns to the orchestrator as a tool result; the orchestrator may call several specialists before it combines their answers and replies to the user.
 
 ### Passing agents directly
 

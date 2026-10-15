@@ -7,95 +7,11 @@ A hook callback subscribes to a specific event type and runs when that event fir
 The following diagram shows when hook events are emitted during a typical agent invocation where tools are invoked:
 
 (( tab "Python" ))
-```mermaid
-flowchart LR
- subgraph Start["Request Start Events"]
-    direction TB
-        BeforeInvocationEvent["BeforeInvocationEvent"]
-        StartMessage["MessageAddedEvent"]
-        BeforeInvocationEvent --> StartMessage
-  end
- subgraph Model["Model Events"]
-    direction TB
-        BeforeModelCallEvent["BeforeModelCallEvent"]
-        AfterModelCallEvent["AfterModelCallEvent"]
-        ModelMessage["MessageAddedEvent"]
-        BeforeModelCallEvent --> AfterModelCallEvent
-        AfterModelCallEvent --> ModelMessage
-  end
-  subgraph Tool["Tool Events"]
-    direction TB
-        BeforeToolsEvent["BeforeToolsEvent"]
-        BeforeToolCallEvent["BeforeToolCallEvent"]
-        AfterToolCallEvent["AfterToolCallEvent"]
-        AfterToolsEvent["AfterToolsEvent"]
-        ToolMessage["MessageAddedEvent"]
-        BeforeToolsEvent --> BeforeToolCallEvent
-        BeforeToolCallEvent --> AfterToolCallEvent
-        AfterToolCallEvent --> AfterToolsEvent
-        AfterToolsEvent --> ToolMessage
-  end
-  subgraph End["Request End Events"]
-    direction TB
-        AfterInvocationEvent["AfterInvocationEvent"]
-  end
-Start --> Model
-Model <--> Tool
-Tool --> End
-```
+> **Diagram:** Hook events in a single-agent invocation, in Python. Each stage groups its events in firing order. Request start: BeforeInvocationEvent, then MessageAddedEvent for the user's prompt. Then the agent loop. Model call: BeforeModelCallEvent, AfterModelCallEvent, then MessageAddedEvent for the model's message. If the model makes tool calls, tool execution runs: BeforeToolsEvent; then, for each tool call, BeforeToolCallEvent and AfterToolCallEvent; then AfterToolsEvent and MessageAddedEvent for the tool results, which go back to the model for the next model call. When the model makes no tool calls, the loop exits to request end: AfterInvocationEvent.
 (( /tab "Python" ))
 
 (( tab "TypeScript" ))
-```mermaid
-flowchart LR
- subgraph Start["Request Start Events"]
-    direction TB
-        BeforeInvocationEvent["BeforeInvocationEvent"]
-        StartMessage["MessageAddedEvent"]
-        BeforeInvocationEvent --> StartMessage
-  end
- subgraph Model["Model Events"]
-    direction TB
-        BeforeModelCallEvent["BeforeModelCallEvent"]
-        ModelStreamUpdateEvent["ModelStreamUpdateEvent"]
-        ContentBlockEvent["ContentBlockEvent"]
-        ModelMessageEvent["ModelMessageEvent"]
-        AfterModelCallEvent["AfterModelCallEvent"]
-        ModelMessage["MessageAddedEvent"]
-        BeforeModelCallEvent --> ModelStreamUpdateEvent
-        ModelStreamUpdateEvent --> ContentBlockEvent
-        ContentBlockEvent --> ModelMessageEvent
-        ModelMessageEvent --> AfterModelCallEvent
-        AfterModelCallEvent --> ModelMessage
-  end
-  subgraph Tool["Tool Events"]
-    direction TB
-        BeforeToolsEvent["BeforeToolsEvent"]
-        BeforeToolCallEvent["BeforeToolCallEvent"]
-        ToolStreamUpdateEvent["ToolStreamUpdateEvent"]
-        ToolResultEvent["ToolResultEvent"]
-        AfterToolCallEvent["AfterToolCallEvent"]
-        AfterToolsEvent["AfterToolsEvent"]
-        ToolMessage["MessageAddedEvent"]
-        BeforeToolsEvent --> BeforeToolCallEvent
-        BeforeToolCallEvent --> ToolStreamUpdateEvent
-        ToolStreamUpdateEvent --> ToolResultEvent
-        ToolResultEvent --> AfterToolCallEvent
-        AfterToolCallEvent --> AfterToolsEvent
-        AfterToolsEvent --> ToolMessage
-  end
-  subgraph End["Request End Events"]
-    direction TB
-        AgentResultEvent["AgentResultEvent"]
-        AfterInvocationEvent["AfterInvocationEvent"]
-        InterruptEvent["InterruptEvent"]
-        AgentResultEvent --> AfterInvocationEvent
-        InterruptEvent --> AfterInvocationEvent
-  end
-Start --> Model
-Model <--> Tool
-Tool --> End
-```
+> **Diagram:** Hook events in a single-agent invocation, in TypeScript. Each stage groups its events in firing order. Request start: BeforeInvocationEvent, then MessageAddedEvent for the user's prompt. Then the agent loop. Model call: BeforeModelCallEvent, then ModelStreamUpdateEvent and ContentBlockEvent while the response streams, ModelMessageEvent, and AfterModelCallEvent. If the model makes tool calls, tool execution runs: BeforeToolsEvent; then, for each tool call, BeforeToolCallEvent, ToolStreamUpdateEvent, AfterToolCallEvent, and ToolResultEvent; then AfterToolsEvent, MessageAddedEvent for the model's message, and MessageAddedEvent for the tool results, which go back to the model for the next model call. When the model makes no tool calls, MessageAddedEvent fires for the model's message as the loop exits, and the request ends: AfterInvocationEvent, then AgentResultEvent. If tool execution is interrupted, InterruptEvent fires once per unanswered interrupt before the request ends.
 (( /tab "TypeScript" ))
 
 ### Multi-Agent Lifecycle
@@ -103,59 +19,11 @@ Tool --> End
 The following diagram shows when multi-agent hook events are emitted during orchestrator execution:
 
 (( tab "Python" ))
-```mermaid
-flowchart LR
-subgraph Init["Initialization"]
-    direction TB
-    MultiAgentInitializedEvent["MultiAgentInitializedEvent"]
-end
-subgraph Invocation["Invocation Lifecycle"]
-    direction TB
-    BeforeMultiAgentInvocationEvent["BeforeMultiAgentInvocationEvent"]
-    AfterMultiAgentInvocationEvent["AfterMultiAgentInvocationEvent"]
-    BeforeMultiAgentInvocationEvent --> NodeExecution
-    NodeExecution --> AfterMultiAgentInvocationEvent
-end
-subgraph NodeExecution["Node Execution (Repeated)"]
-    direction TB
-    BeforeNodeCallEvent["BeforeNodeCallEvent"]
-    AfterNodeCallEvent["AfterNodeCallEvent"]
-    BeforeNodeCallEvent --> AfterNodeCallEvent
-end
-Init --> Invocation
-```
+> **Diagram:** Multi-agent hook events, in Python. Each stage groups its events in firing order. Initialization, once when the orchestrator is initialized: MultiAgentInitializedEvent. Then, for each invocation: invocation start, BeforeMultiAgentInvocationEvent; node execution, BeforeNodeCallEvent and AfterNodeCallEvent for every node the orchestrator runs, repeating for the next node; and invocation end, AfterMultiAgentInvocationEvent.
 (( /tab "Python" ))
 
 (( tab "TypeScript" ))
-```mermaid
-flowchart LR
-subgraph Init["Initialization"]
-    direction TB
-    MultiAgentInitializedEvent["MultiAgentInitializedEvent"]
-end
-subgraph Invocation["Invocation Lifecycle"]
-    direction TB
-    BeforeMultiAgentInvocationEvent["BeforeMultiAgentInvocationEvent"]
-    AfterMultiAgentInvocationEvent["AfterMultiAgentInvocationEvent"]
-    MultiAgentResultEvent["MultiAgentResultEvent"]
-    BeforeMultiAgentInvocationEvent --> NodeExecution
-    NodeExecution --> AfterMultiAgentInvocationEvent
-    AfterMultiAgentInvocationEvent --> MultiAgentResultEvent
-end
-subgraph NodeExecution["Node Execution (Repeated)"]
-    direction TB
-    BeforeNodeCallEvent["BeforeNodeCallEvent"]
-    NodeStreamUpdateEvent["NodeStreamUpdateEvent"]
-    AfterNodeCallEvent["AfterNodeCallEvent"]
-    NodeResultEvent["NodeResultEvent"]
-    MultiAgentHandoffEvent["MultiAgentHandoffEvent"]
-    BeforeNodeCallEvent --> NodeStreamUpdateEvent
-    NodeStreamUpdateEvent --> AfterNodeCallEvent
-    AfterNodeCallEvent --> NodeResultEvent
-    NodeResultEvent --> MultiAgentHandoffEvent
-end
-Init --> Invocation
-```
+> **Diagram:** Multi-agent hook events, in TypeScript. Each stage groups its events in firing order. Initialization, once when the orchestrator is initialized: MultiAgentInitializedEvent. Then, for each invocation: invocation start, BeforeMultiAgentInvocationEvent; node execution, BeforeNodeCallEvent, NodeStreamUpdateEvent while the node streams, NodeResultEvent, and AfterNodeCallEvent for every node the orchestrator runs; when execution moves on to the next node, MultiAgentHandoffEvent fires and node execution repeats; and invocation end, AfterMultiAgentInvocationEvent, then MultiAgentResultEvent.
 (( /tab "TypeScript" ))
 
 ### Available Events

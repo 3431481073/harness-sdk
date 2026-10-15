@@ -162,9 +162,9 @@ model = OpenAIRealtimeModel(
 - [Strands evaluation quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) (1 shared tag)
 - [Strands Shell quickstart](/docs/user-guide/shell/quickstart/index.md) (1 shared tag)
 - [TypeScript Quickstart](/docs/user-guide/sdk/quickstart/typescript/index.md) (1 shared tag)
+- [Use Strands with AI coding agents](/docs/user-guide/build-with-ai/index.md) (1 shared tag)
 - [BidiAgent](/docs/user-guide/sdk/bidi/agent/index.md) (1 shared tag)
 - [Bidirectional Streaming](/docs/user-guide/sdk/bidi/index.md) (1 shared tag)
-- [Bidirectional Streaming Models](/docs/user-guide/sdk/bidi/models/index.md) (1 shared tag)
 
 
 ## Implementation
