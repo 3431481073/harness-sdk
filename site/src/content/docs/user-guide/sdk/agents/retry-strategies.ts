@@ -97,6 +97,7 @@ async function hookRetryExample() {
 
 void defaultStrategyExample
 void customBackoffExample
+void customBackoffStrategyExample
 void disableExample
 void customSubclassExample
 void hookRetryExample
