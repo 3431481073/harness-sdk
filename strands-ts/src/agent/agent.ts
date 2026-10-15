@@ -105,7 +105,6 @@ import { AgentMetrics, Meter } from '../telemetry/meter.js'
 import type { AttributeValue } from '@opentelemetry/api'
 import { logger } from '../logging/logger.js'
 import { CancelledError, CheckpointError, MaxTokensError } from '../errors.js'
-import { recoverMessageOnMaxTokensReached } from './recover-message-on-max-tokens-reached.js'
 import { DefaultModelRetryStrategy } from '../retry/default-model-retry-strategy.js'
 import type { RetryStrategy } from '../retry/retry-strategy.js'
 import { warnOnDuplicateRetryStrategyTypes } from '../retry/retry-strategy.js'
@@ -2270,11 +2269,26 @@ export class Agent implements LocalAgent, InvokableAgent {
         }
 
         // Keep the truncated response in history so the agent can be invoked again to continue.
-        if (error instanceof MaxTokensError) {
-          const recovered = recoverMessageOnMaxTokensReached(error.partialMessage)
-          if (recovered.content.length > 0) {
-            yield this._appendMessage(recovered, invocationState)
-          }
+        // Its tool uses cannot be trusted, so each is replaced with explanatory text rather than
+        // leaving an unmatched tool use in history.
+        if (error instanceof MaxTokensError && error.partialMessage.content.length > 0) {
+          logger.info('handling maxTokens stop reason - replacing all tool uses with error messages')
+          const { partialMessage } = error
+          const content = partialMessage.content.map((block) => {
+            if (!(block instanceof ToolUseBlock)) return block
+            const displayName = block.name || '<unknown>'
+            logger.warn(`tool_name=<${displayName}> | replacing with error message due to max_tokens truncation`)
+            return new TextBlock(
+              `The selected tool ${displayName}'s tool use was incomplete due to maximum token limits being reached.`
+            )
+          })
+          const recovered = new Message({
+            role: partialMessage.role,
+            content,
+            trackingId: partialMessage.trackingId,
+            ...(partialMessage.metadata !== undefined && { metadata: partialMessage.metadata }),
+          })
+          yield this._appendMessage(recovered, invocationState)
         }
 
         throw error
