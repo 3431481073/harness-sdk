@@ -137,7 +137,7 @@ export function PermissionsPanel({
                   <Text
                     {...(pressed || active ? { color: accent } : row.tone === 'danger' ? { color: error } : {})}
                     bold={active}
-                    dimColor={!custom && !active}
+                    dimColor={!custom}
                     wrap="truncate-end"
                   >
                     {active ? '› ' : '  '}

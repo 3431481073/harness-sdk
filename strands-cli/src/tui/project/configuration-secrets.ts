@@ -32,11 +32,10 @@ export function scanConfigSecrets(config: HarnessAgentConfig, mcpServers: Record
 }
 
 function validatePortableMcp(servers: Record<string, unknown>): void {
-  for (const [name, raw] of Object.entries(servers)) {
-    if (!isRecord(raw)) {
+  for (const [name, server] of Object.entries(servers)) {
+    if (!isRecord(server)) {
       continue
     }
-    const server = raw
     const label = `MCP server ${JSON.stringify(name)}`
     for (const field of ['env', 'headers']) {
       const values = server[field]

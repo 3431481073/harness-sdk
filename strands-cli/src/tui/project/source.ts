@@ -331,9 +331,8 @@ function sourceLiteral(
 function mcpServersForSource(servers: HarnessAgentConfig['mcpServers']): HarnessAgentConfig['mcpServers'] {
   if (typeof servers === 'string') return servers
   return Object.fromEntries(
-    Object.entries(servers).map(([name, raw]) => {
-      if (!isRecord(raw)) return [name, raw]
-      const server = raw
+    Object.entries(servers).map(([name, server]) => {
+      if (!isRecord(server)) return [name, server]
       const localRunner =
         typeof server.command === 'string' &&
         /^(?:node|python(?:\d+(?:\.\d+)*)?|(?:ba|da|z)?sh)(?:\.exe)?$/iu.test(server.command)

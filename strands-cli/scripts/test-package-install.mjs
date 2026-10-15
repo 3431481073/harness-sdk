@@ -15,25 +15,25 @@ if (!npm) {
   throw new Error('Run this check with npm run test:package-install.')
 }
 
-async function run(command, args, cwd) {
-  return execFileAsync(command, args, {
+async function run(args, cwd) {
+  return execFileAsync(process.execPath, args, {
     cwd,
     maxBuffer: 8 * 1024 * 1024,
     windowsHide: true,
   })
 }
 
-const { stdout: packOutput } = await run(process.execPath, [npm, 'pack', '--silent', '--json'], packageRoot)
+const { stdout: packOutput } = await run([npm, 'pack', '--silent', '--json'], packageRoot)
 const [{ filename }] = JSON.parse(packOutput)
 const tarball = resolve(packageRoot, filename)
 const installRoot = await mkdtemp(join(tmpdir(), 'strands-cli-package-'))
 
 try {
-  await run(process.execPath, [npm, 'init', '--yes'], installRoot)
-  await run(process.execPath, [npm, 'install', '--ignore-scripts', '--no-audit', '--no-fund', tarball], installRoot)
+  await run([npm, 'init', '--yes'], installRoot)
+  await run([npm, 'install', '--ignore-scripts', '--no-audit', '--no-fund', tarball], installRoot)
 
   const bin = join(installRoot, 'node_modules', '@strands-agents', 'cli', 'bin', 'strands.js')
-  const { stdout } = await run(process.execPath, [bin, '--help'], installRoot)
+  const { stdout } = await run([bin, '--help'], installRoot)
   if (!stdout.includes('Chat with a Strands harness agent')) {
     throw new Error('installed strands binary did not print its help text')
   }

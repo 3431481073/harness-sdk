@@ -684,14 +684,13 @@ function validateSourceConfiguration(path: string, contents: Buffer): void {
     return
   }
   if (!path.endsWith('.json')) return
-  let value: unknown
+  let document: unknown
   try {
-    value = JSON.parse(contents.toString().replace(/^\uFEFF/u, ''))
+    document = JSON.parse(contents.toString().replace(/^\uFEFF/u, ''))
   } catch {
     return
   }
-  if (!isRecord(value)) return
-  const document = value
+  if (!isRecord(document)) return
   if (basename(path) === 'mcp.json' || basename(path) === '.mcp.json' || isRecord(document.mcpServers)) {
     validateNoConfigSecrets(normalizeHarnessAgentConfig({ mcpServers: document }))
   }
