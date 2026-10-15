@@ -198,6 +198,10 @@ export type { BaseModelConfig, CountTokensOptions, StreamOptions, CacheConfig } 
 
 export { Model } from './models/model.js'
 
+// Decision models
+export { DecisionModel, defineQuestions, LLMDecisionModel, Uncertain } from './decisions/index.js'
+export type { AnswerOf, DecisionInput, DecisionResult, LLMDecisionModelOptions, Question } from './decisions/index.js'
+
 // Model routing
 export { ClassifierStrategy, FallbackStrategy, ModelRouter, RoutingCandidate } from './models/routing/index.js'
 export type {
@@ -319,7 +323,10 @@ export type { Logger } from './logging/types.js'
 // MCP Client types and implementations
 export {
   type McpClientOptions,
+  type McpListOptions,
   type McpListToolsOptions,
+  type McpProgress,
+  type McpProgressCallback,
   type McpToolFilterCallback,
   type McpToolFilters,
   type McpToolMatcher,
