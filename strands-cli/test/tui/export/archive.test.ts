@@ -9,9 +9,9 @@ import { ZipFile } from 'yazl'
 const execute = vi.hoisted(() => vi.fn())
 vi.mock('node:child_process', () => ({ execFile: execute }))
 
-import { prepareArchiveDependencies } from '../src/tui/project/archive.js'
-import { npmInvocation } from '../src/tui/npm.js'
-import { importAgentProject } from '../src/tui/project/import.js'
+import { prepareArchiveDependencies } from '../../../src/tui/project/archive.js'
+import { importAgentProject } from '../../../src/tui/project/import.js'
+import { npmInvocation } from '../../../src/tui/npm.js'
 
 let temporary: string | undefined
 
@@ -35,6 +35,15 @@ it('removes the extraction directory when the ZIP contains no agent', async () =
 
   expect(() => importAgentProject(archive)).toThrow('The ZIP must contain a project with agent.ts, agent.py')
   expect(await readdir(join(temporary, '.strands', 'cli', 'cache', 'agents'))).toEqual([])
+})
+
+it('rejects Windows-reserved paths', async () => {
+  temporary = await mkdtemp(join(tmpdir(), 'strands-archive-'))
+  stubHome(temporary)
+  const archive = join(temporary, 'agent.zip')
+  await writeFile(archive, zipSync({ 'agent/agent.ts': strToU8(''), 'agent/CON': strToU8('reserved') }))
+
+  expect(() => importAgentProject(archive)).toThrow('not portable to Windows')
 })
 
 it.each(['missing.py', '../outside.py', 'notes.txt'] as const)(
@@ -160,7 +169,7 @@ it.skipIf(process.platform === 'win32').each([false, true])(
   }
 )
 
-it.each([false, true])('rejects symbolic links in ZIP64=%s before extraction', async (zip64) => {
+it.each([false, true])('rejects symbolic links in ZIP64=%s', async (zip64) => {
   const archive = await archiveWithMode(0o120777, zip64)
   expect(() => importAgentProject(archive)).toThrow('symbolic links')
 })
