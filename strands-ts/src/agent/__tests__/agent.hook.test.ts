@@ -191,7 +191,18 @@ describe('Agent Hooks Integration', () => {
 
       await agent.invoke('secret')
 
-      expect(agent.messages[0]!.content).toEqual([new TextBlock('redacted')])
+      expect(agent.messages).toEqual([
+        new Message({
+          role: 'user',
+          content: [new TextBlock('redacted')],
+          trackingId: anyTrackingId,
+        }),
+        new Message({
+          role: 'assistant',
+          content: [new TextBlock('Hello')],
+          trackingId: anyTrackingId,
+        }),
+      ])
     })
 
     it('uses messages replaced by a hook', async () => {
