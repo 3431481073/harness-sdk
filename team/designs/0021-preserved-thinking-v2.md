@@ -119,6 +119,11 @@ Tool-result drops never touch `agent.messages` in native mode. `DropStrategy` re
 > - Configuration or setup required
 > - Error messages and edge cases -->
 
+The following is a flow chart showing how each time an agent is run, the context management strategy will be determined, so Strands can use the correct API for modifying the context. 
+
+![Proposed Context Strategy](./assets/PreservedThinkingContextManagementStrat.png)
+
+
 ## Open Questions
 - Should we log when a thinking block is noticed in the prefix/context, then start to check that the prefix is unchanged from the last turn? 
 

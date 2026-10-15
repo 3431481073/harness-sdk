@@ -4,7 +4,7 @@
 
 **Issue**: [#4933](https://github.com/strands-agents/harness-sdk/issues/4933)
 
-**Scope**: Both SDKs. Deliverable 1 keeps summarization and tool-result dropping working on preserved-thinking models (Claude Opus 5.5, Sonnet 5.5, and Fable 5.1) through Claude's server-side compaction and context editing. Deliverable 2 covers the edits the SDK does not route through a summarizer.
+ Both SDKs. Deliverable 1 keeps summarization and tool-result dropping working on preserved-thinking models (Claude Opus 5.5, Sonnet 5.5, and Fable 5.1) through Claude's server-side compaction and context editing. Deliverable 2 covers the edits the SDK does not route through a summarizer.
 
 **Related**: Builds on the model-side compaction proposal ([#4742](https://github.com/strands-agents/harness-sdk/pull/4742), implementation [#4752](https://github.com/strands-agents/harness-sdk/pull/4752)), and design [0015](./0015-context-manager.md), the context manager.
 
@@ -40,18 +40,38 @@ Strands users hit this when a summarizer or conversation manager reduces context
 Each thinking block is bound to everything sent before it:
 
 ```mermaid
-flowchart LR
-    subgraph prefix["Bound into the block's signature"]
+flowchart TD
+    subgraph turns["Turns 1–2: history only grows"]
         direction TB
-        sys["system prompt"] ~~~ tools["tools"] ~~~ earlier["messages 0 … k-1"]
+        u1["agent('Weather in Seattle?')"] --> r1["Model returns thinking + tool_use<br/>signature binds system prompt, tools,<br/>and every message before it"]
+        r1 --> s1["Strands appends the reply,<br/>including the signed thinking block,<br/>to agent.messages"]
+        s1 --> u2["agent('And Portland?')<br/>prefix unchanged → 200"]:::pass
     end
-    prefix --> block["thinking block<br/>in message k"]
-    block --> next{"Next request:<br/>is the prefix<br/>unchanged?"}
-    next -- yes --> ok["200<br/>model reads its reasoning"]:::pass
-    next -- "no: trim, summary,<br/>rewrite, new system prompt" --> bad["400<br/>or the block is dropped"]:::fail
 
-    classDef fail fill:#c0392b,color:#ffffff,stroke:#c0392b
+    u2 --> edit{"Before turn 3, does Strands<br/>change anything before<br/>a thinking block?"}
+    edit -- "no: history only grew" --> ok["200<br/>model reads its earlier reasoning"]:::pass
+    edit -- "yes" --> what["SlidingWindowConversationManager trims old turns<br/>SummarizingConversationManager or Offload.summarize<br/>swaps turns for a summary<br/>a seen tool result is truncated<br/>agent.system_prompt or the tools change"]:::edit
+
+    what --> send["agent('And Boise?')<br/>Strands sends the edited history,<br/>still holding the old thinking blocks"]
+    send --> any{"Is any thinking block<br/>left after the edit?"}
+    any -- "no: trimmed away,<br/>or the model never thought" --> ok2["200<br/>nothing to check"]:::pass
+    any -- yes --> enforced{"Is the check on?<br/>Account created on or after 2026-08-31,<br/>or prefix_mismatch_behavior is set"}
+    enforced -- no --> legacy["200<br/>older account, check not on"]:::pass
+    enforced -- yes --> behavior{"prefix_mismatch_behavior"}
+
+    behavior -- "&quot;error&quot; (default)" --> e400["400 ValidationException<br/>'block is bound to a<br/>different conversation'"]:::fail
+    behavior -- "&quot;drop_block&quot;" --> drop["API ignores the stale block<br/>and answers without it"]:::warn
+
+    e400 --> sdk["BedrockModel re-raises it as-is:<br/>not throttling, not context overflow,<br/>so no retry and no reduce_context"]:::fail
+    sdk --> user["The user's agent() call raises.<br/>The history is unchanged, so every<br/>later call fails the same way"]:::fail
+
+    drop --> d200["200<br/>that reasoning is lost"]:::warn
+    d200 --> stale["The stale block stays in agent.messages<br/>and is dropped again every turn<br/>(Anthropic measured 4.6–67.1% more output tokens)"]:::warn
+
     classDef pass fill:#2e7d32,color:#ffffff,stroke:#2e7d32
+    classDef fail fill:#c0392b,color:#ffffff,stroke:#c0392b
+    classDef warn fill:#f0ad4e,color:#000000,stroke:#c77c00
+    classDef edit fill:#e3ecfa,stroke:#1f5fbf
 ```
 
 Strands treats `agent.messages` as freely editable. Each built-in edit against `global.anthropic.claude-opus-5-5` was reproduced through both Bedrock Converse (`BedrockModel`) and Bedrock InvokeModel (see appendix for test script):
@@ -452,7 +472,7 @@ One PR per step per SDK:
 ## Open questions
 
 1. Should `compact()` and the capability properties live on `Model` or a separate capability protocol?
-2. **Compaction message role.** The proposal returns the block in a user message, which keeps the history starting with a user message and lets the split fall inside a tool loop (tail starting with an assistant turn). The API accepts the block in a user message, but the tail-thinking-survives result was verified with the assistant role it returns. Verify the user role before committing; the [native snippet](#native-messages-api-bedrock-invokemodel) checks both split points.
+2. **Compaction message role. Resolved 2026-10-13:** the block goes in a user message. With the block in a user message, a turn-boundary split (2 tail thinking blocks) and a split inside a tool loop (1 thinking block in the in-progress turn) both returned 200 on Bedrock InvokeModel with the tail's thinking intact ([native snippet](#native-messages-api-bedrock-invokemodel)).
 3. The API also returns `encrypted_content` and `tool_changes` on the block (both null in our runs) and rejects fields it didn't return. Should `CompactionContent` model them now, or round-trip unknown fields as-is?
 4. How should context edits reach the provider: a `stream()` keyword (proposed), or state the strategy sets on the model?
 5. When `SummarizeConfig.model` is set, should compaction override it (proposed, with a warning), or should an explicit summarizer model mean strip mode?
@@ -493,7 +513,7 @@ On-demand compaction on Bedrock InvokeModel, verified 2026-10-13 (and by #4742 o
 - The response is an assistant message with one `compaction` block (`content`, `signature`), `stop_reason: "compaction"`, and zero top-level tokens; the cost is in `usage.iterations`.
 - `[compaction message, kept tail]` returns 200 with the tail's thinking intact under `prefix_mismatch_behavior: "error"`.
 - The same request without the `compact-2026-09-04` header returns 400: `compaction` is an unknown block type.
-- The API also accepts the block in a user message ([open question 2](#open-questions)).
+- The block also works in a user message, verified 2026-10-13: with the split at a turn boundary or inside a tool loop, the tail's thinking stays valid and the next request returns 200 ([open question 2](#open-questions)).
 - Changing the block's text or signature returns `compaction_signature_invalid` or `compaction_content_mismatch` (per #4742).
 
 ### `AnthropicModel.compact()` sketch
@@ -591,7 +611,7 @@ Both scripts call `global.anthropic.claude-opus-5-5` in `us-west-2` with your de
 | Script | Saved as | Run with | Expected |
 |---|---|---|---|
 | Strands | `strands-py/src/test_preserved_thinking.py` | `python -i test_preserved_thinking.py` from `strands-py/src`, then paste each scenario | The baseline and `drop_block` scenarios return; the tool-added and in-progress-turn scenarios are unverified; the other four raise the 400 shown in their comments |
-| Native | `strands-py/src/test_preserved_thinking_anthropic.py` | `python test_preserved_thinking_anthropic.py` from `strands-py/src` | Runs top to bottom: prints the applied context edits and `compaction`, then prints `200` or `400 <message>` for the three open-question checks, then ends with the expected 400 from the last scenario |
+| Native | `strands-py/src/test_preserved_thinking_anthropic.py` | `python test_preserved_thinking_anthropic.py` from `strands-py/src` | Runs top to bottom: prints the applied context edits and `compaction`, then prints `200` or `400 <message>` for the three open-question checks with the number of thinking blocks each one tested (re-run any check that reports 0), then ends with the expected 400 from the last scenario |
 
 Thinking is adaptive, so the model sometimes skips it on a short turn. If no thinking block ends up in the history, an edit has nothing to invalidate and the scenario passes; re-run it.
 
@@ -686,7 +706,8 @@ first_result = next(b for m in agent.messages for b in m["content"] if "toolResu
 first_result["toolResult"]["content"] = [{"text": "[truncated]"}]
 agent("And Boise?")
 
-# Tool added between turns -> 400 expected (not yet reproduced)
+# Tool added between turns -> 400
+# "The `tools` list differs from the one this block was created with."
 agent = make_agent()
 agent("Weather in Seattle?"); agent("And Portland?")
 agent.tool_registry.process_tools([get_time])
@@ -822,6 +843,17 @@ def make_chat(context_management=None, compact_header=True):
     return Chat(context_management, compact_header)
 
 
+def count_thinking(messages):
+    """Count thinking blocks, so a 200 can be told apart from a turn where the model skipped thinking."""
+    return sum(
+        1
+        for message in messages
+        if isinstance(message["content"], list)
+        for block in message["content"]
+        if block.get("type") in ("thinking", "redacted_thinking")
+    )
+
+
 # Mid-conversation system message instead of editing the system prompt -> 200
 chat = make_chat()
 chat("Weather in Seattle?"); chat("And Portland?")
@@ -836,45 +868,58 @@ print(chat("And Boise?").context_management.applied_edits)
 chat = make_chat()
 chat("Weather in Seattle?"); chat("And Portland?")
 print(chat.compact().stop_reason)  # compaction
+print("tail thinking blocks after compaction:", count_thinking(chat.messages))  # 0 means nothing was tested
 chat("And Boise?")
 
 
 def check(name, scenario):
-    """Run an unverified scenario and print its status instead of stopping the script."""
+    """Run an unverified scenario and print its status instead of stopping the script.
+
+    A scenario returns the thinking-block count it tested; a 200 with a count of 0 proves nothing, so re-run it.
+    """
+    tested = {"thinking_blocks": 0}
     try:
-        scenario()
-        print(f"{name}: 200")
+        scenario(tested)
+        print(f"{name}: 200 (thinking blocks tested: {tested['thinking_blocks']})")
     except anthropic.BadRequestError as error:
-        print(f"{name}: 400 {error.message}")
+        print(f"{name}: 400 (thinking blocks tested: {tested['thinking_blocks']}) {error.message}")
 
 
-def compact_user_role_at_turn():
+def compact_user_role_at_turn(tested):
     chat = make_chat()
     chat("Weather in Seattle?"); chat("And Portland?")
     chat.compact(role="user")
+    tested["thinking_blocks"] = count_thinking(chat.messages)  # thinking kept in the tail
     chat("And Boise?")
 
 
-def compact_user_role_in_tool_loop():
+def compact_user_role_in_tool_loop(tested):
     chat = make_chat()
     chat("Weather in Seattle?")
 
     def compact_once(chat):
         if not chat._has_compaction(chat.messages):
             chat.compact(role="user", split_at="tool_loop")
+            tested["thinking_blocks"] = count_thinking(chat.messages)  # thinking in the in-progress turn
 
     chat("And Portland?", on_tool_result=compact_once)
     chat("And Boise?")
 
 
-def strip_in_progress_turn():
-    chat = make_chat()
-
+def strip_in_progress_turn(tested, attempts=5):
     def strip_thinking(chat):
         in_progress = chat.messages[-2]
-        in_progress["content"] = [block for block in in_progress["content"] if block.get("type") != "thinking"]
+        kept = [block for block in in_progress["content"] if block.get("type") not in ("thinking", "redacted_thinking")]
+        tested["thinking_blocks"] += len(in_progress["content"]) - len(kept)  # thinking removed
+        in_progress["content"] = kept
 
-    chat("Weather in Seattle?", on_tool_result=strip_thinking)
+    # A prompt that needs reasoning makes thinking before the tool call likely; retry if the model skipped it.
+    for _ in range(attempts):
+        chat = make_chat()
+        chat("Check Seattle and Portland, then tell me which city to visit for a dry, warm afternoon and why.",
+             on_tool_result=strip_thinking)
+        if tested["thinking_blocks"]:
+            return
 
 
 # Open question 2: compaction block in a user message, tail starts with a user turn -> result unknown
