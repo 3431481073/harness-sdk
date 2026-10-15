@@ -109,14 +109,6 @@ class _ToolCaller:
                         "Set record_direct_tool_call=False to allow direct tool calls during an active session."
                     )
 
-            # Snapshot cancel state so a tool (e.g. the stop tool) that calls
-            # agent.cancel(after_current_tools=True) does not leak signal / deferred_cancel /
-            # message into a subsequent invocation. State the caller set before the call is
-            # restored verbatim. BidiAgent has no _deferred_cancel attribute.
-            cancel_signal_was_set = agent._cancel_signal.is_set()
-            prior_deferred_cancel = getattr(agent, "_deferred_cancel", None)
-            prior_cancel_message = agent._cancel_message
-
             try:
                 normalized_name = self._find_normalized_tool_name(name)
 
@@ -153,14 +145,6 @@ class _ToolCaller:
                 return tool_result
 
             finally:
-                if cancel_signal_was_set:
-                    agent._cancel_signal.set()
-                else:
-                    agent._cancel_signal.clear()
-                if isinstance(agent, Agent):
-                    agent._deferred_cancel = bool(prior_deferred_cancel)
-                agent._cancel_message = prior_cancel_message
-
                 if acquired_lock and isinstance(agent, Agent):
                     agent._concurrency.release_lock()
 

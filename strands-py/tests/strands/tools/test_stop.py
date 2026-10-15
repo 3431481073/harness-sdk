@@ -10,7 +10,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from strands.experimental.tools.stop import make_stop, stop
+from strands.tools.stop import make_stop, stop
 from strands.types.tools import ToolContext
 
 

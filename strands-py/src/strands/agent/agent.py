@@ -643,11 +643,15 @@ class Agent(AgentBase, LocalAgent):
 
         With ``after_current_tools=True`` the cancellation is deferred: tools already requested in
         the current batch run to completion, and the loop exits before the next model call. This is
-        the cooperative stop a tool uses to end the loop from inside the agent.
+        the cooperative stop a tool uses to end the loop from inside the agent; see
+        :mod:`strands.experimental.tools.stop` for the vended tool.
 
-        Either way the agent returns a result with ``stop_reason="cancelled"``. When ``message`` is
-        given, it becomes the text of the final assistant message; otherwise the result carries the
-        model's last message. When several callers set a message, the last write wins.
+        When cancellation actually interrupts the loop the agent returns a result with
+        ``stop_reason="cancelled"``. If ``message`` is given, it becomes the text of the final
+        assistant message; otherwise the result carries the model's last message. When several
+        callers set a message, the last write wins. A deferred cancel that never gets to apply --
+        for example, the model answers with plain text and no tools in the same turn -- is a no-op
+        and the invocation returns with its natural ``stop_reason``.
 
         For cancellation driven from outside the agent (a client disconnect, a request
         lifecycle, a timeout), pass a ``cancel_signal`` into the invocation instead. The agent
@@ -669,14 +673,6 @@ class Agent(AgentBase, LocalAgent):
 
             result = await task
             assert result.stop_reason == "cancelled"
-            ```
-
-            Cooperative stop from inside a tool:
-            ```python
-            @tool(context=True)
-            def finish(tool_context: ToolContext, summary: str) -> str:
-                tool_context.agent.cancel(message=summary, after_current_tools=True)
-                return summary
             ```
 
         Note:
@@ -1420,6 +1416,11 @@ class Agent(AgentBase, LocalAgent):
         cancel_watcher: asyncio.Task[None] | None = None
 
         try:
+            # Clear a deferred-cancel flag that bypassed stream_async's finally (e.g.
+            # agent.tool.stop(...) called directly). _cancel_signal and _cancel_message
+            # are left intact so pre-invocation agent.cancel(message=...) still applies.
+            self._deferred_cancel = False
+
             self._external_cancel_signal = cancel_signal
             cancel_watcher = self._start_cancel_watcher(cancel_signal)
 

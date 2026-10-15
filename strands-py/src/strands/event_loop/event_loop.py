@@ -390,19 +390,6 @@ async def event_loop_cycle(
                     yield typed_event
                 return
 
-            # Honor cancel(after_current_tools=True) when the model answered without tools.
-            # Without this, a deferred cancel set from a hook or callback is silently lost on
-            # a plain-text turn (the deferred-cancel branch in _handle_tool_execution never runs).
-            if agent._deferred_cancel:
-                if agent._cancel_message is not None:
-                    message = Message(role="assistant", content=[{"text": agent._cancel_message}])
-                    await agent._append_messages(message)
-                tracer.end_event_loop_cycle_span(cycle_span, message)
-                yield EventLoopStopEvent(
-                    "cancelled", message, agent.event_loop_metrics, invocation_state["request_state"]
-                )
-                return
-
             tracer.end_event_loop_cycle_span(cycle_span, message)
             yield EventLoopStopEvent(stop_reason, message, agent.event_loop_metrics, invocation_state["request_state"])
         except (
@@ -888,23 +875,23 @@ async def _handle_tool_execution(
             yield interrupt_event
         return
 
-    tool_cancel_reason = None
+    cancel_message = None
     if before_tools_event.cancel:
-        tool_cancel_reason = (
+        cancel_message = (
             before_tools_event.cancel if isinstance(before_tools_event.cancel, str) else "Tool cancelled by hook"
         )
     elif agent._observe_cancellation():
-        tool_cancel_reason = "Tool execution cancelled"
+        cancel_message = "Tool execution cancelled"
 
     structured_output_result = None
     try:
-        if tool_cancel_reason:
+        if cancel_message:
             logger.debug("tool_count=<%d> | cancellation detected before tool execution", len(tool_uses))
             for tool_use in tool_uses:
                 cancel_result: ToolResult = {
                     "toolUseId": tool_use["toolUseId"],
                     "status": "error",
-                    "content": [{"text": tool_cancel_reason}],
+                    "content": [{"text": cancel_message}],
                 }
                 tool_results.append(cancel_result)
                 yield ToolResultEvent(cancel_result)
@@ -975,7 +962,7 @@ async def _handle_tool_execution(
     if not agent._observe_cancellation():
         agent._interrupt_state.end_tool_cycle()
     # Update stored results so replay filter skips already-executed tools on next resume.
-    elif tool_cancel_reason is None:
+    elif cancel_message is None:
         agent._interrupt_state.set_pending_tool_results(tool_results)
 
     await agent._append_messages(tool_result_message)

@@ -535,11 +535,11 @@ async def test_event_loop_cycle_deferred_cancel_without_message_keeps_model_mess
 
 
 @pytest.mark.asyncio
-async def test_event_loop_cycle_deferred_cancel_fires_on_plain_text_turn(agent, model, agenerator, alist):
-    """cancel(after_current_tools=True) must still halt when the model answers with text and no tools."""
+async def test_event_loop_cycle_deferred_cancel_on_plain_text_turn_is_a_noop(agent, model, agenerator, alist):
+    """cancel(after_current_tools=True) with no tools in the turn is a no-op; natural stop_reason wins."""
 
     def set_deferred_cancel(event):
-        agent.cancel(message="all done", after_current_tools=True)
+        agent.cancel(message="ignored", after_current_tools=True)
 
     agent.hooks.add_callback(AfterModelCallEvent, set_deferred_cancel)
     model.stream.return_value = agenerator(
@@ -553,9 +553,8 @@ async def test_event_loop_cycle_deferred_cancel_fires_on_plain_text_turn(agent, 
     events = await alist(strands.event_loop.event_loop.event_loop_cycle(agent=agent, invocation_state={}))
     tru_stop_reason, tru_message, _, _, _, _, _ = events[-1]["stop"]
 
-    assert tru_stop_reason == "cancelled"
-    assert tru_message["content"] == [{"text": "all done"}]
-    assert agent.messages[-1]["content"] == [{"text": "all done"}]
+    assert tru_stop_reason == "end_turn"
+    assert tru_message["content"] == [{"text": "hi"}]
 
 
 @pytest.mark.asyncio

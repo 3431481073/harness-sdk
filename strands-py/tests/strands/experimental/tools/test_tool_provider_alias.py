@@ -85,3 +85,15 @@ def test_no_warning_on_production_import(captured_warnings):
     ]
 
     assert len(tool_provider_warnings) == 0
+
+
+def test_stop_experimental_import_warns():
+    import importlib
+
+    import strands.experimental.tools as experimental_tools
+
+    importlib.reload(experimental_tools)
+    with pytest.warns(DeprecationWarning, match="stop has been moved"):
+        from strands.experimental.tools import stop  # noqa: F401
+    with pytest.warns(DeprecationWarning, match="make_stop has been moved"):
+        from strands.experimental.tools import make_stop  # noqa: F401

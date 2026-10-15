@@ -291,7 +291,8 @@ class BidiAgent(LocalAgent):
         group completes, so ``after_current_tools`` is accepted for API parity
         with ``Agent.cancel()`` but has no additional effect here. The
         ``message`` argument is stored for future use; BidiAgent does not yet
-        surface it in output history.
+        surface it in output history (tracked by
+        https://github.com/strands-agents/harness-sdk/issues/5162).
 
         Args:
             message: Optional terminal message describing why cancellation was

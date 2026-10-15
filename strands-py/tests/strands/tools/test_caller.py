@@ -463,30 +463,22 @@ def test_tool_caller_raises_reference_error_after_agent_collected():
         _ = caller._agent
 
 
-def test_direct_tool_call_isolates_cancel_state():
-    """A direct agent.tool.* call that cancels the agent must not leak state into the next invocation."""
-    from strands.experimental.tools import stop as stop_tool
+@pytest.mark.asyncio
+async def test_direct_tool_stop_does_not_cancel_next_invocation():
+    """A direct agent.tool.stop(...) call leaves deferred-cancel state behind, but the next
+    invocation clears it at start so the stop does not bleed in."""
+    from strands.tools import stop as stop_tool
+    from tests.fixtures.mocked_model_provider import MockedModelProvider
 
-    agent = Agent(tools=[stop_tool])
-    assert not agent.cancel_signal.is_set()
-    assert agent._deferred_cancel is False
-    assert agent._cancel_message is None
+    model = MockedModelProvider([{"role": "assistant", "content": [{"text": "ok"}]}])
+    agent = Agent(model=model, tools=[stop_tool])
 
     agent.tool.stop(message="done", record_direct_tool_call=False)
 
-    assert not agent.cancel_signal.is_set()
-    assert agent._deferred_cancel is False
-    assert agent._cancel_message is None
+    # The direct call leaves state behind (expected).
+    assert agent._deferred_cancel is True
+    assert agent._cancel_message == "done"
 
-
-def test_direct_tool_call_preserves_pre_existing_cancel_state():
-    """Cancel state the caller set before the tool call survives verbatim."""
-    from strands.experimental.tools import stop as stop_tool
-
-    agent = Agent(tools=[stop_tool])
-    agent.cancel(message="caller intent")
-
-    agent.tool.stop(message="tool-authored", record_direct_tool_call=False)
-
-    assert agent.cancel_signal.is_set()
-    assert agent._cancel_message == "caller intent"
+    # The next invocation clears tool-authored state at the start.
+    result = await agent.invoke_async("hi")
+    assert result.stop_reason == "end_turn"
