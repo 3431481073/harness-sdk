@@ -68,7 +68,7 @@ async function create(): ReturnType<typeof createInteractiveChat> {
 }
 
 async function invokeText(agent: Agent, name: string, input: Record<string, JSONValue> = {}): Promise<string> {
-  // MCP connections no longer block agent construction, so an authored server's tools register shortly after.
+  // MCP connections can finish registering tools after agent construction.
   for (let attempt = 0; !agent.toolRegistry.get(name) && attempt < 200; attempt++) {
     await new Promise((resolve) => setTimeout(resolve, 25))
   }

@@ -56,12 +56,6 @@ export class LiveSteering extends InterventionHandler {
   override beforeModelCall(
     event: BeforeModelCallEvent
   ): ReturnType<typeof InterventionActions.transform | typeof InterventionActions.proceed> {
-    return this._consume(event)
-  }
-
-  private _consume(
-    event: BeforeModelCallEvent
-  ): ReturnType<typeof InterventionActions.transform | typeof InterventionActions.proceed> {
     const updates = this._take(event.agent)
     if (updates.length === 0) {
       return InterventionActions.proceed()

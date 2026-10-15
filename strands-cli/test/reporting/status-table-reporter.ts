@@ -194,25 +194,18 @@ function caseCount(progress: Progress): string {
 }
 
 function summary(progress: readonly Progress[], scenarioMode: boolean): string {
-  if (scenarioMode) {
-    const states = stateCounts(progress)
-    return [
-      `${states.passed} passed`,
-      states.skipped > 0 ? `${states.skipped} skipped` : undefined,
-      states.failed > 0 ? `${states.failed} failed` : undefined,
-      `${progress.length} scenarios`,
-    ]
-      .filter(Boolean)
-      .join(' · ')
-  }
-  const passed = progress.reduce((total, entry) => total + entry.passed, 0)
-  const skipped = progress.reduce((total, entry) => total + entry.skipped, 0)
-  const failed = progress.reduce((total, entry) => total + entry.failed, 0)
+  const counts = scenarioMode
+    ? stateCounts(progress)
+    : {
+        passed: progress.reduce((total, entry) => total + entry.passed, 0),
+        skipped: progress.reduce((total, entry) => total + entry.skipped, 0),
+        failed: progress.reduce((total, entry) => total + entry.failed, 0),
+      }
   return [
-    `${passed} passed`,
-    skipped > 0 ? `${skipped} skipped` : undefined,
-    failed > 0 ? `${failed} failed` : undefined,
-    `${progress.length} files`,
+    `${counts.passed} passed`,
+    counts.skipped > 0 ? `${counts.skipped} skipped` : undefined,
+    counts.failed > 0 ? `${counts.failed} failed` : undefined,
+    `${progress.length} ${scenarioMode ? 'scenarios' : 'files'}`,
   ]
     .filter(Boolean)
     .join(' · ')

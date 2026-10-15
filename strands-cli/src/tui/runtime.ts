@@ -450,18 +450,18 @@ export async function createInteractiveChat(options: CreateInteractiveChatOption
         ...(options.project ? { project: options.project } : {}),
         exportAgentProject: (language, destination, output): Promise<string | undefined> => {
           if (options.project) {
-            const args = [
+            return exportSourceProject(
               options.project,
               runtime.agent.name,
               language,
               [sessionDirectory, memoryDirectory(controllerOptions.memory)],
               destination,
-            ] as const
-            return output ? exportSourceProject(...args, output) : exportSourceProject(...args)
+              output
+            )
           }
           const profile = configuration?.profile() ?? exportProfile
           const baseDir = configSnapshot.profileBaseDir ?? initialWorkspace
-          const args = [
+          return exportAgentProject(
             profile,
             language,
             resolveSkillPaths(
@@ -471,8 +471,8 @@ export async function createInteractiveChat(options: CreateInteractiveChatOption
             ),
             baseDir,
             destination,
-          ] as const
-          return output ? exportAgentProject(...args, output) : exportAgentProject(...args)
+            output
+          )
         },
         ...(configuration
           ? {

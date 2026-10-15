@@ -281,9 +281,6 @@ function EntryView({
     )
   }
   if (entry.type === 'reasoning') {
-    if (!settings.showReasoning) {
-      return <></>
-    }
     return (
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
         <Text dimColor bold>

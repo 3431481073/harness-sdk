@@ -29,7 +29,6 @@ let archive: string
 let home: string
 let pythonArchive: string
 let pythonStubs: string
-let profile: HarnessAgentConfig
 let setupHome: string
 
 describe('cross-platform exported agent E2E', () => {
@@ -45,9 +44,9 @@ describe('cross-platform exported agent E2E', () => {
       resolve(import.meta.dirname, '..', 'fixtures', 'platform-integration-sitecustomize.py'),
       join(pythonStubs, 'sitecustomize.py')
     )
-    profile = await createPlatformProfile('https://skills.example.test/SKILL.md', 'typescript')
+    const profile = await createPlatformProfile('typescript')
     archive = await exportProfile(profile, 'platform-agent.zip')
-    const exportedPythonProfile = await createPlatformProfile('https://skills.example.test/SKILL.md', 'python')
+    const exportedPythonProfile = await createPlatformProfile('python')
     pythonArchive = await exportProfile(exportedPythonProfile, 'platform-python-agent.zip', 'python')
     const config = await CliConfigStore.load(join(home, '.strands', 'cli.toml'))
     await config.saveSetup({
@@ -201,7 +200,7 @@ describe('cross-platform exported agent E2E', () => {
   })
 })
 
-async function createPlatformProfile(skillUrl: string, language: AgentProjectLanguage): Promise<HarnessAgentConfig> {
+async function createPlatformProfile(language: AgentProjectLanguage): Promise<HarnessAgentConfig> {
   const modelFile = `platform-integration-model.${language === 'python' ? 'py' : 'ts'}`
   const model = await fixture(modelFile)
   const mcpServer = await fixture('platform-integration-mcp.mjs')
@@ -220,7 +219,6 @@ async function createPlatformProfile(skillUrl: string, language: AgentProjectLan
     language,
     files: [`./${modelFile}`],
   }
-  const skills = [skillUrl, './skills']
   return defineHarnessAgentConfig({
     name: `Platform ${language} integration agent`,
     model: 'fixture/platform-integration',
@@ -236,7 +234,7 @@ async function createPlatformProfile(skillUrl: string, language: AgentProjectLan
     },
     memory: false,
     session: language === 'typescript' ? { dir: './state/sessions' } : false,
-    skills,
+    skills: ['https://skills.example.test/SKILL.md', './skills'],
   })
 }
 

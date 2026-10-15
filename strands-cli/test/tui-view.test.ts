@@ -2388,7 +2388,7 @@ describe('ChatView', () => {
   it('scrolls /settings rows in a short terminal', () => {
     const rows = settingsRows(DEFAULT_CHAT_SETTINGS, 'Appearance')
     const height = composerPanelHeight(snapshot({ panel: settingsPanel('Appearance') }), 7)
-    const capacity = panelRowCapacity('settings', height, rows)
+    const capacity = panelRowCapacity('settings', height)
     expect(capacity).toBeLessThan(rows.length)
     const selected = rows.length - 1
     const output = sanitizeTerminalText(
@@ -3129,7 +3129,6 @@ function settingsPanel(
     rows: settingsRows(settings, category, includeSetupAction),
     filters: settingsCategoryFilters(),
     settingsCategory: category,
-    settingsCategories: SETTINGS_CATEGORIES,
   }
 }
 

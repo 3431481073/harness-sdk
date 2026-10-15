@@ -53,7 +53,7 @@ const BASE_COLORS = {
     diffAdd: '#dcf5e2',
     diffRemove: '#fbe1e3',
   },
-} satisfies Record<ResolvedColorMode, Omit<ThemeColors, 'accent' | 'frog'>>
+} satisfies Record<ResolvedColorMode, Omit<ThemeColors, 'accent'>>
 
 const ACCENTS = {
   green: { light: '#007439', dark: '#00cc60' },
@@ -66,17 +66,6 @@ const ACCENTS = {
   scarlet: { light: '#a51f38', dark: '#ff7888' },
 } satisfies Record<FrogTheme, Record<ResolvedColorMode, string>>
 
-const FROG_COLORS = {
-  green: { light: '#02a435', dark: '#00cc60' },
-  minimal: { light: '#1c1e22', dark: '#ededed' },
-  homeland: { light: '#5a9e64', dark: '#80e28f' },
-  merlin: { light: '#5b4788', dark: '#8265c2' },
-  kikker: { light: '#b35900', dark: '#ff7f00' },
-  oak: { light: '#724a2c', dark: '#a36a3f' },
-  spectre: { light: '#111317', dark: '#181b21' },
-  scarlet: { light: '#9d212c', dark: '#e02f3f' },
-} satisfies Record<FrogTheme, Record<ResolvedColorMode, string>>
-
 export function getTheme(settings: ThemeSettings, detectedMode?: ResolvedColorMode, canvas?: string): Theme {
   const mode = detectedMode ?? currentColorMode()
   // A supplied mode renders a preview, not the live terminal, so the detected canvas does not apply.
@@ -84,7 +73,6 @@ export function getTheme(settings: ThemeSettings, detectedMode?: ResolvedColorMo
   return {
     ...BASE_COLORS[mode],
     accent: ACCENTS[settings.frogTheme][mode],
-    frog: FROG_COLORS[settings.frogTheme][mode],
     canvas: canvas ?? detectedCanvas ?? BASE_COLORS[mode].background,
     mode,
   }

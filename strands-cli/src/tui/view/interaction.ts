@@ -163,50 +163,6 @@ export function configurationDockCodeSize(width: number, height: number): { widt
   }
 }
 
-export function settingsLayout(
-  panelWidth: number,
-  setting?: string
-): {
-  contentWidth: number
-  labelWidth: number
-  columns: number
-  optionWidth: number
-} {
-  const contentWidth = Math.max(1, Math.min(68, panelWidth - 4))
-  const longLabel = setting === 'agentMessaging' || setting === 'telemetry'
-  const labelWidth =
-    setting === 'frogTheme'
-      ? Math.floor(contentWidth / 3)
-      : longLabel
-        ? Math.min(contentWidth, 32, Math.max(15, contentWidth - 14))
-        : Math.min(contentWidth, 23, Math.max(15, Math.floor(contentWidth / 3)))
-  const optionWidth = setting === 'frogTheme' ? 11 : 14
-  return {
-    contentWidth,
-    labelWidth,
-    columns: Math.min(4, Math.max(1, Math.floor((contentWidth - labelWidth) / optionWidth))),
-    optionWidth,
-  }
-}
-
-export function settingsThemeLayout(panelWidth: number): {
-  columns: number
-  optionWidth: number
-  optionHeight: number
-  offset: number
-} {
-  const { contentWidth, labelWidth } = settingsLayout(panelWidth)
-  const offset = contentWidth >= 54 ? labelWidth : 0
-  const gridWidth = contentWidth - offset
-  const columns = gridWidth >= 30 ? 3 : gridWidth >= 20 ? 2 : 1
-  return {
-    columns,
-    optionWidth: Math.floor(gridWidth / columns),
-    optionHeight: contentWidth >= 54 ? 3 : 1,
-    offset,
-  }
-}
-
 /** The settings row activation for ← or →: the neighboring option, or Off and On for a toggle. */
 export function settingArrowValue(row: ChatPanelRow, direction: -1 | 1): string | undefined {
   const { control, value } = row
@@ -511,11 +467,7 @@ export function permissionPreviewCapacity(lineCount: number, height: number): nu
   return Math.max(1, height - Number(lineCount > height && height > 1))
 }
 
-export function panelRowCapacity(
-  kind: ChatPanel['kind'],
-  terminalHeight: number,
-  _rows: readonly ChatPanelRow[] = []
-): number {
+export function panelRowCapacity(kind: ChatPanel['kind'], terminalHeight: number): number {
   if (SECTIONED_PANEL_KINDS.has(kind)) {
     return Math.max(1, terminalHeight - SECTIONED_PANEL_CHROME_ROWS)
   }

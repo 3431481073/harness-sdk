@@ -258,11 +258,8 @@ export function settingsUpdateRow(version: string, status: SettingsUpdateStatus)
 export function taskRows(tasks: readonly ChatTask[]): ChatPanelRow[] {
   return tasks
     .filter((task) => task.source === 'background')
-    .map((task, index) => ({ task, index }))
-    .sort(
-      (left, right) => taskStatusRank(left.task.status) - taskStatusRank(right.task.status) || left.index - right.index
-    )
-    .map(({ task }) => {
+    .sort((left, right) => taskStatusRank(left.status) - taskStatusRank(right.status))
+    .map((task) => {
       const status = taskStatusLabel(task.status)
       return {
         label: task.label,
@@ -356,11 +353,6 @@ export function makePanel(id: string, panel: NewChatPanel): ChatPanel {
   }
   switch (panel.kind) {
     case 'effort':
-      return {
-        ...common,
-        kind: panel.kind,
-        slider: sanitizeSlider(panel.slider),
-      }
     case 'permissions':
       return {
         ...common,
@@ -375,19 +367,6 @@ export function makePanel(id: string, panel: NewChatPanel): ChatPanel {
           ...panel.request,
           ...(panel.request.diff ? { diff: sanitizeDiffPreview(panel.request.diff) } : {}),
         },
-      }
-    case 'settings':
-      return {
-        ...common,
-        kind: panel.kind,
-        ...(panel.settingsCategories
-          ? {
-              settingsCategories: panel.settingsCategories.map(({ id: categoryId, label }) => ({
-                id: categoryId,
-                label: sanitizeTerminalText(label),
-              })),
-            }
-          : {}),
       }
     case 'config':
       return {

@@ -19,7 +19,13 @@ import type { AgentProjectLanguage, ImportedAgentProject } from './import.js'
 import { portableConfig, validateNoConfigSecrets } from './configuration.js'
 import { containsPath, expandHome } from '../paths.js'
 import { isRecord } from '../values.js'
-import { assertPortablePathComponent, MAX_PROJECT_BYTES, type PackagedSource } from './packaging.js'
+import {
+  assertPortablePathComponent,
+  hasIgnoredDirectory,
+  IGNORED_DIRECTORIES,
+  MAX_PROJECT_BYTES,
+  type PackagedSource,
+} from './packaging.js'
 
 export type AgentProjectOutput = 'zip' | 'directory'
 
@@ -569,13 +575,7 @@ function hasSkillFile(path: string): boolean {
 }
 
 // The manifest scan never sees packaged file trees, so credential-shaped files get the same
-// fail-explicitly treatment by name before they reach the archive. Junk directories that are
-// never part of shareable source are skipped silently instead of failing the export.
-export const IGNORED_DIRECTORIES: ReadonlySet<string> = new Set(['.git', 'node_modules', '.venv', '__pycache__'])
-
-export function hasIgnoredDirectory(path: string, ignored = IGNORED_DIRECTORIES): boolean {
-  return path.split(/[\\/]/u).some((part) => ignored.has(part))
-}
+// fail-explicitly treatment by name before they reach the archive.
 const SECRET_FILE_PATTERN =
   /^(?:\.env(?:\..+)?|\.npmrc|\.netrc|credentials(?:\.json)?|id_(?:rsa|dsa|ecdsa|ed25519)(?:\..+)?|.+\.(?:pem|p12|pfx|key|keystore|jks))$/iu
 const SECRET_FILE_TEMPLATES = new Set(['.env.example', '.env.sample', '.env.template'])

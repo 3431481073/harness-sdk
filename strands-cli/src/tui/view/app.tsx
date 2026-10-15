@@ -513,8 +513,7 @@ export function ChatApp({
       }
       const capacity = panelRowCapacity(
         snapshot.panel.kind,
-        composerHeight === undefined ? terminalHeight : composerPanelContentHeight(snapshot.panel, composerHeight),
-        panelRows
+        composerHeight === undefined ? terminalHeight : composerPanelContentHeight(snapshot.panel, composerHeight)
       )
       const start = revealPanelSelection(
         panelSelectionRef.current,
@@ -562,7 +561,7 @@ export function ChatApp({
     if (snapshot.panel && snapshot.panel.id === detailReturn?.id) {
       const rows = filterPanelRows(snapshot.panel.rows, detailReturn.query, detailReturn.filter)
       const selected = Math.max(0, Math.min(detailReturn.selection, rows.length - 1))
-      const capacity = panelRowCapacity(snapshot.panel.kind, composerPanelHeight(snapshot, height, party, width), rows)
+      const capacity = panelRowCapacity(snapshot.panel.kind, composerPanelHeight(snapshot, height, party, width))
       const start = revealPanelSelection(selected, detailReturn.viewport, capacity, rows.length)
       setPanelQuery(detailReturn.query)
       setPanelFilter(detailReturn.filter)
@@ -762,8 +761,7 @@ export function ChatApp({
           const rows = panelRows ?? []
           const capacity = panelRowCapacity(
             snapshot.panel.kind,
-            composerHeight === undefined ? terminalHeight : composerPanelContentHeight(snapshot.panel, composerHeight),
-            rows
+            composerHeight === undefined ? terminalHeight : composerPanelContentHeight(snapshot.panel, composerHeight)
           )
           const nextStart = scrollPanelViewport(panelViewportStartRef.current, scroll, rows.length, capacity)
           panelViewportStartRef.current = nextStart
@@ -1267,8 +1265,7 @@ export function ChatApp({
                 snapshot.panel.kind,
                 composerHeight === undefined
                   ? terminalHeight
-                  : composerPanelContentHeight(snapshot.panel, composerHeight),
-                rows
+                  : composerPanelContentHeight(snapshot.panel, composerHeight)
               )
         if (snapshot.panel.kind === 'permission' && key.escape) {
           const escapeRow = permissionEscapeRow(rows, snapshot.panel.stage)
@@ -1470,11 +1467,7 @@ export function ChatApp({
             )
             return
           }
-          if (modelPanelFocus === 'search' && key.downArrow) {
-            setModelPanelFocus('models')
-            return
-          }
-          if (modelPanelFocus === 'search' && key.return) {
+          if (modelPanelFocus === 'search' && (key.downArrow || key.return)) {
             setModelPanelFocus('models')
             return
           }

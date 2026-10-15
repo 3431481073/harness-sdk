@@ -7,21 +7,11 @@ import { promisify } from 'node:util'
 import { URL, fileURLToPath } from 'node:url'
 import { expect } from 'vitest'
 
+import type { TUI_CASE } from './catalog.js'
+
 const execFileAsync = promisify(execFile)
 
-export type TuiScenario =
-  | 'approval'
-  | 'chat'
-  | 'exit'
-  | 'follow-up'
-  | 'frog'
-  | 'panels'
-  | 'resize'
-  | 'setup-export'
-  | 'shell-command'
-  | 'shell-interrupt'
-  | 'startup'
-  | 'startup-typing'
+export type TuiScenario = (typeof TUI_CASE)[keyof typeof TUI_CASE]['scenario']
 
 export type TuiDriverScenario =
   | TuiScenario

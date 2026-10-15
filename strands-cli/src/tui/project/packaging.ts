@@ -6,6 +6,12 @@ import { containsPath, expandHome } from '../paths.js'
 export type PackagedSource =
   { source: string; destination: string; directoryOnly?: boolean } | { contents: string; destination: string }
 
+export const IGNORED_DIRECTORIES: ReadonlySet<string> = new Set(['.git', 'node_modules', '.venv', '__pycache__'])
+
+export function hasIgnoredDirectory(path: string, ignored = IGNORED_DIRECTORIES): boolean {
+  return path.split(/[\\/]/u).some((part) => ignored.has(part))
+}
+
 export function realSource(path: string, fileOnly = false, baseDir = process.cwd()): string {
   const candidate = resolve(baseDir, expandHome(path))
   const details = lstatSync(candidate)

@@ -27,86 +27,7 @@ export function PanelHelpFooter({
   const panel = useContext(PanelHelpContext)
   if (!panel) return null
   const displayedModelId = width >= 80 ? (modelId ?? panelModelId(panel)) : undefined
-  const permission = panel.kind === 'permission'
-  const detail = panel.kind === 'detail' || panel.kind === 'help-detail'
-  const actionable = panel.rows.some((row) => row.value !== undefined)
-  const customPermissions =
-    panel.kind === 'permissions' && panel.slider.options.some((option) => option.id === 'custom' && option.active)
-  const keys = permission
-    ? panel.stage
-      ? '↑↓←→ · Enter save rule · Esc back'
-      : width < 64
-        ? '↑↓←→ · Enter choose · Esc deny'
-        : '↑↓←→ · Enter choose · PgUp/PgDn scroll · Esc deny once'
-    : panel.kind === 'error' && scrollable
-      ? width < 53
-        ? '↑↓ scroll · Esc close'
-        : '↑↓ / PgUp / PgDn scroll · Esc close'
-      : detail
-        ? width < 53
-          ? '↑↓ scroll · Esc back'
-          : '↑↓ / PgUp / PgDn scroll · Esc back'
-        : panel.kind === 'config'
-          ? width < 53
-            ? `${panel.configuration.project ? 'E open · ' : ''}←→ language · ↑↓ scroll · Esc`
-            : `${panel.configuration.project ? 'E open · ' : ''}←→ language · ↑↓ / PgUp / PgDn scroll · Esc close`
-          : panel.kind === 'effort'
-            ? width < 53
-              ? '←→ · Enter done · Esc close'
-              : '←→ change · Enter done · Esc close'
-            : !actionable
-              ? 'Esc close'
-              : panel.kind === 'settings'
-                ? width < 42
-                  ? '↑↓ move · ←→ change · Esc back'
-                  : '↑↓ · ←→ change · Tab section · Esc back'
-                : panel.kind === 'help'
-                  ? width < 53
-                    ? 'Tab · / search · ↑↓ · Enter · Esc'
-                    : 'Tab section · / search · ↑↓ · Enter open/run · Esc back'
-                  : panel.kind === 'models'
-                    ? width < 53
-                      ? 'Ctrl+Y · Tab · / · ↑↓ · Enter · Esc'
-                      : 'Ctrl+Y copy ID · Tab section · / search in models · ↑↓ · Enter choose · Esc back'
-                    : panel.kind === 'sessions'
-                      ? width < 53
-                        ? 'Tab · / · ↑↓ · Enter · Esc'
-                        : 'Tab section · / search sessions · ↑↓ · Enter open · Esc back'
-                      : panel.kind === 'export'
-                        ? '←→ / Tab choose · Enter continue · Esc back'
-                        : panel.kind === 'voice'
-                          ? width < 53
-                            ? 'Tab · ↑↓ · ←→ · Space mute · Enter · Esc'
-                            : 'Tab section · ↑↓ move · ←→ change · Space mute · Enter choose · Esc back'
-                          : panel.kind === 'tools'
-                            ? '↑↓ · Enter toggle · Esc save'
-                            : panel.kind === 'tasks'
-                              ? width < 53
-                                ? 'Tab · / · ←→ · ↑↓ · Enter · Esc'
-                                : 'Tab section · / search tasks · ←→ change · ↑↓ · Enter open/toggle · Esc back'
-                              : panel.kind === 'permissions'
-                                ? width < 53
-                                  ? customPermissions
-                                    ? 'Tab · / · ←→ · ↑↓ · Enter · Esc'
-                                    : '←→ mode · Tab tools · / search · Esc'
-                                  : customPermissions
-                                    ? 'Tab section · / search tools · ←→ mode · ↑↓ · Enter toggle · Esc save'
-                                    : '←→ mode · Tab tools · / search · choose Custom to edit · Esc save'
-                                : panel.kind === 'mcp'
-                                  ? width < 64
-                                    ? `/ · ${panel.rows.some((row) => row.control) ? 'Enter toggle · ' : ''}→ info · ${panel.canRetry ? 'R · ' : ''}Esc`
-                                    : `/ search · ↑↓ · ${panel.rows.some((row) => row.control) ? 'Enter toggle · ' : ''}→ details · ${panel.canRetry ? 'R retry · ' : ''}Esc back`
-                                  : panel.kind === 'skills'
-                                    ? '↑↓ · Enter run · → details · Esc back'
-                                    : panel.kind === 'agents'
-                                      ? width < 26
-                                        ? 'Arrows · Enter · Esc'
-                                        : width < 64
-                                          ? '↑↓←→ · Enter switch · Esc'
-                                          : '↑↓←→ choose · Enter switch · PgUp/PgDn scroll · Esc back'
-                                      : panel.filters?.length
-                                        ? 'Tab category · Enter · Esc back'
-                                        : '↑↓ · Enter open · Esc back'
+  const keys = panelHelpKeys(panel, width, scrollable)
   return (
     <Box
       width={Math.max(1, width)}
@@ -129,6 +50,83 @@ export function PanelHelpFooter({
       </Box>
     </Box>
   )
+}
+
+function panelHelpKeys(panel: ChatPanel, width: number, scrollable: boolean): string {
+  if (panel.kind === 'permission') {
+    return panel.stage
+      ? '↑↓←→ · Enter save rule · Esc back'
+      : width < 64
+        ? '↑↓←→ · Enter choose · Esc deny'
+        : '↑↓←→ · Enter choose · PgUp/PgDn scroll · Esc deny once'
+  }
+  if (panel.kind === 'error' && scrollable) {
+    return width < 53 ? '↑↓ scroll · Esc close' : '↑↓ / PgUp / PgDn scroll · Esc close'
+  }
+  if (panel.kind === 'detail' || panel.kind === 'help-detail') {
+    return width < 53 ? '↑↓ scroll · Esc back' : '↑↓ / PgUp / PgDn scroll · Esc back'
+  }
+  if (panel.kind === 'config') {
+    return width < 53
+      ? `${panel.configuration.project ? 'E open · ' : ''}←→ language · ↑↓ scroll · Esc`
+      : `${panel.configuration.project ? 'E open · ' : ''}←→ language · ↑↓ / PgUp / PgDn scroll · Esc close`
+  }
+  if (panel.kind === 'effort') {
+    return width < 53 ? '←→ · Enter done · Esc close' : '←→ change · Enter done · Esc close'
+  }
+  if (!panel.rows.some((row) => row.value !== undefined)) return 'Esc close'
+  switch (panel.kind) {
+    case 'settings':
+      return width < 42 ? '↑↓ move · ←→ change · Esc back' : '↑↓ · ←→ change · Tab section · Esc back'
+    case 'help':
+      return width < 53
+        ? 'Tab · / search · ↑↓ · Enter · Esc'
+        : 'Tab section · / search · ↑↓ · Enter open/run · Esc back'
+    case 'models':
+      return width < 53
+        ? 'Ctrl+Y · Tab · / · ↑↓ · Enter · Esc'
+        : 'Ctrl+Y copy ID · Tab section · / search in models · ↑↓ · Enter choose · Esc back'
+    case 'sessions':
+      return width < 53 ? 'Tab · / · ↑↓ · Enter · Esc' : 'Tab section · / search sessions · ↑↓ · Enter open · Esc back'
+    case 'export':
+      return '←→ / Tab choose · Enter continue · Esc back'
+    case 'voice':
+      return width < 53
+        ? 'Tab · ↑↓ · ←→ · Space mute · Enter · Esc'
+        : 'Tab section · ↑↓ move · ←→ change · Space mute · Enter choose · Esc back'
+    case 'tools':
+      return '↑↓ · Enter toggle · Esc save'
+    case 'tasks':
+      return width < 53
+        ? 'Tab · / · ←→ · ↑↓ · Enter · Esc'
+        : 'Tab section · / search tasks · ←→ change · ↑↓ · Enter open/toggle · Esc back'
+    case 'permissions': {
+      const custom = panel.slider.options.some((option) => option.id === 'custom' && option.active)
+      return width < 53
+        ? custom
+          ? 'Tab · / · ←→ · ↑↓ · Enter · Esc'
+          : '←→ mode · Tab tools · / search · Esc'
+        : custom
+          ? 'Tab section · / search tools · ←→ mode · ↑↓ · Enter toggle · Esc save'
+          : '←→ mode · Tab tools · / search · choose Custom to edit · Esc save'
+    }
+    case 'mcp': {
+      const toggle = panel.rows.some((row) => row.control) ? 'Enter toggle · ' : ''
+      return width < 64
+        ? `/ · ${toggle}→ info · ${panel.canRetry ? 'R · ' : ''}Esc`
+        : `/ search · ↑↓ · ${toggle}→ details · ${panel.canRetry ? 'R retry · ' : ''}Esc back`
+    }
+    case 'skills':
+      return '↑↓ · Enter run · → details · Esc back'
+    case 'agents':
+      return width < 26
+        ? 'Arrows · Enter · Esc'
+        : width < 64
+          ? '↑↓←→ · Enter switch · Esc'
+          : '↑↓←→ choose · Enter switch · PgUp/PgDn scroll · Esc back'
+    default:
+      return panel.filters?.length ? 'Tab category · Enter · Esc back' : '↑↓ · Enter open · Esc back'
+  }
 }
 
 export function ComposerFooter({

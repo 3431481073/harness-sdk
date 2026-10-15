@@ -3,7 +3,7 @@ import type { DOMElement } from 'ink'
 
 import type { ChatContextBreakdown, ChatContextUsage } from '../chat/types.js'
 import { PanelHelpFooter } from './help-footer.js'
-import { contextColor } from './presentation.js'
+import { contextColor, formatContext } from './presentation.js'
 import { Box, Text, useTheme, type Theme } from './theme.js'
 
 type CategoryKind = ChatContextBreakdown['categories'][number]['kind'] | 'free'
@@ -168,16 +168,30 @@ function Legend({
 
 export function ContextPanel({
   context,
+  title,
   width,
-  height,
+  height: requestedHeight,
   onPanelElement,
 }: {
   context: ChatContextUsage
+  title: string
   width: number
-  height: number
+  height?: number
   onPanelElement?: (element: DOMElement | null) => void
 }): ReactElement {
   const theme = useTheme()
+  if (!context.breakdown) {
+    return (
+      <ContextSummary
+        context={context}
+        title={title}
+        width={width}
+        {...(requestedHeight === undefined ? {} : { height: requestedHeight })}
+        {...(onPanelElement ? { onPanelElement } : {})}
+      />
+    )
+  }
+  const height = requestedHeight ?? 14
   const used = context.projectedTokens ?? context.currentTokens
   const segments = contextSegments(context, theme)
   const contentWidth = Math.min(116, width)
@@ -251,6 +265,89 @@ export function ContextPanel({
             </Box>
           </Box>
         )}
+      </Box>
+      <PanelHelpFooter width={contentWidth} centered />
+    </Box>
+  )
+}
+
+function ContextSummary({
+  context,
+  title,
+  width,
+  height,
+  onPanelElement,
+}: {
+  context: ChatContextUsage
+  title: string
+  width: number
+  height?: number
+  onPanelElement?: (element: DOMElement | null) => void
+}): ReactElement {
+  const palette = useTheme()
+  const { accent } = palette
+  const used = context.projectedTokens ?? context.currentTokens
+  const wide = width >= 64
+  const contentWidth = Math.min(wide ? 96 : 52, width)
+  const columnWidth = wide ? Math.floor((contentWidth - 4) / 2) : contentWidth
+  const stats = [
+    ['Input', context.inputTokens],
+    ['Output', context.outputTokens],
+    ['Cache read', context.cacheReadInputTokens],
+    ['Cache write', context.cacheWriteInputTokens],
+  ] as const
+  const stat = ([label, tokens]: (typeof stats)[number], statWidth?: number): ReactElement => (
+    <Box key={label} {...(statWidth === undefined ? {} : { width: statWidth })} justifyContent="space-between">
+      <Text dimColor>{label}</Text>
+      <Text>{tokens?.toLocaleString() ?? '—'}</Text>
+    </Box>
+  )
+  return (
+    <Box
+      ref={onPanelElement}
+      width={width}
+      {...(height === undefined ? {} : { height })}
+      flexDirection="column"
+      alignItems="center"
+      overflow="hidden"
+    >
+      <Box width={contentWidth} flexGrow={1} flexDirection="column" justifyContent="center" overflow="hidden">
+        <Box
+          width="100%"
+          overflow="hidden"
+          {...(wide ? { flexDirection: 'row', justifyContent: 'space-between' } : { flexDirection: 'column' })}
+        >
+          <Box width={columnWidth} flexShrink={0} flexDirection="column">
+            <Text bold color={accent} wrap="truncate-end">
+              {title}
+            </Text>
+            {context.contextWindow ? (
+              <Text color={contextColor(context, palette)} wrap="truncate-end">
+                {formatContext(context, Math.max(1, columnWidth - 12))}
+              </Text>
+            ) : null}
+            <Text dimColor wrap="truncate-end">
+              {used?.toLocaleString() ?? '—'}
+              {context.contextWindow ? ` / ${context.contextWindow.toLocaleString()}` : ''} tokens
+            </Text>
+            <Text dimColor wrap="truncate-end">
+              {used === undefined ? 'Send a message to measure context' : 'Category breakdown unavailable'}
+            </Text>
+          </Box>
+          <Box width={columnWidth} flexShrink={0} flexDirection="column" {...(wide ? {} : { marginTop: 1 })}>
+            <Box justifyContent="space-between">
+              <Text bold>Last turn</Text>
+              <Text>{context.totalTokens?.toLocaleString() ?? '—'} tokens</Text>
+            </Box>
+            {wide
+              ? stats.map((entry) => stat(entry))
+              : [stats.slice(0, 2), stats.slice(2)].map((pair) => (
+                  <Box key={pair[0]![0]} justifyContent="space-between">
+                    {pair.map((entry) => stat(entry, Math.floor((contentWidth - 2) / 2)))}
+                  </Box>
+                ))}
+          </Box>
+        </Box>
       </Box>
       <PanelHelpFooter width={contentWidth} centered />
     </Box>

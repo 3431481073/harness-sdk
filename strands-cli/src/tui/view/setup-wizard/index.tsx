@@ -317,26 +317,6 @@ function SetupWizardContent({
   const isSettings = isAppearance && settingsReturn !== undefined
   const progress = appearanceOnly || isSettings ? undefined : setupStepProgress(flow, step)
   const progressHeight = progress ? 3 : 0
-  const updateSettings = useCallback(
-    (next: ChatSettings): void => {
-      setPanelSettings(next)
-      setAppearance(appearanceSettings(next))
-      setDraft((current) => ({
-        ...current,
-        settings: {
-          ...current.settings,
-          mcpDiscovery: next.mcpDiscovery,
-          skillDiscovery: next.skillDiscovery,
-          agentMessaging: next.agentMessaging,
-        },
-      }))
-      setError(undefined)
-      void config
-        .setSettings(next)
-        .catch((cause: unknown) => setError(cause instanceof Error ? cause.message : String(cause)))
-    },
-    [config, setAppearance]
-  )
   const updateSetupSettings = useCallback(
     (next: ChatSettings): void => {
       setPanelSettings(next)
@@ -352,6 +332,16 @@ function SetupWizardContent({
       }))
     },
     [setAppearance]
+  )
+  const updateSettings = useCallback(
+    (next: ChatSettings): void => {
+      updateSetupSettings(next)
+      setError(undefined)
+      void config
+        .setSettings(next)
+        .catch((cause: unknown) => setError(cause instanceof Error ? cause.message : String(cause)))
+    },
+    [config, updateSetupSettings]
   )
   const isProviderSetup = (flow === 'quickstart' || flow === 'customize') && step === 1
   const isTools = flow === 'customize' && step === 3
@@ -533,10 +523,10 @@ function SetupWizardContent({
   const assessmentFacts = inspectedAssessment?.facts ?? []
   const quickstartExaSearchActive = flow === 'quickstart' && step === 1 && exaWebSearchActive(draft.profile)
   const quickstartWebSearchOffered = rows.some((row) => row.id === 'quickstart-web-search')
-  const canShowQuickstartOptionsPanel = splitQuickstart && quickstartDetailColumnWidth >= 66
+  const showModelOptionsPanel = splitQuickstart && quickstartDetailColumnWidth >= 66
   const quickstartOptionsColumnWidth = 32
   const quickstartModelColumnWidth =
-    quickstartDetailColumnWidth - (canShowQuickstartOptionsPanel ? quickstartOptionsColumnWidth : 0)
+    quickstartDetailColumnWidth - (showModelOptionsPanel ? quickstartOptionsColumnWidth : 0)
   const quickstartDetailContentWidth = Math.max(1, quickstartModelColumnWidth - 4)
   const bannerWarning = warning
     ? assessmentFacts.length > 0
@@ -693,7 +683,6 @@ function SetupWizardContent({
           ...(reasoningRow.disabled ? { disabled: true } : {}),
         }
       : undefined
-  const showModelOptionsPanel = canShowQuickstartOptionsPanel
   const modelOptionRows = providerReady
     ? providerConfigurationRows.filter((row) => row.id !== 'thinking' || reasoningRow !== undefined)
     : []
@@ -2729,7 +2718,7 @@ function SetupWizardContent({
               {!isAppearance && flow === 'customize' && !isProviderSetup && !isCapabilities ? (
                 <Box paddingX={1} marginBottom={1} justifyContent="space-between" flexShrink={0}>
                   <Text bold color={accent}>
-                    {isSettings ? 'Settings' : isAppearance ? 'Appearance' : CUSTOMIZE_STEPS[step - 1]}
+                    {CUSTOMIZE_STEPS[step - 1]}
                   </Text>
                   {customizeOverflowLabel ? <Text dimColor>{customizeOverflowLabel}</Text> : null}
                 </Box>
@@ -3276,7 +3265,7 @@ function SetupWizardContent({
                     if (row.id === 'refresh-provider') {
                       return renderRefreshButton(row, bubbleWidth - 2)
                     }
-                    if (isProviderSetup && row.status) {
+                    if (row.status) {
                       return (
                         <ProviderList
                           key={row.id}
@@ -3315,17 +3304,7 @@ function SetupWizardContent({
                             dimColor={row.disabled === true}
                             wrap="truncate-end"
                           >
-                            {row.status ? (
-                              <Text color={palette[row.status]}>● </Text>
-                            ) : row.field ? (
-                              ''
-                            ) : row.active === undefined ? (
-                              ''
-                            ) : row.active ? (
-                              '☑ '
-                            ) : (
-                              '☐ '
-                            )}
+                            {row.field || row.active === undefined ? '' : row.active ? '☑ ' : '☐ '}
                             {row.label}
                           </Text>
                           {directoryRows.has(index) ? (
@@ -3363,11 +3342,7 @@ function SetupWizardContent({
                           </Box>
                         ) : (
                           <Text
-                            {...(row.descriptionColor
-                              ? { color: row.descriptionColor }
-                              : row.status
-                                ? { color: palette[row.status] }
-                                : { dimColor: true })}
+                            {...(row.descriptionColor ? { color: row.descriptionColor } : { dimColor: true })}
                             wrap="truncate-end"
                           >
                             {row.description}

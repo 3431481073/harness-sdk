@@ -195,7 +195,7 @@ export class Canvas implements PixelSink {
     this._partyOffset = Math.floor(partyElapsedMs / 80)
     this.theme = _party ? 'green' : theme
     this.colorMode = options.colorMode ?? 'dark'
-    const palette = frogPalette(this.theme, _party ? { colorMode: options.colorMode ?? 'dark' } : options)
+    const palette = frogPalette(this.theme, options)
     this._foregroundCodes = colorCodes(palette, 38)
     this._backgroundCodes = colorCodes(palette, 48)
     this._pixelWidth = width * 2

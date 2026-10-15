@@ -3,7 +3,6 @@ import { randomUUID } from 'node:crypto'
 import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
-import { StringDecoder } from 'node:string_decoder'
 import {
   Sandbox,
   SandboxAbortError,
@@ -171,8 +170,8 @@ export class WorkspaceSandbox extends Sandbox {
       detached: process.platform !== 'win32',
       windowsHide: true,
     })
-    const stdoutDecoder = new StringDecoder('utf8')
-    const stderrDecoder = new StringDecoder('utf8')
+    child.stdout!.setEncoding('utf8')
+    child.stderr!.setEncoding('utf8')
     const chunks: StreamChunk[] = []
     let stdout = ''
     let stderr = ''
@@ -208,14 +207,8 @@ export class WorkspaceSandbox extends Sandbox {
       notify()
     }
 
-    child.stdout!.on('data', (data: Buffer) => {
-      appendOutput(stdoutDecoder.write(data), 'stdout')
-    })
-    child.stderr!.on('data', (data: Buffer) => {
-      appendOutput(stderrDecoder.write(data), 'stderr')
-    })
-    child.stdout!.on('end', () => appendOutput(stdoutDecoder.end(), 'stdout'))
-    child.stderr!.on('end', () => appendOutput(stderrDecoder.end(), 'stderr'))
+    child.stdout!.on('data', (data: string) => appendOutput(data, 'stdout'))
+    child.stderr!.on('data', (data: string) => appendOutput(data, 'stderr'))
     child.on('error', (error) => {
       failure = error
       done = true

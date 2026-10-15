@@ -2,14 +2,67 @@ import { readFileSync } from 'node:fs'
 
 import type { HarnessAgentConfig } from '@strands-agents/harness'
 
-import type { ChatConfigurationDocument, ChatConfigurationLanguage, ChatConfigurationSource } from './chat/types.js'
+import type {
+  ChatConfigurationDiffs,
+  ChatConfigurationDocument,
+  ChatConfigurationLanguage,
+  ChatConfigurationSource,
+} from './chat/types.js'
+import { createDiffPreview } from './permissions/file-change-preview.js'
 import type { ImportedAgentProject } from './project/import.js'
 import { prepareAgentProject } from './project/export.js'
 import { agentProjectSource } from './project/source.js'
 import { resolveSkillPaths } from './skills.js'
-import { errorMessage } from './terminal/sanitize.js'
+import { errorMessage, sanitizeTerminalText } from './terminal/sanitize.js'
 
 const CONFIGURATION_LANGUAGES = ['typescript', 'python'] as const
+
+export function configurationDiffs(
+  previous: ChatConfigurationSource,
+  current: ChatConfigurationSource
+): ChatConfigurationDiffs | undefined {
+  const diffs: ChatConfigurationDiffs = {}
+  for (const language of CONFIGURATION_LANGUAGES) {
+    const before = previous.documents[language]
+    const after = current.documents[language]
+    if (before.source !== after.source) {
+      diffs[language] = createDiffPreview(
+        after.path ?? before.path ?? language,
+        before.source,
+        after.source,
+        Number.POSITIVE_INFINITY
+      )
+    }
+  }
+  return Object.keys(diffs).length > 0 ? diffs : undefined
+}
+
+export function sanitizeConfigurationSource(configuration: ChatConfigurationSource): ChatConfigurationSource {
+  const document = (language: ChatConfigurationLanguage): ChatConfigurationDocument => {
+    const source = configuration.documents[language]
+    return {
+      source: sanitizeTerminalText(source.source),
+      generated: source.generated,
+      ...(source.path ? { path: sanitizeTerminalText(source.path) } : {}),
+      ...(source.error ? { error: sanitizeTerminalText(source.error) } : {}),
+    }
+  }
+  return {
+    preferredLanguage: configuration.preferredLanguage,
+    documents: {
+      typescript: document('typescript'),
+      python: document('python'),
+    },
+    ...(configuration.project
+      ? {
+          project: {
+            root: sanitizeTerminalText(configuration.project.root),
+            entrypoint: sanitizeTerminalText(configuration.project.entrypoint),
+          },
+        }
+      : {}),
+  }
+}
 
 export function configurationSource(
   profile: HarnessAgentConfig,
@@ -55,14 +108,6 @@ function configurationDocument(
       }
     }
   }
-  return generatedDocument(profile, language, baseDir)
-}
-
-function generatedDocument(
-  profile: HarnessAgentConfig,
-  language: ChatConfigurationLanguage,
-  baseDir: string
-): ChatConfigurationDocument {
   try {
     const skillPaths = resolveSkillPaths(
       typeof profile.skills === 'object' ? [...profile.skills] : profile.skills,

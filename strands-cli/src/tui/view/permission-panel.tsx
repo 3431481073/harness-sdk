@@ -185,7 +185,7 @@ function PermissionChoices({
   rows: readonly ChatPanelRow[]
   selected: number
   start: number
-  width: number | undefined
+  width: number
   grid: boolean
   pressedRow?: number
   hoveredRow?: number
@@ -209,7 +209,7 @@ function PermissionChoices({
       pairs.push(rows.slice(index, index + 2))
     }
     return (
-      <Box {...(width === undefined ? {} : { width })} flexShrink={0} flexDirection="column" overflow="hidden">
+      <Box width={width} flexShrink={0} flexDirection="column" overflow="hidden">
         {pairs.map((pair, pairIndex) => (
           <Box key={pairIndex} height={3} flexShrink={0} overflow="hidden">
             {pair.map((row, column) => {
@@ -241,7 +241,7 @@ function PermissionChoices({
     )
   }
   return (
-    <Box {...(width === undefined ? {} : { width })} flexShrink={0} flexDirection="column" overflow="hidden">
+    <Box width={width} flexShrink={0} flexDirection="column" overflow="hidden">
       {rows.map((row, visibleIndex) => {
         const index = start + visibleIndex
         const { active, highlighted, color } = state(index, row.tone)

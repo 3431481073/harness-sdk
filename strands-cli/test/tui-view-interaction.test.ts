@@ -34,7 +34,7 @@ import type { ChatPanel } from '../src/tui/chat/types.js'
 import { summarizeToolInput, toolAction } from '../src/tui/view/presentation.js'
 import { parseMouseInput, selectScreenText } from '../src/tui/terminal/mouse-input.js'
 import { settingsCategoryFilters, settingsRows } from '../src/tui/chat/panels.js'
-import { DEFAULT_CHAT_SETTINGS, SETTINGS_CATEGORIES, type SettingsCategory } from '../src/tui/settings.js'
+import { DEFAULT_CHAT_SETTINGS, type SettingsCategory } from '../src/tui/settings.js'
 import { snapshot } from './fixtures/chat-snapshot.js'
 import { ChatApp } from '../src/tui/view/app.js'
 import { ChatController } from '../src/tui/chat/controller.js'
@@ -178,7 +178,6 @@ describe('panel helpers', () => {
       rows: settingsRows(DEFAULT_CHAT_SETTINGS, category),
       filters: settingsCategoryFilters(),
       settingsCategory: category,
-      settingsCategories: SETTINGS_CATEGORIES,
     })
 
     const effortPanel = {

@@ -52,7 +52,7 @@ export function ComposerListPanel({
       <PanelSection
         focused
         height={Math.max(1, height - 1)}
-        {...(meta ? { meta } : {})}
+        meta={meta}
         header={
           <Text dimColor wrap="truncate-end">
             {panel.title}

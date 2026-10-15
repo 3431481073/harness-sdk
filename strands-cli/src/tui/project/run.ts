@@ -49,8 +49,7 @@ export async function createPythonChat(
       requestSetup,
       project,
       exportAgentProject: (language, destination, output): Promise<string | undefined> => {
-        const args = [project, backend.name, language, backend.privatePaths, destination] as const
-        return output ? exportSourceProject(...args, output) : exportSourceProject(...args)
+        return exportSourceProject(project, backend.name, language, backend.privatePaths, destination, output)
       },
       configurationSource: () => configurationSource(config.snapshot().profile, project),
     })

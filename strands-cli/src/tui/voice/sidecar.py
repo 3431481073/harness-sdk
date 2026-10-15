@@ -440,7 +440,7 @@ class ControlledAudioOutput:
                 self._idle.set()
                 return
             if self._tool_response and not self._audio_started:
-                self._prepare_routed_response()
+                self._finish_response(idle=False)
                 return
             if self._audio_started:
                 emit("speech_output_complete", response_id=event.response_id)
@@ -478,13 +478,6 @@ class ControlledAudioOutput:
             self._idle.set()
         else:
             self._idle.clear()
-
-    def _prepare_routed_response(self) -> None:
-        self._response_id = None
-        self._play_current = False
-        self._audio_started = False
-        self._tool_response = False
-        self._idle.clear()
 
 
 def parse_args() -> argparse.Namespace:

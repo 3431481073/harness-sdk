@@ -61,7 +61,7 @@ import { canUseNativePicker, chooseDirectory } from '../terminal/directory-picke
 import { copyTerminalText } from '../terminal/terminal.js'
 import { expandHome, strandsUserPath } from '../paths.js'
 import { attachmentContent } from '../attachments.js'
-import { createDiffPreview } from '../permissions/file-change-preview.js'
+import { configurationDiffs, sanitizeConfigurationSource } from '../configuration-source.js'
 import {
   cloneRuntime,
   cloneTask,
@@ -81,7 +81,6 @@ import {
   type ChatConversation,
   type ChatConfigurationBaseline,
   type ChatConfigurationDiffs,
-  type ChatConfigurationDocument,
   type ChatConfigurationLanguage,
   type ChatConfigurationSource,
   type ChatControllerOptions,
@@ -1058,7 +1057,7 @@ export class ChatController implements ChatControllerApi {
           }
           const name = decodeURIComponent(encodedName)
           if (!custom) {
-            return this._exportAgent(language, this._defaultExportPath(name), 'directory')
+            return this._exportAgent(language, strandsUserPath('harnesses', name), 'directory')
           }
           const parent = await chooseDirectory(`Choose where to save ${name}`)
           return parent ? this._exportAgent(language, join(parent, name), 'directory') : true
@@ -2179,15 +2178,10 @@ export class ChatController implements ChatControllerApi {
         for (const toolName of status.allowedTools) {
           await this._backend.removeAllowedPermission(toolName)
         }
-        await this._backend.setPermissionMode('default')
-        this._permissionMode = 'default'
-      } else if (preset === 'bypass') {
-        await this._backend.setPermissionMode('bypassPermissions')
-        this._permissionMode = 'bypassPermissions'
-      } else {
-        await this._backend.setPermissionMode('default')
-        this._permissionMode = 'default'
       }
+      const mode = preset === 'bypass' ? 'bypassPermissions' : 'default'
+      await this._backend.setPermissionMode(mode)
+      this._permissionMode = mode
       this._permissionPreset = preset
       this._openPermissionsPanel(true)
       return true
@@ -2292,10 +2286,6 @@ export class ChatController implements ChatControllerApi {
       ],
       body: 'Choose where to save this copy.',
     })
-  }
-
-  private _defaultExportPath(name: string): string {
-    return strandsUserPath('harnesses', name)
   }
 
   private async _exportAgent(
@@ -2445,7 +2435,6 @@ export class ChatController implements ChatControllerApi {
       rows,
       filters: settingsCategoryFilters(),
       settingsCategory: category.id,
-      settingsCategories: SETTINGS_CATEGORIES,
     } satisfies NewChatPanel
     if (replace) {
       this._openPanel(panel)
@@ -2879,53 +2868,6 @@ function skillInvocationPrompt(activation: SkillActivation, displayPrompt: strin
     '',
     displayPrompt,
   ].join('\n')
-}
-
-function configurationDiffs(
-  previous: ChatConfigurationSource,
-  current: ChatConfigurationSource
-): ChatConfigurationDiffs | undefined {
-  const diffs: ChatConfigurationDiffs = {}
-  for (const language of ['typescript', 'python'] as const) {
-    const before = previous.documents[language]
-    const after = current.documents[language]
-    if (before.source !== after.source) {
-      diffs[language] = createDiffPreview(
-        after.path ?? before.path ?? language,
-        before.source,
-        after.source,
-        Number.POSITIVE_INFINITY
-      )
-    }
-  }
-  return Object.keys(diffs).length > 0 ? diffs : undefined
-}
-
-function sanitizeConfigurationSource(configuration: ChatConfigurationSource): ChatConfigurationSource {
-  const document = (language: ChatConfigurationLanguage): ChatConfigurationDocument => {
-    const source = configuration.documents[language]
-    return {
-      source: sanitizeTerminalText(source.source),
-      generated: source.generated,
-      ...(source.path ? { path: sanitizeTerminalText(source.path) } : {}),
-      ...(source.error ? { error: sanitizeTerminalText(source.error) } : {}),
-    }
-  }
-  return {
-    preferredLanguage: configuration.preferredLanguage,
-    documents: {
-      typescript: document('typescript'),
-      python: document('python'),
-    },
-    ...(configuration.project
-      ? {
-          project: {
-            root: sanitizeTerminalText(configuration.project.root),
-            entrypoint: sanitizeTerminalText(configuration.project.entrypoint),
-          },
-        }
-      : {}),
-  }
 }
 
 function isLiveLocalCommand(prompt: string): boolean {

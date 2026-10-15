@@ -88,8 +88,8 @@ export function SessionsPanel({
   const sidebarWidth = sectionedPanelSidebarWidth(width)
   const tableWidth = Math.max(1, width - sidebarWidth - 4)
   const columnWidths = sessionColumnWidths(tableWidth, panel.rows)
-  const total = panel.loading ? undefined : `${panel.rows.length}`
-  const meta = total && (query || filter !== 'all') ? `${allRows.length} / ${total}` : total
+  const total = `${panel.rows.length}`
+  const meta = query || filter !== 'all' ? `${allRows.length} / ${total}` : total
   return (
     <Box flexGrow={1} height={height} overflow="hidden">
       <PanelSectionList
@@ -103,7 +103,7 @@ export function SessionsPanel({
         {...(hoveredFilter ? { hovered: hoveredFilter } : {})}
         {...(onFilterElement ? { onElement: onFilterElement } : {})}
       />
-      <PanelSection focused={focus !== 'providers'} {...(meta ? { meta } : {})} header={<Text dimColor>Sessions</Text>}>
+      <PanelSection focused={focus !== 'providers'} meta={meta} header={<Text dimColor>Sessions</Text>}>
         <PanelSearchHeader
           query={query}
           placeholder="Search sessions"

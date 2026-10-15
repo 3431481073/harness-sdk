@@ -47,7 +47,6 @@ export function SetupSettingsPanel({
     title: category,
     rows: panelRows,
     filters: SETTINGS_CATEGORIES.map(({ id, label }) => ({ id: `settings:${id}`, label })),
-    settingsCategories: SETTINGS_CATEGORIES,
     settingsCategory: category,
   }
   const hoveredTarget = setupHoveredTarget(hoveredControl, rows, start)

@@ -70,7 +70,6 @@ export const THEME_COLOR_KEYS = [
   'error',
   'diffAdd',
   'diffRemove',
-  'frog',
 ] as const
 
 export interface ChatSettings {

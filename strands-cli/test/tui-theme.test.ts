@@ -6,7 +6,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DEFAULT_CHAT_SETTINGS, FROG_THEMES, THEME_COLOR_KEYS, type ChatSettings } from '../src/tui/chat/types.js'
 import { Markdown } from '../src/tui/view/markdown.js'
 import { MediaView } from '../src/tui/view/media.js'
-import { PanelOverlay } from '../src/tui/view/panel-components.js'
 import { contextColor, detailLines, permissionLines } from '../src/tui/view/presentation.js'
 import { PromptEditor } from '../src/tui/view/prompt-editor.js'
 import { SettingsControl } from '../src/tui/view/settings-panel.js'
@@ -56,7 +55,7 @@ describe('theme resolution', () => {
     for (const mode of ['light', 'dark'] as const) {
       const theme = getTheme(settings(name), mode)
       expect(theme.mode).toBe(mode)
-      for (const key of name === 'green' ? THEME_COLOR_KEYS : (['accent', 'frog'] as const)) {
+      for (const key of name === 'green' ? THEME_COLOR_KEYS : (['accent'] as const)) {
         expect(theme[key]).toMatch(/^#[\da-f]{6}$/i)
       }
       const textColors =
@@ -80,9 +79,9 @@ describe('theme resolution', () => {
     expect(getTheme(settings(), 'dark', '#1b1f27').canvas).toBe('#1b1f27')
   })
 
-  it('keeps preset mascot colors independent of their UI accent', () => {
+  it('keeps the preset Oak accent', () => {
     const oak = getTheme(settings('oak'), 'dark')
-    expect(oak).toMatchObject({ accent: '#d0a071', frog: '#a36a3f' })
+    expect(oak.accent).toBe('#d0a071')
   })
 })
 
@@ -283,13 +282,9 @@ describe('themed Ink output', () => {
           h(MediaView, {
             content: { type: 'document', name: 'Notes', format: 'txt', source: { type: 'text', text: 'preview' } },
           }),
-          h(PanelOverlay, {
-            width: 40,
-            children: h(SettingsControl, {
-              rowIndex: 0,
-              spacious: true,
-              control: { kind: 'segmented', options: [{ label: 'Chosen', value: 'chosen', active: true }] },
-            }),
+          h(SettingsControl, {
+            rowIndex: 0,
+            control: { kind: 'segmented', options: [{ label: 'Chosen', value: 'chosen', active: true }] },
           })
         ),
       })
@@ -297,7 +292,6 @@ describe('themed Ink output', () => {
     expect(output).toContain(ansi(theme.accent))
     expect(output).toContain(ansi(theme.foreground))
     expect(output).toContain(ansi(theme.surface, true))
-    expect(output).toContain(ansi(theme.panel, true))
     expect(output).not.toContain(ansi('#202223', true))
     expect(output).not.toContain(ansi('#181a1b', true))
   })

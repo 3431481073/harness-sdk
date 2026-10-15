@@ -1,8 +1,7 @@
-import type { ReactElement, ReactNode } from 'react'
+import type { ReactElement } from 'react'
 import type { DOMElement } from 'ink'
 
 import type { ChatPanel, ChatPanelRow } from '../chat/controller.js'
-import { PanelHelpFooter } from './help-footer.js'
 import { Cursor } from './text-input.js'
 import { Box, Text, useTheme } from './theme.js'
 
@@ -55,43 +54,6 @@ export function PanelItemHeader({
       <Text {...(labelColor ? { color: labelColor } : {})} bold={bold || (active && !pressed)} wrap={wrap}>
         {label}
       </Text>
-    </Box>
-  )
-}
-
-export function PanelTitle({ title, color }: { title: string; color: string }): ReactElement {
-  return (
-    <Text color={color} bold wrap="truncate-end">
-      {title}
-    </Text>
-  )
-}
-
-export function PanelOverlay({
-  width,
-  height,
-  children,
-  onElement,
-}: {
-  width: number
-  height?: number
-  children: ReactNode
-  onElement?: (element: DOMElement | null) => void
-}): ReactElement {
-  const theme = useTheme()
-  return (
-    <Box position="absolute" width="100%" height="100%" alignItems="center" justifyContent="center" padding={1}>
-      <Box
-        ref={onElement}
-        width={width}
-        {...(height === undefined ? {} : { height, overflow: 'hidden' })}
-        flexDirection="column"
-        paddingX={1}
-        backgroundColor={theme.panel}
-      >
-        {children}
-        <PanelHelpFooter width={Math.max(1, width - 2)} />
-      </Box>
     </Box>
   )
 }

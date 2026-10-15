@@ -2,7 +2,7 @@ import { watch, type FSWatcher } from 'node:fs'
 import { resolve } from 'node:path'
 
 import { containsPath } from '../paths.js'
-import { hasIgnoredDirectory, IGNORED_DIRECTORIES } from './export.js'
+import { hasIgnoredDirectory, IGNORED_DIRECTORIES } from './packaging.js'
 import type { ImportedAgentProject } from './import.js'
 
 const WATCH_IGNORED_DIRECTORIES = new Set([...IGNORED_DIRECTORIES, '.agent', 'dist'])
