@@ -10,8 +10,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from strands.tools.stop import make_stop, stop
 from strands.types.tools import ToolContext
+from strands.vended_tools.stop import make_stop, stop
 
 
 def _tool_context() -> ToolContext:

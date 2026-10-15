@@ -1416,10 +1416,12 @@ class Agent(AgentBase, LocalAgent):
         cancel_watcher: asyncio.Task[None] | None = None
 
         try:
-            # Clear a deferred-cancel flag that bypassed stream_async's finally (e.g.
-            # agent.tool.stop(...) called directly). _cancel_signal and _cancel_message
-            # are left intact so pre-invocation agent.cancel(message=...) still applies.
+            # Clear cancel state that bypassed stream_async's finally (e.g.
+            # agent.tool.stop(...) called directly). Keep _cancel_message when the signal is
+            # set so a pre-invocation agent.cancel(message=...) still carries its text.
             self._deferred_cancel = False
+            if not self._cancel_signal.is_set():
+                self._cancel_message = None
 
             self._external_cancel_signal = cancel_signal
             cancel_watcher = self._start_cancel_watcher(cancel_signal)

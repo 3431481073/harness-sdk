@@ -467,7 +467,7 @@ def test_tool_caller_raises_reference_error_after_agent_collected():
 async def test_direct_tool_stop_does_not_cancel_next_invocation():
     """A direct agent.tool.stop(...) call leaves deferred-cancel state behind, but the next
     invocation clears it at start so the stop does not bleed in."""
-    from strands.tools import stop as stop_tool
+    from strands.vended_tools import stop as stop_tool
     from tests.fixtures.mocked_model_provider import MockedModelProvider
 
     model = MockedModelProvider([{"role": "assistant", "content": [{"text": "ok"}]}])

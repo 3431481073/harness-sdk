@@ -26,7 +26,7 @@ sourceLinks:
   - path: strands-py/src/strands/vended_tools/web_fetch/web_fetch.py
   - path: strands-py/src/strands/vended_tools/a2a_client/a2a_client.py
   - path: strands-py/src/strands/vended_tools/subagent/subagent.py
-  - path: strands-py/src/strands/experimental/tools/stop/stop.py
+  - path: strands-py/src/strands/vended_tools/stop/stop.py
   - path: strands-py/src/strands/vended_tools/python_repl/python_repl.py
 ---
 
@@ -55,7 +55,7 @@ Each tool is imported from its own subpath under `@strands-agents/sdk/vended-too
 | [MCP Router](#mcp-router) | Connect to Model Context Protocol servers on a developer-set allowlist | Python, TypeScript (Node.js) |
 | [Sleep](#sleep) | Pause execution for a bounded, cancellable duration | Python, TypeScript (Node.js, browsers) |
 | [Handoff to User](#handoff-to-user) | Pause the agent loop and surface a message to the user | Python, TypeScript (Node.js, browsers) |
-| [Stop](#stop-experimental) | Gracefully end the agent loop when the task is complete | Python, TypeScript (Node.js, browsers) |
+| [Stop](#stop) | Gracefully end the agent loop when the task is complete | Python, TypeScript (Node.js, browsers) |
 | [Web Fetch](#web-fetch) | Fetch a URL and return cleaned markdown for a model to read | Python, TypeScript (Node.js) |
 | [A2A Client](#a2a-client) | Discover and send messages to remote A2A-protocol agents | Python, TypeScript (Node.js, browsers) |
 | [Python REPL](#python-repl) | Execute Python code through the agent's sandbox | Python, TypeScript (Node.js, Unix/Linux/macOS) |
@@ -438,10 +438,7 @@ resumed = agent([
 
 ---
 
-### Stop (experimental)
-
-> This tool is experimental and subject to change in future
-> revisions without notice.
+### Stop
 
 Lets the model gracefully end the agent loop with an optional final message. The default loop already terminates when the model returns without any tool call; the stop tool is useful when you want an explicit "I am done" affordance, when a workflow enforces that termination is a deliberate model decision, or when a sub-agent needs to signal completion back to a coordinator via the loop's last assistant message.
 
@@ -472,7 +469,7 @@ assistant message.
 
 ```python
 from strands import Agent
-from strands.experimental.tools import stop
+from strands.vended_tools import stop
 
 agent = Agent(
     tools=[stop],

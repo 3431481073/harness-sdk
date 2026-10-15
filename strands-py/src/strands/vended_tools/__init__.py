@@ -61,6 +61,7 @@ from .notebook import make_notebook, notebook
 from .python_repl import make_python_repl, python_repl
 from .shell import make_shell, shell
 from .sleep import make_sleep, sleep
+from .stop import make_stop, stop
 from .subagent import make_subagent, subagent
 
 
@@ -106,10 +107,12 @@ __all__ = [
     "make_python_repl",
     "make_shell",
     "make_sleep",
+    "make_stop",
     "make_subagent",
     "notebook",
     "python_repl",
     "shell",
     "sleep",
+    "stop",
     "subagent",
 ]

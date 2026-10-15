@@ -18,19 +18,19 @@ def __getattr__(name: str) -> Any:
             )
             return ToolProvider
         if name == "stop":
-            from ...tools import stop
+            from ...vended_tools import stop
 
             warnings.warn(
-                "stop has been moved to production. Use stop from strands.tools instead.",
+                "stop has been moved to production. Use stop from strands.vended_tools instead.",
                 DeprecationWarning,
                 stacklevel=2,
             )
             return stop
         if name == "make_stop":
-            from ...tools import make_stop
+            from ...vended_tools import make_stop
 
             warnings.warn(
-                "make_stop has been moved to production. Use make_stop from strands.tools instead.",
+                "make_stop has been moved to production. Use make_stop from strands.vended_tools instead.",
                 DeprecationWarning,
                 stacklevel=2,
             )

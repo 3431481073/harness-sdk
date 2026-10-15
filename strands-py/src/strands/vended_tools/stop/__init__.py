@@ -3,7 +3,7 @@
 Example Usage:
     ```python
     from strands import Agent
-    from strands.tools import stop
+    from strands.vended_tools import stop
 
     agent = Agent(tools=[stop])
     ```
