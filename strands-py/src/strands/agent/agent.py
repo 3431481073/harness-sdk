@@ -644,7 +644,7 @@ class Agent(AgentBase, LocalAgent):
         With ``after_current_tools=True`` the cancellation is deferred: tools already requested in
         the current batch run to completion, and the loop exits before the next model call. This is
         the cooperative stop a tool uses to end the loop from inside the agent; see
-        :mod:`strands.experimental.tools.stop` for the vended tool.
+        :mod:`strands.vended_tools.stop` for the vended tool.
 
         When cancellation actually interrupts the loop the agent returns a result with
         ``stop_reason="cancelled"``. If ``message`` is given, it becomes the text of the final
