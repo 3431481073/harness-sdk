@@ -1069,9 +1069,14 @@ export class Agent implements LocalAgent, InvokableAgent {
    *
    * Pass `afterCurrentTools` to defer cancellation until the running tool batch
    * finishes, so sibling tools complete normally instead of receiving
-   * cancellation errors. Pass `message` to set the final assistant message of
-   * the cancelled invocation. When several callers cancel the same invocation,
-   * the last message written wins.
+   * cancellation errors. This is the cooperative stop a tool uses to end the
+   * loop from inside the agent; see the `stop` vended tool. A deferred cancel
+   * that never gets to apply — the model answers with plain text and no tools in
+   * the same turn — is a no-op and the invocation returns its natural stopReason.
+   *
+   * Pass `message` to set the final assistant message of the cancelled
+   * invocation; otherwise the result carries the model's last message. When
+   * several callers set a message, the last write wins.
    *
    * @param options - Final message and deferral behavior
    *
@@ -1095,7 +1100,9 @@ export class Agent implements LocalAgent, InvokableAgent {
     if (!this._isInvoking) {
       return
     }
-    this._cancelMessage = options?.message
+    if (options?.message !== undefined) {
+      this._cancelMessage = options.message
+    }
     if (options?.afterCurrentTools) {
       this._deferredCancel = true
     } else {
@@ -1375,6 +1382,8 @@ export class Agent implements LocalAgent, InvokableAgent {
         continuationEvent,
         new Error('Agent stream closed before continuation input was incorporated into agent history')
       )
+      // Reset here, after AgentResultEvent, so consumers can still read cancelSignal on it.
+      this.resetCancelState()
       this._isInvoking = false
     }
   }
@@ -1506,9 +1515,6 @@ export class Agent implements LocalAgent, InvokableAgent {
         }
         drainResult = await streamGenerator.next()
       }
-
-      // Reset cancellation state for next iteration / invocation
-      this.resetCancelState()
     }
 
     return iterationResult.value
@@ -1833,7 +1839,7 @@ export class Agent implements LocalAgent, InvokableAgent {
 
               const cancelResultMessage = this.cancelResultMessage
               if (cancelResultMessage) {
-                yield this._appendMessage(cancelResultMessage, invocationState)
+                yield this._appendMessage(cancelResultMessage, invocationState, invocationContext)
               }
 
               result = new AgentResult({
@@ -1943,15 +1949,23 @@ export class Agent implements LocalAgent, InvokableAgent {
             return result
           }
 
-          // Structured output captured: exit
           const structuredOutput = structuredOutputTool
             ? this._extractStructuredOutput(assistantMessage, toolResultMessage)
             : undefined
-          if (structuredOutput !== undefined) {
+
+          // Cancel observed after the batch: siblings have finished, so stop here
+          // instead of calling the model again. Wins over a structured-output stop
+          // so the cancel's terminal message is honored.
+          if (this._deferredCancel || this.isCancelled) {
+            const cancelResultMessage = this.cancelResultMessage
+            if (cancelResultMessage) {
+              yield this._appendMessage(cancelResultMessage, invocationState, invocationContext)
+            }
+
             result = new AgentResult({
               invocationContext,
-              stopReason: 'toolUse',
-              lastMessage: assistantMessage,
+              stopReason: 'cancelled',
+              lastMessage: cancelResultMessage ?? assistantMessage,
               traces: this._tracer.localTraces,
               structuredOutput,
               metrics: this._meter.metrics,
@@ -1960,18 +1974,14 @@ export class Agent implements LocalAgent, InvokableAgent {
             return result
           }
 
-          // Cancel observed after the batch: siblings have finished, so stop here
-          // instead of calling the model again.
-          if (this._deferredCancel || this.isCancelled) {
-            const cancelResultMessage = this.cancelResultMessage
-            if (cancelResultMessage) {
-              yield this._appendMessage(cancelResultMessage, invocationState)
-            }
-
+          // Structured output captured: exit
+          if (structuredOutput !== undefined) {
             result = new AgentResult({
-              stopReason: 'cancelled',
-              lastMessage: cancelResultMessage ?? assistantMessage,
+              invocationContext,
+              stopReason: 'toolUse',
+              lastMessage: assistantMessage,
               traces: this._tracer.localTraces,
+              structuredOutput,
               metrics: this._meter.metrics,
               invocationState,
             })

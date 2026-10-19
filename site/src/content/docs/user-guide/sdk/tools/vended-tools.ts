@@ -15,7 +15,7 @@ import {
   HANDOFF_INTERRUPT_NAME,
 } from '@strands-agents/sdk/vended-tools/handoff-to-user'
 import { sleep, makeSleep } from '@strands-agents/sdk/vended-tools/sleep'
-import { stop } from '@strands-agents/sdk/experimental/vended-tools/stop'
+import { stop } from '@strands-agents/sdk/vended-tools/stop'
 import { pythonRepl, makePythonRepl } from '@strands-agents/sdk/vended-tools/python-repl'
 import { DockerSandbox } from '@strands-agents/sdk/sandbox/docker'
 import { webFetch, makeWebFetch } from '@strands-agents/sdk/vended-tools/web-fetch'

@@ -11,6 +11,7 @@
  *   notebook,
  *   pythonRepl,
  *   sleep,
+ *   stop,
  *   subagent,
  *   swarm,
  *   webFetch,
@@ -32,6 +33,7 @@ export * from './http-request/index.js'
 export * from './notebook/index.js'
 export * from './python-repl/index.js'
 export * from './sleep/index.js'
+export * from './stop/index.js'
 export * from './subagent/index.js'
 export * from './swarm/index.js'
 export * from './web-fetch/index.js'
