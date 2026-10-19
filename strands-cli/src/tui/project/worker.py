@@ -398,9 +398,12 @@ class Runtime:
     def attach_context_capture(self, agent):
         # Python exposes effective model requests only through the optional middleware registry.
         try:
-            from strands._middleware import InvokeModelStage
+            from strands.middleware import InvokeModelStage
         except ImportError:
-            return
+            try:
+                from strands._middleware import InvokeModelStage
+            except ImportError:
+                return
         registry = getattr(agent, "_middleware_registry", None)
         add_middleware = getattr(registry, "add_middleware", None)
         handlers_by_stage = getattr(registry, "_handlers", None)
