@@ -113,6 +113,8 @@ Changes are validated and applied after the turn; the conversation is retained. 
 and TypeScript/Python exports use the updated profile. A failed rebuild restores the previous profile.
 For TypeScript agents loaded from source, the CLI edits the source definition and reloads it instead;
 source exports retain that code.
+Agent drafts and exports contain only the agent definition. CLI preferences, provider setup,
+and Ask/Bypass permissions stay under your control in `/settings`, `/setup`, and `/permissions`.
 
 ## Run modes
 

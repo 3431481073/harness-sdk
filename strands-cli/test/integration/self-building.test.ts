@@ -71,6 +71,7 @@ for (const [language, scenario] of [
           providerEnvironment: {},
           settings: { animations: false, agentMessaging: false, mcpDiscovery: false, skillDiscovery: false },
         })
+        const originalConfig = config.snapshot()
         expect(config.snapshot().profile.mcpServers).toEqual({})
         if (round === 0) {
           await copyFile(fixture('live-self-building-mcp.mjs'), join(cwd, 'probe-server.mjs'))
@@ -124,6 +125,10 @@ for (const [language, scenario] of [
           )
         ).toEqual([])
         if (round === 0) {
+          const savedConfig = (await CliConfigStore.load(config.snapshot().path)).snapshot()
+          expect(savedConfig.permissions).toEqual(originalConfig.permissions)
+          expect(savedConfig.settings).toEqual(originalConfig.settings)
+          expect(savedConfig.providers).toEqual(originalConfig.providers)
           const changes = tools.filter((entry) => entry.name === 'strands_config' && entry.status === 'success')
           expect(changes.map((entry) => entry.input)).toEqual(
             expect.arrayContaining([
@@ -158,6 +163,7 @@ for (const [language, scenario] of [
         )
         expect(document.source).toContain('lifecycle')
         expect(document.source).not.toContain(root)
+        expect(document.source).not.toMatch(/strands_config|permissionMode|allowedTools|frogTheme|mcpDiscovery/)
         const servers = Object.keys(files).filter((name) => name.endsWith('probe-server.mjs'))
         expect(servers).toHaveLength(1)
         expect(Buffer.from(files[servers[0]!]!)).toEqual(await readFile(fixture('live-self-building-mcp.mjs')))

@@ -1,7 +1,11 @@
 import { Agent, Model, type JSONValue, type ModelStreamEvent, type ToolContext } from '@strands-agents/sdk'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { createConfigurationTool, configurationFromStore } from '../src/tui/agent-configuration.js'
+import {
+  createConfigurationTool,
+  configurationFromStore,
+  createBuiltinToolsRuntime,
+} from '../src/tui/agent-configuration.js'
 import { CliConfigStore } from '../src/tui/config.js'
 import { discoverProviderModels } from '../src/tui/provider/discovery.js'
 import { CedarPermissions, ToolPermissionBroker } from '../src/tui/permissions/policy.js'
@@ -73,6 +77,76 @@ class ConfigurationModel extends Model {
 }
 
 describe('strands_config tool', () => {
+  it.each([
+    { settings: { animations: false } },
+    { permissionMode: 'bypassPermissions' },
+    { allowedTools: ['shell'] },
+    { providers: ['ollama'] },
+    { providerEnvironment: { AWS_REGION: 'us-west-2' } },
+  ])('rejects CLI settings in an agent draft: %j', async (fields) => {
+    const config = CliConfigStore.memory()
+    const before = config.snapshot()
+    const control = configurationTool(config)
+    await expect(control.invoke({ action: 'update', profile: { name: 'Rejected' }, ...fields })).rejects.toThrow()
+    expect(control.profile()).toEqual(before.profile)
+    expect(control.takePending()).toBeUndefined()
+    expect(config.snapshot()).toEqual(before)
+    expect(JSON.parse(await control.invoke({ action: 'inspect' })).revision).toBe(0)
+  })
+
+  it.each(['before apply', 'after apply'] as const)(
+    'preserves CLI settings changed %s when applying an agent draft',
+    async (timing) => {
+      const config = CliConfigStore.memory()
+      const control = configurationTool(config)
+      await control.invoke({ action: 'update', profile: { name: 'Renamed' } })
+      if (timing === 'after apply') await control.invoke({ action: 'apply', revision: 1 })
+
+      await config.setPermissionMode('bypassPermissions')
+      await config.allowTool('write')
+      await config.setSettings({ frogTheme: 'oak', skillDiscovery: true })
+      if (timing === 'before apply') await control.invoke({ action: 'apply', revision: 1 })
+
+      const change = control.takePending()!
+      await config.saveProfile(change.profile!)
+      expect(config.snapshot()).toMatchObject({
+        profile: { name: 'Renamed' },
+        permissions: { mode: 'bypassPermissions', allow: ['write'] },
+        settings: { frogTheme: 'oak', skillDiscovery: true },
+      })
+    }
+  )
+
+  it('exposes only agent fields in the schema, inspection, draft response, and preview', async () => {
+    const config = CliConfigStore.memory({ mode: 'bypassPermissions', allow: ['shell'] }, { frogTheme: 'oak' })
+    const control = configurationTool(config)
+    expect(Object.keys(control.tool.toolSpec.inputSchema!.properties!)).toEqual([
+      'action',
+      'revision',
+      'provider',
+      'query',
+      'profile',
+    ])
+    const inspected = JSON.parse(await control.invoke({ action: 'inspect' }))
+    expect(Object.keys(inspected).sort()).toEqual(['builtins', 'profile', 'revision', 'target'])
+    const response = JSON.parse(await control.invoke({ action: 'update', profile: { name: 'Renamed' } }))
+    expect(Object.keys(response).sort()).toEqual(['profile', 'revision', 'status'])
+    const preview = JSON.stringify(control.preview())
+    expect(preview).toContain('Renamed')
+    expect(preview).not.toMatch(/permissionMode|allowedTools|frogTheme|providerEnvironment/)
+  })
+
+  it('applies /tools choices as an agent-only change', async () => {
+    const config = CliConfigStore.memory({}, {}, { profile: { builtinTools: ['read', 'edit'] } })
+    const requestSetup = vi.fn()
+    const runtime = createBuiltinToolsRuntime(() => config.snapshot().profile, requestSetup, 'agent-1')
+    await runtime.apply(['read'])
+    expect(requestSetup).toHaveBeenCalledExactlyOnceWith({
+      profile: { ...config.snapshot().profile, builtinTools: ['read'] },
+      conversationId: 'agent-1',
+    })
+  })
+
   it('discards a denied configuration draft through the SDK tool loop', async () => {
     const config = CliConfigStore.memory()
     const broker = new ToolPermissionBroker()
@@ -140,7 +214,7 @@ describe('strands_config tool', () => {
     await control.invoke({ action: 'apply', revision: 2 })
     expect(control.discard(1)).toBe(false)
     expect(control.profile().name).toBe('Jimmy')
-    expect(control.takePending()?.configuration?.profile.name).toBe('Jimmy')
+    expect(control.takePending()?.profile?.name).toBe('Jimmy')
     await control.invoke({ action: 'apply', revision: 2 })
     expect(control.discard(2)).toBe(true)
     expect(control.takePending()).toBeUndefined()
@@ -233,7 +307,7 @@ describe('strands_config tool', () => {
     const control = configurationTool(config)
     await control.invoke({ action: 'update', profile: { name: 'Renamed' } })
     await expect(control.invoke({ action: 'apply', revision: 1 })).resolves.toContain('Configuration validated')
-    expect(control.takePending()?.configuration?.profile).toEqual({ ...config.snapshot().profile, name: 'Renamed' })
+    expect(control.takePending()?.profile).toEqual({ ...config.snapshot().profile, name: 'Renamed' })
     await control.invoke({ action: 'update', profile: { builtinTools: ['read', 'web_search'] } })
     await expect(control.invoke({ action: 'apply', revision: 2 })).rejects.toThrow('has no native web search')
     expect(control.takePending()).toBeUndefined()
@@ -276,7 +350,7 @@ describe('strands_config tool', () => {
     })
     await control.invoke({ action: 'apply', revision: 1 })
     const change = control.takePending()!
-    expect(change.configuration?.profile).toMatchObject({
+    expect(change.profile).toMatchObject({
       name: 'Updated',
       agentConfig: { apiKey: 'FAKE_EXISTING_TOKEN' },
       mcpServers: { service: { headers: { Authorization: 'Bearer ${env:STRANDS_CLI_TEST_API_KEY}' } } },
@@ -295,10 +369,10 @@ describe('strands_config tool', () => {
     const control = configurationTool(config)
     await control.invoke({ action: 'update', profile: { name: 'Local Strands harness' } })
     await expect(control.invoke({ action: 'apply', revision: 1 })).resolves.toContain('Configuration validated')
-    expect(control.takePending()?.configuration?.profile.caching).toBe(true)
+    expect(control.takePending()?.profile?.caching).toBe(true)
     await control.invoke({ action: 'update', profile: { agentConfig: { caching: false } } })
     await expect(control.invoke({ action: 'apply', revision: 2 })).resolves.toContain('Configuration validated')
-    expect(control.takePending()?.configuration?.profile.agentConfig.caching).toBe(false)
+    expect(control.takePending()?.profile?.agentConfig.caching).toBe(false)
     await control.invoke({ action: 'update', profile: { agentConfig: { caching: true } } })
     await expect(control.invoke({ action: 'apply', revision: 3 })).rejects.toThrow('does not support prompt caching')
     expect(control.takePending()).toBeUndefined()
@@ -358,9 +432,6 @@ describe('strands_config tool', () => {
         agentConfig: { backgroundTasks: true },
         mcpServers: { research: { command: 'node', args: ['mcp-server.js'] } },
       },
-      settings: { skillDiscovery: true },
-      permissionMode: 'bypassPermissions',
-      allowedTools: ['edit', 'read'],
     })
     expect(config.snapshot().profile).toEqual(original.profile)
     expect(control.profile()).toMatchObject({
@@ -373,21 +444,18 @@ describe('strands_config tool', () => {
       .lines.filter((line) => line.kind === 'add')
       .map((line) => line.text)
       .join('\n')
-    expect(additions).toContain('bypassPermissions')
     expect(additions).toContain('edit')
     expect(additions).toContain('research')
     expect(additions).toContain('mcp-server.js')
     await control.invoke({ action: 'apply', revision: 1 })
     const pending = control.takePending()
-    expect(pending?.configuration).toMatchObject({
-      profileBaseDir: '/tmp',
-      profile: { name: 'Code Guide', skills: ['./skills'], contextManager: 'agentic' },
-      settings: { skillDiscovery: true },
-      allowedTools: ['edit', 'read'],
+    expect(pending).toEqual({
+      profile: expect.objectContaining({ name: 'Code Guide', skills: ['./skills'], contextManager: 'agentic' }),
+      onFailure: expect.any(Function),
     })
     expect(control.takePending()).toBeUndefined()
     expect(config.snapshot().profile).toEqual(original.profile)
-    await config.saveSetup(pending!.configuration!)
+    await config.saveProfile(pending!.profile!)
     expect(config.snapshot().profile).toEqual(control.profile())
   })
 

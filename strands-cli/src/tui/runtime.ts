@@ -494,7 +494,6 @@ export async function createInteractiveChat(options: CreateInteractiveChatOption
         ...(options.requestSetup && !options.project
           ? {
               builtinTools: createBuiltinToolsRuntime(
-                config,
                 (): HarnessAgentConfig => exportProfile,
                 options.requestSetup,
                 peerEndpointId

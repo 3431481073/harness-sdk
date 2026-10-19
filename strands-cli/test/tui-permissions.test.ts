@@ -17,6 +17,28 @@ afterEach(async () => {
 })
 
 describe('CedarPermissions', () => {
+  it('saves the new mode before releasing a pending tool approval', async () => {
+    const config = CliConfigStore.memory()
+    let finishSaving!: () => void
+    const saving = new Promise<void>((resolve) => {
+      finishSaving = resolve
+    })
+    const saveMode = config.setPermissionMode.bind(config)
+    vi.spyOn(config, 'setPermissionMode').mockImplementation(async (mode) => {
+      await saving
+      await saveMode(mode)
+    })
+    const broker = new ToolPermissionBroker()
+    const permissions = new CedarPermissions({ config, broker, cwd: process.cwd() })
+    const resumedMode = broker.request('write', {}).then(() => config.snapshot().permissions.mode)
+    const changing = permissions.setPermissionMode('bypassPermissions')
+    await Promise.resolve()
+    finishSaving()
+    await changing
+    expect(await resumedMode).toBe('bypassPermissions')
+    broker.dispose()
+  })
+
   it('shows control characters as escapes without hiding any executed input', async () => {
     const broker = new ToolPermissionBroker()
     const command = 'echo start;\u001b]HIDDEN_COMMAND\u0007\t\u202eEND\u009dHIDDEN_C1\u009c'

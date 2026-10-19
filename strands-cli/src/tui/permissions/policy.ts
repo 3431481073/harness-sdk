@@ -256,9 +256,9 @@ export class CedarPermissions extends InterventionHandler {
     return this._config.snapshot()
   }
 
-  setPermissionMode(mode: PermissionMode): Promise<void> {
+  async setPermissionMode(mode: PermissionMode): Promise<void> {
+    await this._config.setPermissionMode(mode)
     this._broker.cancelAll()
-    return this._config.setPermissionMode(mode)
   }
 
   allowTool(toolName: string): Promise<void> {

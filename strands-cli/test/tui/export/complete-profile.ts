@@ -141,7 +141,9 @@ export async function applyCompleteProfileInChat(fixture: CompleteProfileFixture
     await controller.submit('Create this agent and apply every field.')
 
     expect(requestSetup).toHaveBeenCalledOnce()
-    return requestSetup.mock.calls[0]![0].configuration.profile as HarnessAgentConfig
+    const change = requestSetup.mock.calls[0]![0]
+    expect(change.configuration).toBeUndefined()
+    return change.profile as HarnessAgentConfig
   } finally {
     await controller.dispose()
   }

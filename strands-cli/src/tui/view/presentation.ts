@@ -483,15 +483,8 @@ function summarizeStrandsConfigInput(input: Record<string, JSONValue>): string |
   }
   if (action === 'update') {
     const profile = input.profile
-    const settings = input.settings
     const profileObject = isRecord(profile) ? profile : undefined
-    const profileFields = profileObject ? Object.keys(profileObject) : []
-    const settingFields = isRecord(settings) ? Object.keys(settings).map((key) => `settings.${key}`) : []
-    const fields = [
-      ...profileFields,
-      ...settingFields,
-      ...(['permissionMode', 'allowedTools'] as const).filter((key) => input[key] !== undefined),
-    ]
+    const fields = profileObject ? Object.keys(profileObject) : []
     if (fields.length === 1 && fields[0] === 'model') {
       const model = profileObject?.model
       if (typeof model === 'string') {

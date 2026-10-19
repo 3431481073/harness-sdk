@@ -68,6 +68,11 @@ describe('chat-configured export fields', () => {
     expect(applied).toEqual(fixture.expected)
   })
 
+  it('excludes CLI settings and the runtime configuration tool from the exported agent', () => {
+    expect(exported.source).not.toMatch(/strands_config|permissionMode|allowedTools|frogTheme|mcpDiscovery/)
+    expect(Object.keys(exported.entries)).not.toContain('cli.toml')
+  })
+
   it('requires explicit export evidence for every profile field', () => {
     expect(Object.keys(evidence).sort()).toEqual(Object.keys(applied).sort())
   })

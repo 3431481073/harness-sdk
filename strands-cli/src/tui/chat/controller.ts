@@ -104,7 +104,7 @@ import {
 export * from './types.js'
 
 const EXIT_WORDS = new Set(['exit', 'quit', '/exit'])
-const LIVE_LOCAL_COMMAND_NAMES = new Set(['help', 'settings', 'context', 'model', 'config'])
+const LIVE_LOCAL_COMMAND_NAMES = new Set(['help', 'settings', 'context', 'model', 'config', 'permissions'])
 const MAX_PENDING_PEER_MESSAGES = 32
 const TOOL_OUTPUT_EMIT_INTERVAL_MS = 32
 const RESPONSE_DELAY_NOTICE_MS = 30_000
@@ -432,7 +432,8 @@ export class ChatController implements ChatControllerApi {
       attachments.length === 0 &&
       isLiveLocalCommand(prompt) &&
       !this._resourceChanging &&
-      (this._panel?.kind !== 'permission' || parseCommandInvocation(prompt)?.name.toLowerCase() === 'settings')
+      (this._panel?.kind !== 'permission' ||
+        ['settings', 'permissions'].includes(parseCommandInvocation(prompt)?.name.toLowerCase() ?? ''))
     ) {
       return this._executeSubmission(prompt)
     }

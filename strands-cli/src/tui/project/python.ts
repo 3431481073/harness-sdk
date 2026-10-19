@@ -390,8 +390,8 @@ export class PythonBackend implements ChatBackend {
   }
 
   async setPermissionMode(mode: ChatPermissionMode): Promise<void> {
-    this._permissions.cancelAll()
     await this._config.setPermissionMode(mode)
+    this._permissions.cancelAll()
   }
 
   allowPermission(name: string): Promise<void> {

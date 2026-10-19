@@ -1,8 +1,9 @@
+import { render } from './fixtures/terminal.js'
 import { PassThrough } from 'node:stream'
 import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { render, type Instance } from 'ink'
+import type { Instance } from 'ink'
 import { Message, TextBlock } from '@strands-agents/sdk'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -204,152 +205,177 @@ describe('runInkChat', () => {
     }
   })
 
-  it.each([false, true])(
-    'preserves the applying conversation while replacement succeeds or fails (failure=%s)',
-    async (fails) => {
-      const directory = await mkdtemp(join(tmpdir(), 'strands-setup-'))
-      const configPath = join(directory, 'cli.toml')
-      const config = await CliConfigStore.load(configPath)
-      await config.saveSetup(configurationFromStore(config))
-      const saved = await readFile(configPath, 'utf8')
-      const configuration = {
-        ...configurationFromStore(config),
-        profile: { ...config.snapshot().profile, name: 'Replacement' },
-      }
-      const agentProject = join(directory, 'agent.ts')
-      const snapshot: ChatConversation['snapshot'] = {
-        scope: 'agent',
-        schemaVersion: '1.0',
-        createdAt: new Date().toISOString(),
-        data: {},
-        appData: {},
-      }
-      const primary = new ChatController({ ...idleBackend(), captureConversation: async () => snapshot })
-      const fork = new ChatController({ ...idleBackend(), captureConversation: async () => snapshot })
-      const previous = new ConversationManager(primary, { fork: async () => fork })
-      let voicePaused = false
-      const resumeVoiceInput = vi.fn(() => {
-        voicePaused = false
-      })
-      vi.spyOn(previous, 'pauseVoiceInput').mockImplementation(() => {
-        voicePaused = true
-        return resumeVoiceInput
-      })
-      const captureConversation = previous.captureConversation.bind(previous)
-      vi.spyOn(previous, 'captureConversation').mockImplementation((conversationId) => {
-        expect(voicePaused).toBe(true)
-        return captureConversation(conversationId)
-      })
-      let finishDisposal!: () => void
-      const disposal = new Promise<void>((resolve) => {
-        finishDisposal = resolve
-      })
-      const dispose = previous.dispose.bind(previous)
-      vi.spyOn(previous, 'dispose').mockImplementation(async () => {
-        await dispose()
-        await disposal
-      })
-      await previous.submit('Primary history')
-      await previous.submit('/fork')
-      await previous.submit('Fork history')
-      let release!: () => void
-      const gate = new Promise<void>((resolve) => {
-        release = resolve
-      })
-      let requestSetup!: RequestSetup
-      let captured: ChatConversation | undefined
-      let replacement: ChatController | undefined
-      const onFailure = vi.fn(async () => {})
-      const source = async (
-        _signal: AbortSignal,
-        setup: RequestSetup,
-        conversation?: ChatConversation
-      ): Promise<ChatControllerApi> => {
-        requestSetup = setup
-        if (!conversation) return previous
-        captured = conversation
-        await gate
-        if (fails) throw new Error('Replacement failed')
-        replacement = new ChatController(idleBackend(), { initialTurns: conversation.completedTurns })
-        return replacement
-      }
-      const input = Object.assign(new PassThrough(), {
-        isTTY: true,
-        setRawMode: vi.fn(),
-        ref: vi.fn(),
-        unref: vi.fn(),
-      }) as unknown as NodeJS.ReadStream
-      const output = Object.assign(new PassThrough(), {
-        isTTY: true,
-        columns: 100,
-        rows: 30,
-      }) as unknown as NodeJS.WriteStream
-      let rendered = ''
-      output.on('data', (chunk: Buffer) => {
-        rendered += chunk.toString()
-      })
-      let instance!: Instance
-      const running = runInkChat(source, {
-        config,
-        intro: false,
-        alternateScreen: false,
-        input,
-        output,
-        errorOutput: output,
-        renderApp: (element, options) => {
-          instance = render(element, { ...options, interactive: true, patchConsole: false })
-          return instance
-        },
-      })
-      try {
-        await vi.waitFor(() => expect(rendered).toContain('Fork history'))
-        requestSetup({ conversationId: 'agent-1', configuration, agentProject, onFailure })
-        await vi.waitFor(() => expect(captured).toBeDefined())
-        await vi.waitFor(() => expect(rendered).toContain('Reloading agent...'))
-        expect(voicePaused).toBe(true)
-        expect(config.snapshot().profile.name).toBe('Replacement')
-        expect(config.snapshot().agentProject).toBe(agentProject)
-        expect(await readFile(configPath, 'utf8')).toBe(saved)
-        expect(captured!.completedTurns.map((turn) => turn.prompt)).toEqual(['Primary history'])
-        expect(primary.getSnapshot().completedTurns).toHaveLength(1)
-        expect(fork.getSnapshot().completedTurns).toHaveLength(1)
-        rendered = ''
-        release()
-        if (!fails) {
-          await vi.waitFor(() => expect(previous.dispose).toHaveBeenCalledOnce())
-          expect(voicePaused).toBe(true)
-          await instance.waitUntilRenderFlush()
-          expect(rendered).not.toContain('Primary history')
-          finishDisposal()
-        }
-        await vi.waitFor(() => {
-          const active = fails ? previous : replacement
-          expect(active?.getSnapshot().completedTurns.map((turn) => turn.prompt)).toEqual([
-            fails ? 'Fork history' : 'Primary history',
-          ])
-          expect(active?.getSnapshot().completedTurns.every((turn) => turn.status === 'complete')).toBe(true)
-        })
-        await vi.waitFor(() => expect(resumeVoiceInput).toHaveBeenCalledOnce())
-        expect(voicePaused).toBe(false)
-        const reloaded = (await CliConfigStore.load(configPath)).snapshot()
-        expect(reloaded).toEqual(config.snapshot())
-        expect(reloaded.profile.name).toBe(fails ? 'Strands harness' : 'Replacement')
-        expect(reloaded.agentProject).toBe(fails ? undefined : agentProject)
-        if (fails) {
-          expect(await readFile(configPath, 'utf8')).toBe(saved)
-          expect(onFailure).toHaveBeenCalledExactlyOnceWith('Replacement failed')
-        } else {
-          expect(onFailure).not.toHaveBeenCalled()
-        }
-      } finally {
-        release()
-        finishDisposal()
-        instance.unmount()
-        await running
-        await rm(directory, { recursive: true, force: true })
-      }
+  it.each([
+    { kind: 'setup', fails: false },
+    { kind: 'setup', fails: true },
+    { kind: 'profile', fails: false },
+    { kind: 'profile', fails: true },
+  ])('preserves the applying conversation and CLI settings (kind=$kind, failure=$fails)', async ({ kind, fails }) => {
+    const directory = await mkdtemp(join(tmpdir(), 'strands-setup-'))
+    const configPath = join(directory, 'cli.toml')
+    const config = await CliConfigStore.load(configPath)
+    await config.saveSetup(configurationFromStore(config))
+    let saved = await readFile(configPath, 'utf8')
+    const configuration = {
+      ...configurationFromStore(config),
+      profile: { ...config.snapshot().profile, name: 'Replacement' },
     }
-  )
+    const agentProject = join(directory, 'agent.ts')
+    const snapshot: ChatConversation['snapshot'] = {
+      scope: 'agent',
+      schemaVersion: '1.0',
+      createdAt: new Date().toISOString(),
+      data: {},
+      appData: {},
+    }
+    const primary = new ChatController({ ...idleBackend(), captureConversation: async () => snapshot })
+    const fork = new ChatController({ ...idleBackend(), captureConversation: async () => snapshot })
+    const previous = new ConversationManager(primary, { fork: async () => fork })
+    let voicePaused = false
+    const resumeVoiceInput = vi.fn(() => {
+      voicePaused = false
+    })
+    vi.spyOn(previous, 'pauseVoiceInput').mockImplementation(() => {
+      voicePaused = true
+      return resumeVoiceInput
+    })
+    const captureConversation = previous.captureConversation.bind(previous)
+    vi.spyOn(previous, 'captureConversation').mockImplementation((conversationId) => {
+      expect(voicePaused).toBe(true)
+      return captureConversation(conversationId)
+    })
+    let finishDisposal!: () => void
+    const disposal = new Promise<void>((resolve) => {
+      finishDisposal = resolve
+    })
+    const dispose = previous.dispose.bind(previous)
+    vi.spyOn(previous, 'dispose').mockImplementation(async () => {
+      await dispose()
+      await disposal
+    })
+    await previous.submit('Primary history')
+    await previous.submit('/fork')
+    await previous.submit('Fork history')
+    let release!: () => void
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    let requestSetup!: RequestSetup
+    let captured: ChatConversation | undefined
+    let replacement: ChatController | undefined
+    const onFailure = vi.fn(async () => {})
+    const source = async (
+      _signal: AbortSignal,
+      setup: RequestSetup,
+      conversation?: ChatConversation
+    ): Promise<ChatControllerApi> => {
+      requestSetup = setup
+      if (!conversation) return previous
+      captured = conversation
+      await gate
+      if (fails) throw new Error('Replacement failed')
+      replacement = new ChatController(idleBackend(), { initialTurns: conversation.completedTurns })
+      return replacement
+    }
+    const input = Object.assign(new PassThrough(), {
+      isTTY: true,
+      setRawMode: vi.fn(),
+      ref: vi.fn(),
+      unref: vi.fn(),
+    }) as unknown as NodeJS.ReadStream
+    const output = Object.assign(new PassThrough(), {
+      isTTY: true,
+      columns: 100,
+      rows: 30,
+    }) as unknown as NodeJS.WriteStream
+    let rendered = ''
+    output.on('data', (chunk: Buffer) => {
+      rendered += chunk.toString()
+    })
+    let instance!: Instance
+    const running = runInkChat(source, {
+      config,
+      intro: false,
+      alternateScreen: false,
+      input,
+      output,
+      errorOutput: output,
+      renderApp: (element, options) => {
+        instance = render(element, { ...options, interactive: true, patchConsole: false })
+        return instance
+      },
+    })
+    try {
+      await vi.waitFor(() => expect(rendered).toContain('Fork history'))
+      requestSetup({
+        conversationId: 'agent-1',
+        ...(kind === 'profile' ? { profile: configuration.profile } : { configuration, agentProject }),
+        onFailure,
+      })
+      await vi.waitFor(() => expect(captured).toBeDefined())
+      await vi.waitFor(() => expect(rendered).toContain('Reloading agent...'))
+      expect(voicePaused).toBe(true)
+      expect(config.snapshot().profile.name).toBe(kind === 'profile' ? 'Strands harness' : 'Replacement')
+      expect(config.snapshot().agentProject).toBe(kind === 'profile' ? undefined : agentProject)
+      expect(await readFile(configPath, 'utf8')).toBe(saved)
+      if (kind === 'profile') {
+        await config.saveSetup({
+          ...configurationFromStore(config),
+          providers: ['ollama'],
+          providerEnvironment: { AWS_REGION: 'us-west-2' },
+          permissionMode: 'bypassPermissions',
+          allowedTools: ['write'],
+          settings: { frogTheme: 'oak', skillDiscovery: true },
+        })
+        saved = await readFile(configPath, 'utf8')
+      }
+      expect(captured!.completedTurns.map((turn) => turn.prompt)).toEqual(['Primary history'])
+      expect(primary.getSnapshot().completedTurns).toHaveLength(1)
+      expect(fork.getSnapshot().completedTurns).toHaveLength(1)
+      rendered = ''
+      release()
+      if (!fails) {
+        await vi.waitFor(() => expect(previous.dispose).toHaveBeenCalledOnce())
+        expect(voicePaused).toBe(true)
+        await instance.waitUntilRenderFlush()
+        expect(rendered).not.toContain('Primary history')
+        finishDisposal()
+      }
+      await vi.waitFor(() => {
+        const active = fails ? previous : replacement
+        expect(active?.getSnapshot().completedTurns.map((turn) => turn.prompt)).toEqual([
+          fails ? 'Fork history' : 'Primary history',
+        ])
+        expect(active?.getSnapshot().completedTurns.every((turn) => turn.status === 'complete')).toBe(true)
+      })
+      await vi.waitFor(() => expect(resumeVoiceInput).toHaveBeenCalledOnce())
+      expect(voicePaused).toBe(false)
+      const reloaded = (await CliConfigStore.load(configPath)).snapshot()
+      expect(reloaded).toEqual(config.snapshot())
+      expect(reloaded.profile.name).toBe(fails ? 'Strands harness' : 'Replacement')
+      expect(reloaded.agentProject).toBe(fails || kind === 'profile' ? undefined : agentProject)
+      if (kind === 'profile') {
+        expect(reloaded).toMatchObject({
+          providers: { enabled: ['ollama'] },
+          permissions: { mode: 'bypassPermissions', allow: ['write'] },
+          settings: { frogTheme: 'oak', skillDiscovery: true },
+        })
+        expect(config.configuredProviderEnvironment()).toEqual({ AWS_REGION: 'us-west-2' })
+      }
+      if (fails) {
+        expect(await readFile(configPath, 'utf8')).toBe(saved)
+        expect(onFailure).toHaveBeenCalledExactlyOnceWith('Replacement failed')
+      } else {
+        expect(onFailure).not.toHaveBeenCalled()
+      }
+    } finally {
+      release()
+      finishDisposal()
+      instance.unmount()
+      await running
+      await rm(directory, { recursive: true, force: true })
+    }
+  })
 
   it('returns the requested exit code while a replacement is starting', async () => {
     const snapshot: ChatConversation['snapshot'] = {

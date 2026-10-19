@@ -861,7 +861,7 @@ describe('interactive runtime lifecycle', () => {
         expect(requestSetup).toHaveBeenCalledOnce()
         expect(requestSetup).toHaveBeenCalledWith(
           expect.objectContaining({
-            configuration: expect.objectContaining({ profile: expect.objectContaining({ name: 'Changed' }) }),
+            profile: expect.objectContaining({ name: 'Changed' }),
           })
         )
       } finally {
