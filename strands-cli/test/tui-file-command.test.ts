@@ -2,7 +2,7 @@ import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { createElement } from 'react'
 
-import { render, renderToString, type Instance } from 'ink'
+import { renderToString, type Instance } from 'ink'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ChatController, type ChatBackend } from '../src/tui/chat/controller.js'
@@ -11,7 +11,7 @@ import { ChatApp } from '../src/tui/view/app.js'
 import { PromptEditor } from '../src/tui/view/prompt-editor.js'
 import { idleBackend } from './fixtures/chat-backend.js'
 import { temporaryDirectory } from './fixtures/tempdir.js'
-import { ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, ttyInput, ttyOutput } from './fixtures/terminal.js'
 
 const instances: Instance[] = []
 const controllers: ChatController[] = []
@@ -50,10 +50,10 @@ describe('/file', () => {
     input.write(`/file "${path}"`)
     await instance.waitUntilRenderFlush()
     input.write('\r')
-    await vi.waitFor(() => expect(frame()).toContain('frog notes.md'))
+    await vi.waitFor(() => expect(frame()).toMatch(/frog notes\.md.*12 B/u))
 
     input.write('Summarize this')
-    await instance.waitUntilRenderFlush()
+    await vi.waitFor(() => expect(frame()).toContain('Summarize this'))
     input.write('\r')
 
     await vi.waitFor(() => expect(stream).toHaveBeenCalledOnce())

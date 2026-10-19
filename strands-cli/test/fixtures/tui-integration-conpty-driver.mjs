@@ -2,8 +2,9 @@
 
 import { Buffer } from 'node:buffer'
 import { existsSync } from 'node:fs'
-import { setTimeout } from 'node:timers'
+import { clearTimeout, setTimeout } from 'node:timers'
 import nodePty from 'node-pty'
+import { TerminalScreen } from './terminal-screen.mjs'
 
 const ANSI_ESCAPE = new RegExp(String.raw`\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007]*(?:\u0007|\u001b\\))`, 'gu')
 // ChatApp enables bracketed paste after attaching its keyboard input handler.
@@ -34,6 +35,9 @@ async function main() {
   const resize = scenario === 'resize'
   const rows = startupTyping ? 40 : intro ? 20 : 30
   let transcript = ''
+  const screens = []
+  const screen = new TerminalScreen(100, rows)
+  let screenWrites = Promise.resolve()
   let returnCode
   let resolveExit
   const exited = new Promise((resolve) => {
@@ -49,6 +53,7 @@ async function main() {
   })
   const dataSubscription = terminal.onData((data) => {
     transcript += data
+    screenWrites = screenWrites.then(() => screen.write(data))
   })
   const exitSubscription = terminal.onExit(({ exitCode }) => {
     returnCode = exitCode
@@ -58,8 +63,10 @@ async function main() {
   const waitFor = async (markers, timeout = 8_000, styled = true, start = 0) => {
     const deadline = Date.now() + timeout
     while (Date.now() < deadline) {
+      await screenWrites
       const output = styled ? transcript.slice(start) : transcript.slice(start).replace(ANSI_ESCAPE, '')
-      if (markers.every((marker) => output.includes(marker))) {
+      if (markers.every((marker) => (styled || marker.startsWith('__') ? output : screen.text).includes(marker))) {
+        screens.push(screen.text)
         return
       }
       if (returnCode !== undefined) {
@@ -68,13 +75,18 @@ async function main() {
       await sleep(25)
     }
     const output = styled ? transcript.slice(start) : transcript.slice(start).replace(ANSI_ESCAPE, '')
-    const missing = markers.filter((marker) => !output.includes(marker))
-    throw new Error(`missing markers ${JSON.stringify(missing)}; returncode=${returnCode}; output=${transcript}`)
+    const missing = markers.filter(
+      (marker) => !(styled || marker.startsWith('__') ? output : screen.text).includes(marker)
+    )
+    throw new Error(
+      `missing markers ${JSON.stringify(missing)}; returncode=${returnCode}; screen=${screen.text}; output=${transcript}`
+    )
   }
   const settle = async (timeout = 150) => {
     let deadline = Date.now() + timeout
+    const limit = Date.now() + 2_000
     let length = transcript.length
-    while (Date.now() < deadline) {
+    while (Date.now() < deadline && Date.now() < limit) {
       await sleep(25)
       if (transcript.length !== length) {
         length = transcript.length
@@ -82,15 +94,39 @@ async function main() {
       }
     }
   }
+  const clickText = async (text) => {
+    await waitFor([text], 8_000, false)
+    const { column, row } = screen.locate(text)
+    terminal.write(`\u001b[<0;${column};${row}M\u001b[<3;${column};${row}m`)
+  }
+  const waitForStyle = async (text, style) => {
+    const deadline = Date.now() + 8_000
+    while (Date.now() < deadline) {
+      await screenWrites
+      if (JSON.stringify(screen.locate(text)?.style) === JSON.stringify(style)) {
+        screens.push(screen.text)
+        return
+      }
+      await sleep(25)
+    }
+    throw new Error(`focus did not move to ${text}; screen=${screen.text}`)
+  }
+  const resizeTerminal = (columns, height) => {
+    screen.resize(columns, height)
+    terminal.resize(columns, height)
+  }
   const waitForExit = async (timeout = 8_000) => {
-    await Promise.race([
-      exited,
-      sleep(timeout).then(() => {
-        if (returnCode === undefined) {
-          throw new Error(`process did not exit; output=${transcript}`)
-        }
-      }),
-    ])
+    let timer
+    try {
+      await Promise.race([
+        exited,
+        new Promise((_, reject) => {
+          timer = setTimeout(() => reject(new Error(`process did not exit; output=${transcript}`)), timeout)
+        }),
+      ])
+    } finally {
+      clearTimeout(timer)
+    }
   }
 
   let resizeOutput = ''
@@ -114,7 +150,7 @@ async function main() {
         [100, 30],
       ]) {
         const offset = transcript.length
-        terminal.resize(columns, height)
+        resizeTerminal(columns, height)
         await waitFor(['\u001b[1;1H'], 2_000, true, offset)
       }
       resizeOutput = transcript.slice(start)
@@ -125,14 +161,14 @@ async function main() {
         [50, 18],
         [120, 40],
       ]) {
-        terminal.resize(columns, height)
+        resizeTerminal(columns, height)
       }
       await waitFor(['\u001b[1;1H'], 2_000, true, burstStart)
       await settle()
       burstOutput = transcript.slice(burstStart)
 
       const noopStart = transcript.length
-      terminal.resize(120, 40)
+      resizeTerminal(120, 40)
       await settle(200)
       noopOutput = transcript.slice(noopStart)
     }
@@ -153,15 +189,11 @@ async function main() {
         false,
         start
       )
-      await settle()
+      await waitFor(['Enter to send'], 8_000, false)
     }
 
     if (setupImportMode) {
-      terminal.write('\u001b[B')
-      await sleep(200)
-      terminal.write('\u001b[C')
-      await sleep(200)
-      terminal.write('\r')
+      await clickText('Import')
       await waitFor(['Import an agent'], 5_000, false)
       const editStart = transcript.length
       terminal.write('\r')
@@ -172,10 +204,8 @@ async function main() {
       const commitStart = transcript.length
       terminal.write('\r')
       await waitFor(['Click or Enter to choose'], 2_000, false, commitStart)
-      terminal.write('\u001b[Z')
-      await sleep(200)
       const launchStart = transcript.length
-      terminal.write('\r')
+      await clickText('Launch')
       await waitFor(['Enter to send', CHAT_READY], 30_000, true, launchStart)
     }
 
@@ -188,7 +218,7 @@ async function main() {
         await waitFor([prompt.slice(0, 40)], 5_000, false, start)
         terminal.write('\r')
         await waitFor([`__LIVE_IDLE_${idleGeneration}_${idleTurns}__`], 150_000, true, start)
-        await settle()
+        await waitFor(['Enter to send'], 8_000, false)
       }
       if (process.env.STRANDS_CLI_TEST_SETUP_PROMPT) {
         generation = 2
@@ -197,11 +227,10 @@ async function main() {
       }
       await liveSubmit(process.env.STRANDS_CLI_TEST_USE_PROMPT, generation, turns + 1)
       terminal.write(`/config ${exportLanguage}`)
-      await sleep(200)
+      await waitFor([`/config ${exportLanguage}▌`], 8_000, false)
       const configStart = transcript.length
       terminal.write('\r')
       await waitFor(['TypeScript'], 8_000, false, configStart)
-      await settle()
       let closeStart = transcript.length
       terminal.write('\u001b')
       await waitFor(['Enter to send'], 8_000, false, closeStart)
@@ -225,20 +254,18 @@ async function main() {
       const command = `/export ${exportLanguage} "${process.env.STRANDS_CLI_TEST_EXPORT_PATH}"`
       terminal.write(command)
       await waitFor([`/export ${exportLanguage}`], 2_000, false)
-      await sleep(200)
       terminal.write('\r')
       await waitFor(['Export complete'], 15_000, false)
       terminal.write('\u001b')
-      await sleep(200)
+      await waitFor(['Enter to send'], 8_000, false)
     } else if (exportFailureMode) {
       const command = `/export typescript "${process.env.STRANDS_CLI_TEST_EXPORT_PATH}"`
       terminal.write(command)
       await waitFor(['/export typescript'], 2_000, false)
-      await sleep(200)
       terminal.write('\r')
       await waitFor(['file already exists'], 15_000, false)
       terminal.write('\u001b')
-      await sleep(200)
+      await waitFor(['Enter to send'], 8_000, false)
     } else if (chatMode) {
       terminal.write('hello from integration')
       await waitFor(['hello from integration'], 2_000, false)
@@ -249,15 +276,15 @@ async function main() {
         ['first turn', 'Fixture turn 1'],
         ['second turn', 'Fixture turn 2'],
       ]) {
+        const start = transcript.length
         terminal.write(prompt)
         await waitFor([prompt], 2_000, false)
         terminal.write('\r')
-        await waitFor([reply, '__CHAT_IDLE__'], 8_000, false)
+        await waitFor([reply, '__CHAT_IDLE__'], 8_000, false, start)
       }
     } else if (approvalMode) {
       terminal.write('request approval')
       await waitFor(['request approval'], 2_000, false)
-      await sleep(200)
       terminal.write('\r')
       await waitFor(['Allow once'], 8_000, false)
       terminal.write('\r')
@@ -265,20 +292,18 @@ async function main() {
     } else if (setupExportMode) {
       terminal.write('/setup')
       await waitFor(['/setup'], 2_000, false)
-      await sleep(200)
       terminal.write('\r')
       await waitFor(['__SETUP_REQUESTED__'], 8_000, false)
       const command = `/export typescript ${process.env.STRANDS_CLI_TEST_EXPORT_PATH}`
       terminal.write(command)
       await waitFor(['/export typescript'], 2_000, false)
-      await sleep(200)
       terminal.write('\r')
       await waitFor(['Export complete'], 8_000, false)
       terminal.write('\u001b')
-      await sleep(200)
+      await waitFor(['Enter to send'], 8_000, false)
     } else if (panelsMode) {
       for (const [command, markers, tabMarker] of [
-        ['/help', ['Send a message', 'Search help', 'Controls'], undefined],
+        ['/help', ['Send a message', 'Search help', '› Controls'], undefined],
         ['/agents', ['Agents', 'Current', 'idle', '1/1', 'Enter switch'], undefined],
         ['/mcp', ['fixture-mcp', 'failed', 'Server is not accepting connections', '→ details', 'R retry'], undefined],
         ['/model', ['Fixture Model Alpha', 'Fixture Model Beta'], '› Fixture Model Alpha'],
@@ -322,9 +347,9 @@ async function main() {
             [100, 30],
           ]) {
             const resizeStart = transcript.length
-            terminal.resize(columns, height)
-            await waitFor(['Agents', '1/1'], 8_000, false, resizeStart)
-            await settle()
+            resizeTerminal(columns, height)
+            await waitFor(['\u001b[1;1H'], 2_000, true, resizeStart)
+            await waitFor(['Agents', '1/1', columns < 30 ? 'Arrows' : 'Enter switch'], 8_000, false)
           }
           const chatStart = transcript.length
           terminal.write('\r')
@@ -336,7 +361,6 @@ async function main() {
           await waitFor(markers, 8_000, false, agentsStart)
         }
         if (command === '/help') {
-          await sleep(200)
           const tabStart = transcript.length
           terminal.write('\t')
           await waitFor(['› Send a message'], 8_000, false, tabStart)
@@ -377,8 +401,9 @@ async function main() {
         }
         if (command === '/export') {
           const exportStart = transcript.length
+          const selectedStyle = screen.locate('Python').style
           terminal.write('\t')
-          await sleep(200)
+          await waitForStyle('TypeScript', selectedStyle)
           terminal.write('\r')
           await waitFor(['Name exported folder'], 8_000, false, exportStart)
           terminal.write('\r')
@@ -396,27 +421,24 @@ async function main() {
           await waitFor([tabMarker], 8_000, false, tabStart)
         }
         terminal.write('\u001b')
-        await sleep(200)
+        await waitFor(['Enter to send'], 8_000, false)
       }
     } else if (frogMode) {
       terminal.write('/frog peek')
       await waitFor(['/frog peek'], 2_000, false)
       terminal.write('\r')
-      await waitFor(['▗▄▄▖'], 2_000, false)
+      await waitFor(['▗▄▄▖'], 2_000)
     } else if (shellMode === 'command') {
       const input = "!Write-Output '__SHELL_LINE_1__','__SHELL_LINE_2__','__SHELL_LINE_3__','__SHELL_LINE_4__'"
       terminal.write(input)
       await waitFor(["!Write-Output '__SHELL_LINE_1__"], 2_000, false)
-      await sleep(200)
       terminal.write('\r')
       await waitFor(['__SHELL_LINE_1__', '__SHELL_LINE_4__', '__SHELL_IDLE__'], 8_000, false)
     } else if (shellMode === 'interrupt') {
       terminal.write('!sleep 30')
       await waitFor(['!sleep 30'], 2_000, false)
-      await sleep(200)
       terminal.write('\r')
       await waitFor(['Shell sleep 30'], 8_000, false)
-      await sleep(200)
       terminal.write('\u0003')
       await waitFor(['Cancelled', '__SHELL_IDLE__'], 4_000, false)
     }
@@ -424,21 +446,18 @@ async function main() {
     const draft = startupTyping ? 'startup draft' : 'junk'
     terminal.write(draft)
     await waitFor([draft], 2_000, false)
-    for (const keypress of [...draft].map(() => '\u007f').concat('/exit')) {
-      terminal.write(keypress)
-      await sleep(50)
-    }
-    await waitFor(['/exit'], 2_000, false)
-    await sleep(200)
+    terminal.write('\u007f'.repeat(draft.length) + '/exit')
+    await waitFor(['/exit▌'], 2_000, false)
     terminal.write('\r')
     await waitForExit()
-    await settle(50)
+    await screenWrites
 
     process.stdout.write(
       JSON.stringify({
         returnCode,
         termiosRestored: null,
         transcript: Buffer.from(transcript).toString('base64'),
+        screens,
         resizeTranscript: Buffer.from(resizeOutput).toString('base64'),
         resizeBurstTranscript: Buffer.from(burstOutput).toString('base64'),
         resizeNoopTranscript: Buffer.from(noopOutput).toString('base64'),
@@ -454,6 +473,8 @@ async function main() {
   } finally {
     dataSubscription.dispose()
     exitSubscription.dispose()
+    await screenWrites
+    screen.dispose()
   }
 }
 

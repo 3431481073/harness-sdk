@@ -39,9 +39,10 @@ export class PlatformIntegrationModel extends Model {
       .join('|')
     yield* response(
       [
+        `HISTORY=${history}`,
+        // Completion markers must remain visible after a long echoed history.
         `LOCAL_SKILL=${systemPrompt.includes('local-platform-skill')}`,
         `REMOTE_SKILL=${systemPrompt.includes('remote-platform-skill')}`,
-        `HISTORY=${history}`,
       ].join(' ')
     )
   }

@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { render, renderToString } from 'ink'
+import { renderToString } from 'ink'
 import chalk from 'chalk'
 import stringWidth from 'string-width'
 import { describe, expect, it, vi } from 'vitest'
@@ -13,7 +13,7 @@ import { setupBrandFrame } from '../src/tui/view/setup-wizard/brand.js'
 import { SetupWizard } from '../src/tui/view/setup-wizard/index.js'
 import { SetupProgress } from '../src/tui/view/setup-wizard/progress.js'
 import { PROVIDERS } from '../src/tui/view/setup-wizard/providers.js'
-import { mouseInputSequence, ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, mouseInputSequence, ttyInput, ttyOutput } from './fixtures/terminal.js'
 
 vi.mock('../src/tui/provider/discovery.js', async (original) => ({
   ...(await original<typeof import('../src/tui/provider/discovery.js')>()),

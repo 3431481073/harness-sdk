@@ -1,8 +1,8 @@
 import { createElement } from 'react'
-import { measureElement, render, type DOMElement } from 'ink'
+import { measureElement, type DOMElement } from 'ink'
 import stringWidth from 'string-width'
 import { describe, expect, it } from 'vitest'
-import { captureFrame, ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, captureFrame, ttyInput, ttyOutput } from './fixtures/terminal.js'
 import { snapshot } from './fixtures/chat-snapshot.js'
 
 import { ChatView } from '../src/tui/view/chat-view.js'

@@ -155,7 +155,9 @@ describe('session catalog', () => {
           expect.objectContaining({ directory: currentSessions, workspace: currentWorkspace }),
         ])
       )
-      await expect(readFile(join(currentSessions, 'workspace.json'), 'utf8')).resolves.toContain(currentWorkspace)
+      expect(JSON.parse(await readFile(join(currentSessions, 'workspace.json'), 'utf8'))).toMatchObject({
+        workspace: currentWorkspace,
+      })
     } finally {
       await rm(directory, { recursive: true, force: true })
     }

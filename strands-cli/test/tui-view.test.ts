@@ -1,10 +1,10 @@
 import chalk from 'chalk'
 import { createElement, type ReactElement } from 'react'
-import { render, renderToString } from 'ink'
+import { renderToString } from 'ink'
 import stringWidth from 'string-width'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { snapshot } from './fixtures/chat-snapshot.js'
-import { ttyOutput } from './fixtures/terminal.js'
+import { render, ttyOutput } from './fixtures/terminal.js'
 
 import { ChatView } from '../src/tui/view/chat-view.js'
 import { Markdown } from '../src/tui/view/markdown.js'

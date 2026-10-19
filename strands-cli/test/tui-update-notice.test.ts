@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { render, renderToString } from 'ink'
+import { renderToString } from 'ink'
 import stringWidth from 'string-width'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -11,7 +11,7 @@ import { SetupWizard } from '../src/tui/view/setup-wizard/index.js'
 import { ThemeProvider } from '../src/tui/view/theme.js'
 import { UpdatePrompt } from '../src/tui/view/update-prompt.js'
 import { ChatRoot, type SetupBridge } from '../src/tui/view/chat-root.js'
-import { ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, ttyInput, ttyOutput } from './fixtures/terminal.js'
 
 const NOTICE = 'Strands CLI 0.1.3 is available! Run `strands update` to install it.'
 

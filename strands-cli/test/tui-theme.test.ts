@@ -1,5 +1,5 @@
 import { createElement as h } from 'react'
-import { Box, render, renderToString } from 'ink'
+import { Box, renderToString } from 'ink'
 import chalk from 'chalk'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -20,7 +20,7 @@ import { ChatView } from '../src/tui/view/chat-view.js'
 import { SetupWizard } from '../src/tui/view/setup-wizard/index.js'
 import { CliConfigStore } from '../src/tui/config.js'
 import { snapshot } from './fixtures/chat-snapshot.js'
-import { ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, ttyInput, ttyOutput } from './fixtures/terminal.js'
 
 const colorLevel = chalk.level
 
@@ -100,7 +100,7 @@ describe('terminal background detection', () => {
     const observer = observeTerminalColorMode(input, output)
     await vi.waitFor(() => expect(query).toBe('\u001b[?2031h\u001b]11;?\u001b\\'))
     input.write(`x\u001b]11;rgb:${rgb.slice(0, 9)}`)
-    await new Promise((resolve) => setTimeout(resolve, 20))
+    await vi.waitFor(() => expect(observer.input.readableLength).toBe(1))
     input.write(`${rgb.slice(9)}\u001b\\`)
 
     await observer.ready

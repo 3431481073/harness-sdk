@@ -1138,14 +1138,22 @@ describe('ChatController', () => {
       result: 'done',
     }
 
-    taskListener?.([ready])
-    await vi.waitFor(() => expect(controller.getSnapshot().completedTurns).toHaveLength(1))
-    taskListener?.([ready])
-    await new Promise((resolve) => setTimeout(resolve, 20))
-    expect(attempts).toBe(1)
+    vi.useFakeTimers()
+    try {
+      taskListener?.([ready])
+      await vi.runAllTimersAsync()
+      expect(controller.getSnapshot().completedTurns).toHaveLength(1)
+      taskListener?.([ready])
+      await vi.runAllTimersAsync()
+      expect(attempts).toBe(1)
 
-    taskListener?.([{ ...ready, id: 'task-2' }])
-    await vi.waitFor(() => expect(attempts).toBe(2))
+      taskListener?.([{ ...ready, id: 'task-2' }])
+      await vi.runAllTimersAsync()
+      expect(attempts).toBe(2)
+    } finally {
+      await controller.dispose()
+      vi.useRealTimers()
+    }
   })
 
   it('shows unknown context values before the first model response', async () => {

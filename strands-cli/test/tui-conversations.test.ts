@@ -104,6 +104,12 @@ describe('ConversationManager', () => {
   })
 
   it('refreshes project source immediately and reloads after active work finishes', async () => {
+    let changed!: () => void
+    const stopWatching = vi.fn()
+    const watch = vi.spyOn(projectWatch, 'watchAgentProject').mockImplementation((_project, onChange) => {
+      changed = onChange
+      return stopWatching
+    })
     const root = await mkdtemp(join(tmpdir(), 'strands-live-reload-'))
     const entrypoint = join(root, 'agent.ts')
     const helper = join(root, 'helper.ts')
@@ -144,6 +150,7 @@ describe('ConversationManager', () => {
       const running = manager.submit('Keep working')
       await vi.waitFor(() => expect(manager.busy).toBe(true))
       await writeFile(entrypoint, "createHarness({ name: 'After' })\n")
+      changed()
       await vi.waitFor(
         () => expect(manager.getSnapshot().configuration?.documents.typescript.source).toContain('After'),
         { timeout: 5_000 }
@@ -156,11 +163,14 @@ describe('ConversationManager', () => {
 
       reloadProject.mockClear()
       await writeFile(helper, "export const name = 'After'\n")
+      changed()
       await vi.waitFor(() => expect(reloadProject).toHaveBeenCalledWith('agent-1'), { timeout: 5_000 })
     } finally {
       finish()
       await manager.dispose()
+      watch.mockRestore()
       await rm(root, { recursive: true, force: true })
+      expect(stopWatching).toHaveBeenCalledOnce()
     }
   })
 

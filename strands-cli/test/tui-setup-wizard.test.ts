@@ -1,10 +1,8 @@
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { setTimeout as delay } from 'node:timers/promises'
 import chalk from 'chalk'
 import { createElement } from 'react'
-import { render } from 'ink'
 import stringWidth from 'string-width'
 import { describe, expect, it, vi } from 'vitest'
 import { DEFAULT_HARNESS_AGENT_CONFIG } from '@strands-agents/harness'
@@ -26,7 +24,7 @@ import {
   discoverProviderModels,
 } from '../src/tui/provider/discovery.js'
 import { discoverAwsConfiguration as readAwsConfiguration } from '../src/tui/provider/aws-config.js'
-import { mouseInputSequence, ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, mouseInputSequence, ttyInput, ttyOutput } from './fixtures/terminal.js'
 
 vi.mock('../src/tui/provider/discovery.js', async (original) => ({
   ...(await original<typeof import('../src/tui/provider/discovery.js')>()),
@@ -1392,6 +1390,7 @@ describe('setup presentation', () => {
   })
 
   it('ignores input while fading between setup panels', async () => {
+    vi.useFakeTimers({ toFake: ['Date', 'performance', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] })
     const input = ttyInput()
     const output = ttyOutput(80, 30)
     let frame = ''
@@ -1422,12 +1421,13 @@ describe('setup presentation', () => {
       input.push('\u001b[B')
       input.push('\r')
       await instance.waitUntilRenderFlush()
-      await delay(180)
+      await vi.advanceTimersByTimeAsync(200)
       await vi.waitFor(() => expect(frame).toContain('1 of 1'))
       expect(frame).not.toContain('Name and instruct your agent')
     } finally {
       instance.unmount()
       await instance.waitUntilExit()
+      vi.useRealTimers()
     }
   })
 })

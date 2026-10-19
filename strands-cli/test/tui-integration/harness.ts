@@ -25,6 +25,7 @@ export interface TuiResult {
   returnCode: number
   termiosRestored: boolean | null
   output: string
+  screens: string[]
   resizeOutput: string
   resizeBurstOutput: string
   resizeNoopOutput: string
@@ -32,7 +33,7 @@ export interface TuiResult {
 }
 
 export async function runTuiScenario(scenario: TuiScenario): Promise<TuiResult> {
-  const loader = fileURLToPath(new URL('../fixtures/strands-cli-routing-source-loader.mjs', import.meta.url))
+  const loader = new URL('../fixtures/strands-cli-routing-source-loader.mjs', import.meta.url).href
   const fixture = fileURLToPath(new URL('../fixtures/tui-integration-process.mjs', import.meta.url))
   const exportPath = join(tmpdir(), `strands-tui-export-${randomUUID()}.zip`)
   try {
@@ -91,6 +92,7 @@ export async function runTuiCommand(options: {
     returnCode: result.returnCode,
     termiosRestored: result.termiosRestored,
     output: decode(result.transcript),
+    screens: result.screens,
     resizeOutput: decode(result.resizeTranscript),
     resizeBurstOutput: decode(result.resizeBurstTranscript),
     resizeNoopOutput: decode(result.resizeNoopTranscript),

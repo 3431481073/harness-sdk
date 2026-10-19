@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { render, renderToString } from 'ink'
+import { renderToString } from 'ink'
 import stringWidth from 'string-width'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -7,7 +7,7 @@ import { ChatController, type ChatBackend, type ChatPanelRow } from '../src/tui/
 import { commandAssistance } from '../src/tui/chat/commands.js'
 import { ChatView } from '../src/tui/view/chat-view.js'
 import { ChatApp } from '../src/tui/view/app.js'
-import { captureFrame, mouseInputSequence, ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, captureFrame, mouseInputSequence, ttyInput, ttyOutput } from './fixtures/terminal.js'
 import { idleBackend } from './fixtures/chat-backend.js'
 
 function row(controller: ChatController, label: string): ChatPanelRow {

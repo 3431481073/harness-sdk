@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { render, type Instance } from 'ink'
+import type { Instance } from 'ink'
 import stringWidth from 'string-width'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -8,7 +8,7 @@ import { ConversationManager } from '../src/tui/session/conversations.js'
 import { sanitizeTerminalText } from '../src/tui/terminal/sanitize.js'
 import { ChatApp } from '../src/tui/view/app.js'
 import type { SettingsUpdateStatus } from '../src/tui/chat/panels.js'
-import { ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, ttyInput, ttyOutput } from './fixtures/terminal.js'
 
 const mounted: { instance: Instance; controller: ChatControllerApi }[] = []
 const terminalSizes = [

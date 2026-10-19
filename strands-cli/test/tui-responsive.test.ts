@@ -1,5 +1,5 @@
 import { createElement, type ReactElement } from 'react'
-import { render, type Instance } from 'ink'
+import type { Instance } from 'ink'
 import stringWidth from 'string-width'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -10,7 +10,7 @@ import { ChatApp } from '../src/tui/view/app.js'
 import { frogStartupHeight, renderFrogStartupLockup } from '../src/tui/view/frog-intro-renderer.js'
 import { SetupWizard } from '../src/tui/view/setup-wizard/index.js'
 import { idleBackend } from './fixtures/chat-backend.js'
-import { ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, ttyInput, ttyOutput } from './fixtures/terminal.js'
 
 // Colored output paints solid cells as backgrounds, leaving only the half-block glyphs as text.
 const STRANDS_WORDMARK = /STRANDS|╚════╝|█▀▀ ▀█▀ █▀█ ▄▀█ █▄ █ █▀▄ █▀▀|▀▀ ▀ ▀ {2}▀ {2}▄▀ {3}▄ {4}▀▄ {2}▀▀/

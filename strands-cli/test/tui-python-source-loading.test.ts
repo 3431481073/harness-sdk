@@ -87,7 +87,7 @@ describe.skipIf(!existsSync(python))('Python source loading', () => {
         'agent = build()',
         `
 from dataclasses import replace
-from strands._middleware import InvokeModelStage
+from strands.middleware import InvokeModelStage
 from strands.hooks.events import BeforeModelCallEvent
 
 class ContextModel(SourceReloadModel):
@@ -111,7 +111,7 @@ def inject(context):
     }
     return replace(context, messages=messages, dynamic_trailing_blocks=1)
 
-agent._middleware_registry.add_middleware(InvokeModelStage.Input, inject)
+agent.add_middleware(InvokeModelStage.Input, inject)
 
 async def transform(context, next_handler):
     async for event in next_handler(replace(context, system_prompt="A" * 400)):
@@ -121,7 +121,7 @@ registered = False
 def register_transform(event):
     global registered
     if not registered:
-        event.agent._middleware_registry.add_middleware(InvokeModelStage, transform)
+        event.agent.add_middleware(InvokeModelStage, transform)
         registered = True
 
 agent.hooks.add_callback(BeforeModelCallEvent, register_transform)
@@ -156,8 +156,8 @@ agent.hooks.add_callback(BeforeModelCallEvent, register_transform)
 
   it('keeps aggregate context usage when the Python SDK lacks model middleware capture', async () => {
     const backend = await open(`${baseSource}
-import strands._middleware
-del strands._middleware.InvokeModelStage
+import strands.middleware
+del strands.middleware.InvokeModelStage
 `)
     const result = await runTurn(backend)
 

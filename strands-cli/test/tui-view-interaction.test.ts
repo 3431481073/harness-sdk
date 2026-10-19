@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { render } from 'ink'
+
 import { describe, expect, it, vi } from 'vitest'
 
 import {
@@ -39,7 +39,7 @@ import { snapshot } from './fixtures/chat-snapshot.js'
 import { ChatApp } from '../src/tui/view/app.js'
 import { ChatController } from '../src/tui/chat/controller.js'
 import { idleBackend } from './fixtures/chat-backend.js'
-import { captureFrame, ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, captureFrame, ttyInput, ttyOutput } from './fixtures/terminal.js'
 
 describe('voice input', () => {
   it('uses a single empty-editor Space tap for mute without consuming typed spaces', () => {
@@ -252,10 +252,9 @@ describe('panel helpers', () => {
     expect(
       summarizeToolInput('strands_config', {
         action: 'update',
-        profile: { effort: 'high' },
-        settings: { animations: false },
+        profile: { effort: 'high', instructions: 'Be concise.' },
       })
-    ).toBe('update: effort, settings.animations')
+    ).toBe('update: effort, instructions')
     expect(summarizeToolInput('strands_config', { action: 'apply', revision: 2 })).toBe('apply')
   })
 

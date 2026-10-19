@@ -17,7 +17,6 @@ import {
   type ImportedAgentProject,
 } from '../../src/tui/project/import.js'
 import { resolveSkillPaths } from '../../src/tui/skills.js'
-import { sanitizeTerminalText } from '../../src/tui/terminal/sanitize.js'
 import { pythonEnvironment, pythonExecutable } from '../fixtures/python-runtime.js'
 import { expectRestoredTerminal, runTuiCommand } from '../tui-integration/harness.js'
 import { PLATFORM_CASE } from './catalog.js'
@@ -73,7 +72,7 @@ describe('cross-platform exported agent E2E', () => {
       env: cliEnvironment(),
       timeout: 40_000,
     })
-    const firstOutput = sanitizeTerminalText(first.output)
+    const firstOutput = first.screens.join('\n')
     expect(first.returnCode).toBe(0)
     expect(firstOutput).toMatch(/LOCAL_SKILL=true.*REMOTE_SKILL=true/u)
     expect(first.exportSaved).toBe(true)
@@ -88,7 +87,7 @@ describe('cross-platform exported agent E2E', () => {
       env: cliEnvironment(),
       timeout: 40_000,
     })
-    const secondOutput = sanitizeTerminalText(second.output)
+    const secondOutput = second.screens.join('\n')
     expect(second.returnCode).toBe(0)
     expect(secondOutput).toContain('platform-mcp-ok')
     expectMcpStopped(secondOutput)
@@ -112,7 +111,7 @@ describe('cross-platform exported agent E2E', () => {
       env: cliEnvironment(),
       timeout: 60_000,
     })
-    const output = sanitizeTerminalText(result.output)
+    const output = result.screens.join('\n')
     expect(result.returnCode).toBe(0)
     expect(output).toMatch(/LOCAL_SKILL=true.*REMOTE_SKILL=true/u)
     expect(output).toContain('platform-mcp-ok')
@@ -137,7 +136,7 @@ describe('cross-platform exported agent E2E', () => {
       env: cliEnvironment(setupHome),
       timeout: 60_000,
     })
-    const output = sanitizeTerminalText(result.output)
+    const output = result.screens.join('\n')
     expect(result.returnCode).toBe(0)
     expect(output).toMatch(/LOCAL_SKILL=true.*REMOTE_SKILL=true/u)
     expect(output).toContain('platform-mcp-ok')
@@ -165,7 +164,7 @@ describe('cross-platform exported agent E2E', () => {
     })
     expect(save.returnCode).toBe(0)
     expect(save.exportSaved).toBe(false)
-    expect(sanitizeTerminalText(save.output)).toContain('file already exists')
+    expect(save.screens.join('\n')).toContain('file already exists')
     expectRestoredTerminal(save)
 
     const corrupt = join(root, 'corrupt-agent.zip')

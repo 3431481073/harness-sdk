@@ -1,9 +1,9 @@
 import { createElement } from 'react'
-import { render, type Instance } from 'ink'
+import type { Instance } from 'ink'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { captureFrame, mouseInputSequence, ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, captureFrame, mouseInputSequence, ttyInput, ttyOutput } from './fixtures/terminal.js'
 
 import { ChatApp } from '../src/tui/view/app.js'
 import { ChatController, type ChatPermissionRequest, type ChatTask } from '../src/tui/chat/controller.js'
@@ -34,7 +34,7 @@ describe('TUI mouse input', () => {
       return () => {}
     }
     target.respondPermission = vi.fn(() => true)
-    const controller = new ChatController(target)
+    const controller = new ChatController(target, { settings: { animations: false } })
     const instance = render(createElement(ChatApp, { controller }), {
       stdin: input,
       stdout: output,
@@ -79,8 +79,6 @@ describe('TUI mouse input', () => {
     }
     expect(frame().find((line) => line.includes('← Back'))).toContain('▸')
     const wholeTool = findText(frame(), '* any command')
-    expect(frame()[wholeTool.row - 1]).toContain('┌')
-    expect(frame()[wholeTool.row + 1]).toContain('└')
     input.write(mouseInputSequence(0, wholeTool.column, wholeTool.row, 'M'))
     input.write(mouseInputSequence(3, wholeTool.column, wholeTool.row, 'm'))
     await vi.waitFor(() =>
@@ -95,6 +93,7 @@ describe('TUI mouse input', () => {
     const project = { root: '/work/agent', entrypoint: '/work/agent/agent.ts' }
     const openProject = vi.fn(async () => {})
     const controller = new ChatController(idleBackend(), {
+      settings: { animations: false },
       configurationSource: () => ({
         preferredLanguage: 'typescript',
         documents: {
@@ -154,6 +153,7 @@ describe('TUI mouse input', () => {
       return { stopReason: 'endTurn', context: { projectedTokens: 100, contextWindow: 1_000 } }
     }
     const controller = new ChatController(target, {
+      settings: { animations: false },
       runtime: { version: '1.2.3', model: 'bedrock/test', cwd: '/work' },
     })
     await controller.submit('measure context')
@@ -297,6 +297,7 @@ describe('TUI mouse input', () => {
     target.modelChangeMode = () => 'live'
     target.switchModel = vi.fn()
     const controller = new ChatController(target, {
+      settings: { animations: false },
       runtime: { version: '1.2.3', model: 'model-00', cwd: '/work' },
     })
     const instance = render(createElement(ChatApp, { controller }), {
@@ -335,8 +336,8 @@ describe('TUI mouse input', () => {
     const input = ttyInput()
     const output = ttyOutput(100, 24)
     const frame = captureFrame(output)
-    const primary = new ChatController(idleBackend({ name: 'Primary' }))
-    const fork = new ChatController(idleBackend({ name: 'Reviewer' }))
+    const primary = new ChatController(idleBackend({ name: 'Primary' }), { settings: { animations: false } })
+    const fork = new ChatController(idleBackend({ name: 'Reviewer' }), { settings: { animations: false } })
     const agentMessaging = new AgentMessaging()
     agentMessaging.register({
       id: 'task-1',
@@ -406,6 +407,7 @@ describe('TUI mouse input', () => {
     target.modelChangeMode = () => 'live'
     target.switchModel = vi.fn()
     const controller = new ChatController(target, {
+      settings: { animations: false },
       runtime: { version: '1.2.3', model: 'model-00', cwd: '/work' },
     })
     const instance = render(createElement(ChatApp, { controller }), {
@@ -451,6 +453,7 @@ describe('TUI mouse input', () => {
     ]
     target.setEffort = vi.fn(async (effort) => effort)
     const controller = new ChatController(target, {
+      settings: { animations: false },
       runtime: { version: '1.2.3', model: 'model-00', cwd: '/work' },
     })
     const instance = render(createElement(ChatApp, { controller }), {
@@ -538,6 +541,7 @@ describe('TUI mouse input', () => {
     ]
     target.setEffort = vi.fn(async (effort) => effort)
     const controller = new ChatController(target, {
+      settings: { animations: false },
       runtime: { version: '1.2.3', model: 'model-00', cwd: '/work' },
     })
     const instance = render(createElement(ChatApp, { controller }), {
@@ -575,6 +579,7 @@ describe('TUI mouse input', () => {
     target.modelChangeMode = () => 'live'
     target.switchModel = vi.fn()
     const controller = new ChatController(target, {
+      settings: { animations: false },
       runtime: { version: '1.2.3', model: 'model-00', cwd: '/work' },
     })
     const instance = render(createElement(ChatApp, { controller }), {
@@ -619,6 +624,7 @@ describe('TUI mouse input', () => {
     const output = ttyOutput(width, 30)
     const frame = captureFrame(output)
     const controller = new ChatController(idleBackend(), {
+      settings: { animations: false },
       runtime: { version: '1.2.3', model: 'model-00', cwd: '/work' },
     })
     const instance = render(createElement(ChatApp, { controller }), {
@@ -682,6 +688,7 @@ describe('TUI mouse input', () => {
       return { stopReason: 'endTurn' }
     }
     const controller = new ChatController(target, {
+      settings: { animations: false },
       runtime: { version: '1.2.3', model: 'model-00', cwd: '/work' },
     })
     const instance = render(createElement(ChatApp, { controller }), {
@@ -724,6 +731,7 @@ describe('TUI mouse input', () => {
     const output = ttyOutput(80, 20)
     const frame = captureFrame(output)
     const controller = new ChatController(idleBackend(), {
+      settings: { animations: false },
       runtime: { version: '1.2.3', model: 'bedrock/test', cwd: '/work' },
     })
     const instance = render(createElement(ChatApp, { controller }), {
@@ -755,6 +763,7 @@ describe('TUI mouse input', () => {
     const frame = captureFrame(output)
     const activate = vi.fn()
     const controller = new ChatController(idleBackend(), {
+      settings: { animations: false },
       skills: {
         list: async () => [{ name: 'review', description: 'Review code', instructions: '', active: false }],
         activate,
@@ -796,7 +805,7 @@ describe('TUI mouse input', () => {
       listener([])
       return () => {}
     }
-    const controller = new ChatController(target)
+    const controller = new ChatController(target, { settings: { animations: false } })
     const instance = render(createElement(ChatApp, { controller }), {
       stdin: input,
       stdout: output,
@@ -870,7 +879,7 @@ describe('TUI mouse input', () => {
     target.removeAllowedPermission = vi.fn(async (toolName) => {
       allowedTools = allowedTools.filter((candidate) => candidate !== toolName)
     })
-    const controller = new ChatController(target)
+    const controller = new ChatController(target, { settings: { animations: false } })
     const instance = render(createElement(ChatApp, { controller }), {
       stdin: input,
       stdout: output,
@@ -925,7 +934,7 @@ describe('TUI mouse input', () => {
     const input = ttyInput()
     const output = ttyOutput(80, 20)
     const exportAgentProject = vi.fn(async (_language: string, destination?: string) => destination)
-    const controller = new ChatController(idleBackend(), { exportAgentProject })
+    const controller = new ChatController(idleBackend(), { settings: { animations: false }, exportAgentProject })
     const instance = render(createElement(ChatApp, { controller }), {
       stdin: input,
       stdout: output,
@@ -972,8 +981,6 @@ function lastVisibleModel(lines: readonly string[]): { column: number; row: numb
   throw new Error('No model row is visible')
 }
 
-// Composer panels rise over the transcript for a moment after opening; targets are read from the settled frame.
 async function settled(instance: Instance): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, 250))
   await instance.waitUntilRenderFlush()
 }

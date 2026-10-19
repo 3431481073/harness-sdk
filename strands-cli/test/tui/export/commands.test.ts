@@ -207,12 +207,22 @@ describe('export completion', () => {
     await controller.activatePanelRow(row(controller, 'Copy launch command'))
     const launchCommand = copyText.mock.lastCall![0]
     expect(row(controller, 'Copy launch command').badge?.text).toBe('Copied')
-    expect(
-      // Resolve `sh` from PATH: Windows runners get it from Git for Windows, not /bin/sh.
-      execFileSync('sh', ['-c', `${launchCommand.replace(/^strands /u, 'set -- ')}; printf '%s' "$2"`], {
-        encoding: 'utf8',
-      })
-    ).toBe(path)
+    const output =
+      process.platform === 'win32'
+        ? execFileSync(
+            'pwsh',
+            [
+              '-NoProfile',
+              '-NonInteractive',
+              '-Command',
+              `function strands { [Console]::Write($args[1]) }; ${launchCommand}`,
+            ],
+            { encoding: 'utf8' }
+          )
+        : execFileSync('sh', ['-c', `${launchCommand.replace(/^strands /u, 'set -- ')}; printf '%s' "$2"`], {
+            encoding: 'utf8',
+          })
+    expect(output).toBe(path)
   })
 
   it.each(['cancel', 'error', 'copy-false', 'copy-error'] as const)(

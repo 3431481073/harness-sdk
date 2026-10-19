@@ -1,7 +1,7 @@
 import { createElement } from 'react'
-import { render, renderToString } from 'ink'
+import { renderToString } from 'ink'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, ttyInput, ttyOutput } from './fixtures/terminal.js'
 
 import { commandAssistance } from '../src/tui/chat/commands.js'
 import { ChatController } from '../src/tui/chat/controller.js'

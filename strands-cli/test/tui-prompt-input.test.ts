@@ -1,11 +1,11 @@
 import { createElement } from 'react'
-import { render, type Instance } from 'ink'
+import type { Instance } from 'ink'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ChatController } from '../src/tui/chat/controller.js'
 import { sanitizeTerminalText } from '../src/tui/terminal/sanitize.js'
 import { ChatApp } from '../src/tui/view/app.js'
-import { ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, ttyInput, ttyOutput } from './fixtures/terminal.js'
 import { idleBackend } from './fixtures/chat-backend.js'
 
 const UP = '\u001b[A'

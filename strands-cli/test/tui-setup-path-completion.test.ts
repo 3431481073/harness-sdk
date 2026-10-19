@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, sep } from 'node:path'
 import { createElement } from 'react'
-import { render } from 'ink'
+
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { CliConfigStore } from '../src/tui/config.js'
@@ -10,7 +10,7 @@ import { importPathCompletions } from '../src/tui/view/setup-wizard/path-complet
 import { SetupWizard } from '../src/tui/view/setup-wizard/index.js'
 import { sanitizeTerminalText } from '../src/tui/terminal/sanitize.js'
 import { chooseAgentProject } from '../src/tui/terminal/directory-picker.js'
-import { mouseInputSequence, ttyInput, ttyOutput } from './fixtures/terminal.js'
+import { render, mouseInputSequence, ttyInput, ttyOutput } from './fixtures/terminal.js'
 
 vi.mock('../src/tui/provider/discovery.js', async (original) => ({
   ...(await original<typeof import('../src/tui/provider/discovery.js')>()),

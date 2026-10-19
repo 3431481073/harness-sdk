@@ -1,13 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { sanitizeTerminalText } from '../../src/tui/terminal/sanitize.js'
 import { TUI_CASE } from './catalog.js'
 import { expectRestoredTerminal, runTuiScenario } from './harness.js'
 
 describe('TUI panel integration', () => {
   it(TUI_CASE.panels.testName, async () => {
     const result = await runTuiScenario(TUI_CASE.panels.scenario)
-    const clean = sanitizeTerminalText(result.output)
+    const clean = result.screens.join('\n')
 
     expect(result.returnCode).toBe(0)
     expect(clean).toContain('Send a message')

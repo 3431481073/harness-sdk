@@ -1,6 +1,6 @@
 import { mkdir, mkdtemp, realpath, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { join, sep } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { permissionRuleDecision, permissionScopes } from '../src/tui/permissions/rules.js'
@@ -36,7 +36,7 @@ describe('permission scopes', () => {
       { rule: `write(${join(workspace, 'src', 'tui', 'view', '*')})`, label: join('src', 'tui', 'view', '*') },
       { rule: `write(${join(workspace, 'src', 'tui', '*')})`, label: join('src', 'tui', '*') },
       { rule: `write(${join(workspace, 'src', '*')})`, label: join('src', '*') },
-      { rule: `write(${join(workspace, '*')})`, label: './* this project' },
+      { rule: `write(${join(workspace, '*')})`, label: `.${sep}* this project` },
       { rule: 'write', label: '* any file' },
     ])
   })
@@ -71,9 +71,13 @@ describe('permission rule decisions', () => {
     expect(decide('shell', { command: 'echo "rm -rf build"' }, ['shell'], ['shell(rm *)'])).toBe('allow')
   })
 
-  it('matches path and URL prefixes on segment boundaries', () => {
-    expect(decide('write', { path: '/w/src/a.ts' }, ['write(/w/src/*)'])).toBe('allow')
-    expect(decide('write', { path: '/w/src-other/a.ts' }, ['write(/w/src/*)'])).toBeUndefined()
+  it('matches path and URL prefixes on segment boundaries', async () => {
+    const workspace = await temporaryWorkspace()
+    const rules = { allow: [`write(${join(workspace, 'src', '*')})`], deny: [] }
+    expect(permissionRuleDecision('write', { path: join(workspace, 'src', 'a.ts') }, rules, workspace)).toBe('allow')
+    expect(
+      permissionRuleDecision('write', { path: join(workspace, 'src-other', 'a.ts') }, rules, workspace)
+    ).toBeUndefined()
     expect(decide('web_fetch', { url: 'https://docs.example.com/a/b' }, ['web_fetch(docs.example.com/*)'])).toBe(
       'allow'
     )
