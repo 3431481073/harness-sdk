@@ -252,6 +252,9 @@ from strands.hooks import AfterModelCallEvent
 MAX_ATTEMPTS = 4
 
 async def maybe_retry(event: AfterModelCallEvent) -> None:
+    # Skip if another hook already requested a retry, so delays don't stack.
+    if event.retry:
+        return
     if event.exception and event.attempt_count < MAX_ATTEMPTS:
         await asyncio.sleep(2.0)
         event.retry = True

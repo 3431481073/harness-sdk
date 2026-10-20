@@ -85,6 +85,8 @@ async function hookRetryExample() {
 
   let attempts = 0
   agent.addHook(AfterModelCallEvent, async (event) => {
+    // Skip if another hook already requested a retry, so delays don't stack.
+    if (event.retry) return
     if (event.error && attempts < 3) {
       attempts += 1
       await new Promise((resolve) => setTimeout(resolve, 2_000))

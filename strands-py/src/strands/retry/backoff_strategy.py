@@ -6,6 +6,7 @@ next attempt. Policy concerns (whether to retry, max attempts, time budgets) liv
 
 import math
 import random
+import sys
 from dataclasses import dataclass
 from typing import Literal, Protocol, get_args
 
@@ -77,6 +78,11 @@ def _validate_max_delay(value: float, class_name: str) -> None:
         raise ValueError(f"{class_name}: max_delay must be a non-negative number (got {value!r})")
 
 
+def _finite_cap(max_delay: float) -> float:
+    # An uncapped (math.inf) max_delay is clamped so raw and jittered delays stay finite.
+    return min(max_delay, sys.float_info.max)
+
+
 def _validate_jitter(jitter: str, class_name: str) -> None:
     if jitter not in _JITTER_KINDS:
         raise ValueError(f"{class_name}: jitter must be one of {_JITTER_KINDS} (got {jitter!r})")
@@ -143,7 +149,7 @@ class LinearBackoff:
         _validate_non_negative(base_delay, "base_delay", type(self).__name__)
         _validate_max_delay(max_delay, type(self).__name__)
         self._base_delay = base_delay
-        self._max_delay = max_delay
+        self._max_delay = _finite_cap(max_delay)
         self._jitter: JitterKind = jitter
 
     def next_delay(self, context: BackoffContext) -> float:
@@ -191,7 +197,7 @@ class ExponentialBackoff:
         _validate_max_delay(max_delay, type(self).__name__)
         _validate_non_negative(multiplier, "multiplier", type(self).__name__)
         self._base_delay = base_delay
-        self._max_delay = max_delay
+        self._max_delay = _finite_cap(max_delay)
         self._multiplier = multiplier
         self._jitter: JitterKind = jitter
 
@@ -206,7 +212,8 @@ class ExponentialBackoff:
         """
         _validate_attempt(context.attempt, type(self).__name__)
         try:
-            raw = min(self._max_delay, self._base_delay * self._multiplier ** (context.attempt - 1))
+            growth = float(self._multiplier) ** (context.attempt - 1)
         except OverflowError:
-            raw = self._max_delay
+            growth = math.inf
+        raw = 0.0 if self._base_delay == 0 else min(self._max_delay, self._base_delay * growth)
         return _jitter(raw, self._jitter, self._base_delay, self._max_delay, context.last_delay)

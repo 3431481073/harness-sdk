@@ -1,4 +1,5 @@
 import math
+import sys
 from unittest.mock import patch
 
 import pytest
@@ -123,9 +124,24 @@ def test_infinite_max_delay_disables_cap(backoff_class):
     assert _delays(backoff, [1, 2]) == [100, 200]
 
 
-def test_exponential_backoff_returns_max_delay_when_raw_delay_overflows():
-    backoff = ExponentialBackoff(base_delay=0.5, max_delay=60, multiplier=1.5, jitter="none")
+@pytest.mark.parametrize("multiplier", [2, 1.5])
+def test_exponential_backoff_returns_max_delay_when_growth_overflows(multiplier):
+    backoff = ExponentialBackoff(base_delay=0.5, max_delay=60, multiplier=multiplier, jitter="none")
     assert _delays(backoff, [2000]) == [60]
+
+
+@pytest.mark.parametrize("jitter", ["none", "full", "equal", "decorrelated"])
+@pytest.mark.parametrize("multiplier", [2, 10.0])
+def test_uncapped_exponential_backoff_stays_finite_when_growth_overflows(jitter, multiplier):
+    backoff = ExponentialBackoff(base_delay=1, max_delay=math.inf, multiplier=multiplier, jitter=jitter)
+    delay = backoff.next_delay(BackoffContext(attempt=2000, elapsed=0, last_delay=sys.float_info.max))
+    assert math.isfinite(delay)
+    assert delay >= 0
+
+
+def test_zero_base_delay_stays_zero_when_growth_overflows():
+    backoff = ExponentialBackoff(base_delay=0, max_delay=60, multiplier=1.5, jitter="none")
+    assert _delays(backoff, [2000]) == [0]
 
 
 @pytest.mark.parametrize(
