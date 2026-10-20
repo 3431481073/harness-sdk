@@ -11,6 +11,10 @@ const ANSI_ESCAPE = new RegExp(String.raw`\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u000
 const CHAT_READY = '\u001b[?2004h'
 const SCREEN_QUIET_MS = 75
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds))
+const writeStdout = (value) =>
+  new Promise((resolve, reject) => {
+    process.stdout.write(value, (error) => (error ? reject(error) : resolve()))
+  })
 
 async function main() {
   const [command, ...args] = process.argv.slice(2)
@@ -492,7 +496,7 @@ async function main() {
     await waitForExit()
     await drainScreen(Date.now() + 1_000)
 
-    process.stdout.write(
+    await writeStdout(
       JSON.stringify({
         returnCode,
         termiosRestored: null,
@@ -517,7 +521,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
-  process.exitCode = 1
-})
+main().then(
+  () => process.exit(0),
+  (error) => {
+    process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`, () => process.exit(1))
+  }
+)
