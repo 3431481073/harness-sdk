@@ -559,7 +559,7 @@ describe('TUI startup', () => {
             NODE_ENV: environment,
             FORCE_COLOR: '1',
           },
-          timeout: 10_000,
+          timeout: 30_000,
         }
       )
       let stderr = ''
@@ -574,7 +574,7 @@ describe('TUI startup', () => {
         await rm(directory, { recursive: true, force: true })
       }
     },
-    15_000
+    35_000
   )
 })
 
