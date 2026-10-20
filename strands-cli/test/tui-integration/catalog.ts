@@ -62,8 +62,8 @@ export const TUI_CASE = {
   resize: {
     id: 'Resize',
     scenario: 'resize',
-    description: 'Frames resize without blank clears or burst churn',
-    testName: 'resizes without blanking and coalesces resize bursts',
+    description: 'Visible content survives sequential and burst resizes',
+    testName: 'keeps the terminal usable across sequential and burst resizes',
   },
   exit: {
     id: 'Exit cleanup',

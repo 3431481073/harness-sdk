@@ -26,9 +26,8 @@ export interface TuiResult {
   termiosRestored: boolean | null
   output: string
   screens: string[]
-  resizeOutput: string
-  resizeBurstOutput: string
-  resizeNoopOutput: string
+  resizeScreens: Array<{ columns: number; rows: number; text: string }>
+  resizeNoopRedraw: boolean
   exportSaved: boolean
 }
 
@@ -82,10 +81,8 @@ export async function runTuiCommand(options: {
       },
     }
   )
-  const result = JSON.parse(stdout) as Omit<TuiResult, 'output' | 'resizeOutput'> & {
+  const result = JSON.parse(stdout) as Omit<TuiResult, 'output' | 'resizeNoopRedraw'> & {
     transcript: string
-    resizeTranscript: string
-    resizeBurstTranscript: string
     resizeNoopTranscript: string
   }
   return {
@@ -93,9 +90,8 @@ export async function runTuiCommand(options: {
     termiosRestored: result.termiosRestored,
     output: decode(result.transcript),
     screens: result.screens,
-    resizeOutput: decode(result.resizeTranscript),
-    resizeBurstOutput: decode(result.resizeBurstTranscript),
-    resizeNoopOutput: decode(result.resizeNoopTranscript),
+    resizeScreens: result.resizeScreens,
+    resizeNoopRedraw: decode(result.resizeNoopTranscript).length > 0,
     exportSaved: result.exportSaved,
   }
 }

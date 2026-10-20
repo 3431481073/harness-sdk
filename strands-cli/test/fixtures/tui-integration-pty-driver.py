@@ -22,6 +22,8 @@ ANSI_ESCAPE = re.compile(rb"\x1b(?:\[[0-?]*[ -/]*[@-~]|\][^\x07]*(?:\x07|\x1b\\)
 # ChatApp enables bracketed paste after attaching its keyboard input handler.
 CHAT_READY = b"\x1b[?2004h"
 READY_MARKER = b"Enter to send"
+SCREEN_QUIET_SECONDS = 0.075
+SCREEN_RESPONSE_TIMEOUT_SECONDS = 1.0
 
 
 def main() -> int:
@@ -57,6 +59,7 @@ def main() -> int:
     transcript = bytearray()
     screen = ""
     screens: list[str] = []
+    last_output_at = time.monotonic()
     screen_process = subprocess.Popen(
         [command[0], str(Path(__file__).with_name("terminal-screen.mjs")), "100", str(rows)],
         stdin=subprocess.PIPE,
@@ -75,6 +78,9 @@ def main() -> int:
             request.update(columns=columns, rows=height)
         screen_input.write(json.dumps(request) + "\n")
         screen_input.flush()
+        ready, _, _ = select.select([screen_output], [], [], SCREEN_RESPONSE_TIMEOUT_SECONDS)
+        if not ready:
+            raise RuntimeError("terminal screen parser timed out")
         response = screen_output.readline()
         if not response:
             raise RuntimeError("terminal screen parser exited")
@@ -83,6 +89,7 @@ def main() -> int:
         return parsed.get("target")
 
     def pump() -> None:
+        nonlocal last_output_at
         chunks = bytearray()
         while True:
             try:
@@ -96,14 +103,28 @@ def main() -> int:
             transcript.extend(chunk)
             chunks.extend(chunk)
         if chunks:
+            last_output_at = time.monotonic()
             update_screen(chunks)
 
-    def wait_for(markers: list[bytes], timeout: float = 8.0, *, styled: bool = True, start: int = 0) -> None:
+    def wait_for(
+        markers: list[bytes], timeout: float = 8.0, *, styled: bool = True, start: int = 0, stable: bool = False
+    ) -> None:
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             pump()
             output = bytes(transcript[start:]) if styled else ANSI_ESCAPE.sub(b"", bytes(transcript[start:]))
-            if all(marker in (output if (styled or marker.startswith(b"__")) else screen.encode()) for marker in markers):
+            screen_markers = [] if styled else [marker for marker in markers if not marker.startswith(b"__")]
+            uses_screen = not styled and (bool(screen_markers) or stable)
+            has_fresh_screen = not uses_screen or start == 0 or len(transcript) > start
+            is_stable = not stable or time.monotonic() - last_output_at >= SCREEN_QUIET_SECONDS
+            if (
+                has_fresh_screen
+                and is_stable
+                and all(
+                    marker in (output if (styled or marker.startswith(b"__")) else screen.encode())
+                    for marker in markers
+                )
+            ):
                 screens.append(screen)
                 return
             if process.poll() is not None:
@@ -116,10 +137,16 @@ def main() -> int:
             for marker in markers
             if marker not in (output if (styled or marker.startswith(b"__")) else screen.encode())
         ]
-        raise RuntimeError(f"missing markers {missing}; returncode={process.poll()}; screen={screen!r}; output={transcript!r}")
+        raise RuntimeError(
+            f"missing markers {missing}; returncode={process.poll()}; "
+            f"screen={screen!r}; output={transcript!r}"
+        )
+
+    def wait_for_stable_screen(markers: list[bytes], timeout: float = 8.0, *, start: int = 0) -> None:
+        wait_for(markers, timeout=timeout, styled=False, start=start, stable=True)
 
     def click_text(text: str) -> None:
-        wait_for([text.encode()], styled=False)
+        wait_for_stable_screen([text.encode()])
         target = update_screen(target=text)
         column, row = target["column"], target["row"]
         os.write(master, f"\x1b[<0;{column};{row}M\x1b[<3;{column};{row}m".encode())
@@ -129,7 +156,7 @@ def main() -> int:
         while time.monotonic() < deadline:
             pump()
             target = update_screen(target=text)
-            if target and target["style"] == style:
+            if target and time.monotonic() - last_output_at >= SCREEN_QUIET_SECONDS and target["style"] == style:
                 screens.append(screen)
                 return
             select.select([master], [], [], 0.05)
@@ -179,23 +206,20 @@ def main() -> int:
                 else:
                     select.select([master], [], [], 0.05)
 
-        resize_output = b""
-        burst_output = b""
         noop_output = b""
+        resize_screens: list[dict[str, object]] = []
         if resize:
-            start = len(transcript)
             for columns, height in [(80, 24), (40, 16), (22, 10), (160, 50), (160, 25), (100, 30)]:
                 offset = len(transcript)
                 set_size(columns, height)
-                wait_for([b"\x1b[1;1H"], timeout=2.0, start=offset)
-            resize_output = bytes(transcript[start:])
+                wait_for_stable_screen([], timeout=2.0, start=offset)
+                resize_screens.append({"columns": columns, "rows": height, "text": screen})
 
             burst_start = len(transcript)
             for columns, height in [(70, 25), (50, 18), (120, 40)]:
                 set_size(columns, height)
-            wait_for([b"\x1b[1;1H"], timeout=2.0, start=burst_start)
-            settle()
-            burst_output = bytes(transcript[burst_start:])
+            wait_for_stable_screen([], timeout=2.0, start=burst_start)
+            resize_screens.append({"columns": 120, "rows": 40, "text": screen})
 
             noop_start = len(transcript)
             set_size(120, 40)
@@ -213,7 +237,7 @@ def main() -> int:
                 os.write(master, b"\r")
             idle = [b"__PLATFORM_IDLE__"] if export_language == "typescript" else []
             wait_for(markers + idle, timeout=15.0, styled=False, start=start)
-            wait_for([READY_MARKER], styled=False)
+            wait_for_stable_screen([READY_MARKER])
 
         if setup_import_mode:
             click_text("Import")
@@ -243,7 +267,7 @@ def main() -> int:
                 os.write(master, b"\r")
                 marker = f"__LIVE_IDLE_{idle_generation}_{idle_turns}__".encode()
                 wait_for([marker], timeout=150.0, start=start)
-                wait_for([READY_MARKER], styled=False)
+                wait_for_stable_screen([READY_MARKER])
 
             setup_prompt = os.environ.get("STRANDS_CLI_TEST_SETUP_PROMPT")
             if setup_prompt:
@@ -258,17 +282,17 @@ def main() -> int:
             wait_for([b"TypeScript"], styled=False, start=config_start)
             close_start = len(transcript)
             os.write(master, b"\x1b")
-            wait_for([READY_MARKER], styled=False, start=close_start)
+            wait_for_stable_screen([READY_MARKER], start=close_start)
             path = os.environ["STRANDS_CLI_TEST_EXPORT_PATH"]
             command_start = len(transcript)
             os.write(master, f'/export {export_language} "{path}"'.encode())
             wait_for([b"/export " + export_language.encode()], styled=False, start=command_start)
             export_start = len(transcript)
             os.write(master, b"\r")
-            wait_for([b"Export complete"], timeout=30.0, styled=False, start=export_start)
+            wait_for_stable_screen([b"Export complete"], timeout=30.0, start=export_start)
             close_start = len(transcript)
             os.write(master, b"\x1b")
-            wait_for([READY_MARKER], styled=False, start=close_start)
+            wait_for_stable_screen([READY_MARKER], start=close_start)
         elif lifecycle_mode:
             submit(
                 b"report capabilities before export"
@@ -286,19 +310,23 @@ def main() -> int:
             command = b'/export ' + export_language.encode() + b' "' + path + b'"'
             os.write(master, command)
             wait_for([b"/export " + export_language.encode()], timeout=2.0, styled=False)
+            export_start = len(transcript)
             os.write(master, b"\r")
-            wait_for([b"Export complete"], timeout=15.0, styled=False)
+            wait_for_stable_screen([b"Export complete"], timeout=15.0, start=export_start)
+            close_start = len(transcript)
             os.write(master, b"\x1b")
-            wait_for([READY_MARKER], styled=False)
+            wait_for_stable_screen([READY_MARKER], start=close_start)
         elif export_failure_mode:
             path = os.environ["STRANDS_CLI_TEST_EXPORT_PATH"].encode()
             command = b'/export typescript "' + path + b'"'
             os.write(master, command)
             wait_for([b"/export typescript"], timeout=2.0, styled=False)
+            failure_start = len(transcript)
             os.write(master, b"\r")
-            wait_for([b"file already exists"], timeout=15.0, styled=False)
+            wait_for_stable_screen([b"file already exists"], timeout=15.0, start=failure_start)
+            close_start = len(transcript)
             os.write(master, b"\x1b")
-            wait_for([READY_MARKER], styled=False)
+            wait_for_stable_screen([READY_MARKER], start=close_start)
         elif chat_mode:
             os.write(master, b"hello from integration")
             wait_for([b"hello from integration"], timeout=2.0, styled=False)
@@ -327,10 +355,12 @@ def main() -> int:
             command = b"/export typescript " + path
             os.write(master, command)
             wait_for([b"/export typescript"], timeout=2.0, styled=False)
+            export_start = len(transcript)
             os.write(master, b"\r")
-            wait_for([b"Export complete"], styled=False)
+            wait_for_stable_screen([b"Export complete"], start=export_start)
+            close_start = len(transcript)
             os.write(master, b"\x1b")
-            wait_for([READY_MARKER], styled=False)
+            wait_for_stable_screen([READY_MARKER], start=close_start)
         elif panels_mode:
             panels = [
                 (b"/help", [b"Send a message", b"Search help", "› Controls".encode()], None),
@@ -403,9 +433,8 @@ def main() -> int:
                     for columns, height in [(40, 16), (22, 10), (100, 30)]:
                         resize_start = len(transcript)
                         set_size(columns, height)
-                        wait_for([b"\x1b[1;1H"], timeout=2.0, start=resize_start)
                         footer = b"Arrows" if columns < 30 else b"Enter switch"
-                        wait_for([b"Agents", b"1/1", footer], styled=False)
+                        wait_for_stable_screen([b"Agents", b"1/1", footer], start=resize_start)
                     chat_start = len(transcript)
                     os.write(master, b"\r")
                     wait_for([READY_MARKER], styled=False, start=chat_start)
@@ -467,8 +496,9 @@ def main() -> int:
                     tab_start = len(transcript)
                     os.write(master, b"\t")
                     wait_for([tab_marker], styled=False, start=tab_start)
+                close_start = len(transcript)
                 os.write(master, b"\x1b")
-                wait_for([READY_MARKER], styled=False)
+                wait_for_stable_screen([READY_MARKER], start=close_start)
         elif frog_mode:
             os.write(master, b"/frog peek")
             wait_for([b"/frog peek"], timeout=2.0, styled=False)
@@ -488,8 +518,9 @@ def main() -> int:
             os.write(master, b"\x03")
             wait_for([b"Cancelled", b"__SHELL_IDLE__"], timeout=4.0, styled=False)
         draft = b"startup draft" if startup_typing else b"junk"
+        draft_start = len(transcript)
         os.write(master, draft)
-        wait_for([draft], timeout=2.0, styled=False)
+        wait_for([draft], timeout=2.0, styled=False, start=draft_start)
         os.write(master, b"\x7f" * len(draft) + b"/exit")
         wait_for(["/exit▌".encode()], timeout=2.0, styled=False)
         os.write(master, b"\r")
@@ -504,9 +535,8 @@ def main() -> int:
                     "termiosRestored": initial_terminal == final_terminal,
                     "transcript": base64.b64encode(transcript).decode(),
                     "screens": screens,
-                    "resizeTranscript": base64.b64encode(resize_output).decode(),
-                    "resizeBurstTranscript": base64.b64encode(burst_output).decode(),
                     "resizeNoopTranscript": base64.b64encode(noop_output).decode(),
+                    "resizeScreens": resize_screens,
                     "exportSaved": os.path.isfile(os.environ["STRANDS_CLI_TEST_EXPORT_PATH"]),
                 }
             )

@@ -8,15 +8,20 @@ describe('TUI terminal integration', () => {
     const result = await runTuiScenario(TUI_CASE.resize.scenario)
 
     expect(result.returnCode).toBe(0)
-    expect(result.resizeOutput.split('\u001b[1;1H')).toHaveLength(7)
-    // Native resize events may be coalesced or delivered individually by the OS.
-    const burstRedraws = result.resizeBurstOutput.split('\u001b[1;1H').length - 1
-    expect(burstRedraws).toBeGreaterThanOrEqual(1)
-    expect(burstRedraws).toBeLessThanOrEqual(3)
-    expect(result.resizeNoopOutput).toBe('')
-    for (const code of ['2J', '3J', '2K']) {
-      expect(result.resizeOutput + result.resizeBurstOutput).not.toContain(`\u001b[${code}`)
+    expect(result.resizeScreens.map(({ columns, rows }) => [columns, rows])).toEqual([
+      [80, 24],
+      [40, 16],
+      [22, 10],
+      [160, 50],
+      [160, 25],
+      [100, 30],
+      [120, 40],
+    ])
+    for (const { text } of result.resizeScreens) {
+      expect(text.trim()).not.toBe('')
+      expect(text).toMatch(/Enter(?: to)? send/)
     }
+    expect(result.resizeNoopRedraw).toBe(false)
     expectRestoredTerminal(result)
   })
 

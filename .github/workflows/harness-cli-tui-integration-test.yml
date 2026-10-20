@@ -24,10 +24,22 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os-name: macOS
+          - os-name: Source / Linux
+            runner: strands-agents_ubuntu-latest_4-core
+            dist: 'false'
+            platform: false
+          - os-name: Compiled / Linux
+            runner: strands-agents_ubuntu-latest_4-core
+            dist: 'true'
+            platform: true
+          - os-name: Compiled / macOS
             runner: macos-latest
-          - os-name: Windows
+            dist: 'true'
+            platform: true
+          - os-name: Compiled / Windows
             runner: strands-agents_windows-latest_4-core
+            dist: 'true'
+            platform: true
     defaults:
       run:
         working-directory: strands-cli
@@ -66,8 +78,9 @@ jobs:
 
       - name: Run TUI integration scenarios
         env:
-          STRANDS_CLI_TEST_DIST: 'true'
+          STRANDS_CLI_TEST_DIST: ${{ matrix.dist }}
         run: npm run test:tui-integration
 
       - name: Run deterministic platform E2E scenarios
+        if: matrix.platform
         run: npm run test:platform-integration
