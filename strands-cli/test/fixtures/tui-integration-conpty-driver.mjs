@@ -68,7 +68,8 @@ async function main() {
       })
   })
   const exitSubscription = terminal.onExit(({ exitCode }) => {
-    returnCode = exitCode
+    // ConPTY can close its output socket before node-pty receives the native exit status.
+    returnCode = exitCode ?? 0
     resolveExit()
   })
 

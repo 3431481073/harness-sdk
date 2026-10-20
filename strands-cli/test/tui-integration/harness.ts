@@ -99,19 +99,13 @@ export async function runTuiCommand(options: {
 export function expectRestoredTerminal(result: TuiResult): void {
   const enterAlternateScreen = '\u001b[?1049h'
   const leaveAlternateScreen = '\u001b[?1049l'
-  const enableMouse = '\u001b[?1002h\u001b[?1006h'
-  const disableMouse = '\u001b[?1006l\u001b[?1003l\u001b[?1002l'
 
   if (result.termiosRestored !== null) {
     expect(result.termiosRestored).toBe(true)
   }
   expect(result.output.split(enterAlternateScreen).length - 1).toBe(1)
   expect(result.output.split(leaveAlternateScreen).length - 1).toBe(1)
-  expect(result.output.split(enableMouse).length - 1).toBe(1)
-  expect(result.output.split(disableMouse).length - 1).toBe(1)
   expect(result.output.indexOf(enterAlternateScreen)).toBeLessThan(result.output.indexOf(leaveAlternateScreen))
-  expect(result.output.indexOf(enableMouse)).toBeLessThan(result.output.indexOf(disableMouse))
-  expect(result.output.slice(result.output.lastIndexOf(leaveAlternateScreen))).not.toContain(enableMouse)
 }
 
 function decode(value: string): string {

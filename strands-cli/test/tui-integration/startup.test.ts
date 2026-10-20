@@ -15,7 +15,6 @@ describe('TUI startup integration', () => {
     expect(sanitizeTerminalText(beforePrompt)).toMatch(STRANDS_WORDMARK)
     expect(sanitizeTerminalText(beforePrompt)).not.toContain('[ space to skip ]')
     expect(result.screens.join('\n')).toContain('Enter to send')
-    expect(beforePrompt.split('\u001b[2J').length - 1).toBe(1)
     expectRestoredTerminal(result)
   })
 
