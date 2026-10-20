@@ -1,5 +1,3 @@
-## Overview
-
 The `ConcisenessEvaluator` evaluates how concise an agent’s response is. It assesses whether the response communicates information efficiently without unnecessary verbosity, using a three-level scoring rubric.
 
 ## Key features

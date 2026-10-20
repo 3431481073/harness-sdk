@@ -1,5 +1,3 @@
-## Overview
-
 Deterministic evaluators provide fast, code-based evaluation without LLM judges. They perform exact checks on outputs, trajectories, and environment state, making them a good fit for regression testing, CI/CD pipelines, and cases where evaluation criteria are objective and well-defined.
 
 ## Key features
@@ -173,6 +171,7 @@ evaluators = [
 
 ## Related evaluators
 
+-   [**StructuredOutputSimilarity**](/docs/user-guide/evals-sdk/evaluators/structured_output_evaluator/index.md): Field-by-field scoring of structured output, for when whole-object `Equals` is too blunt
 -   [**OutputEvaluator**](/docs/user-guide/evals-sdk/evaluators/output_evaluator/index.md): LLM-based output evaluation with custom rubrics
 -   [**TrajectoryEvaluator**](/docs/user-guide/evals-sdk/evaluators/trajectory_evaluator/index.md): LLM-based trajectory evaluation
 -   [**CustomEvaluator**](/docs/user-guide/evals-sdk/evaluators/custom_evaluator/index.md): Build your own evaluation logic

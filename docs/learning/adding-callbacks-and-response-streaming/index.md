@@ -1,16 +1,20 @@
+Before you follow along
+
+This video is a snapshot in time. Some APIs and examples have changed since recording. Follow the code on this page, and look for “Changed since recording” notices below.
+
 *[Watch on YouTube](https://www.youtube.com/watch?v=PtdHZBbm1Ys&list=PLDzwjhH-4yhU&index=4)*
-
-About this lesson
-
-The videos in this course are a snapshot in time. Strands is under active development, so the code featured on this page reflects the most up-to-date patterns, but the concepts covered in the video still apply. When in doubt, trust the code.
 
 *Code for this lesson: [`samples/04-callbacks-streaming`](https://github.com/aws-samples/sample-building-with-strands-course/tree/main/samples/04-callbacks-streaming)*
 
-## Callbacks Control What the User Sees
+## Callbacks control what the user sees
 
 Callbacks control how agent output surfaces to users. The default handler streams text to stdout, which is fine for a terminal demo but not for a UI, an API, or a sub-agent running behind the scenes. You can replace the default with a custom handler, silence output entirely, or use `stream_async()` for async servers.
 
-## Custom Callback Handler
+## Custom callback handler
+
+Changed since recording
+
+The calculator is now a small custom `@tool` defined in the sample, replacing the older `strands_tools.calculator` import. The callback and streaming APIs shown in the video still apply.
 
 A callback handler is a function that accepts `**kwargs`. It fires for every agent event: text chunks, tool calls, and complete messages. This handler ignores streaming chunks and only prints complete assistant messages:
 
@@ -60,7 +64,7 @@ Useful event keys you’ll see in `kwargs`:
 -   `current_tool_use`: the tool the model is invoking, including its input
 -   `message`: a complete message once a turn finishes
 
-## Silent Mode
+## Silent mode
 
 Set `callback_handler=None` to suppress all output. The agent runs and returns a result you can use programmatically:
 
@@ -72,7 +76,7 @@ print(f"Captured result: {result}")
 
 This is essential for sub-agents in multi-agent systems that run behind the scenes. Only the orchestrator should be streaming to the user.
 
-## Async Streaming (FastAPI)
+## Async streaming (FastAPI)
 
 For async servers, use `agent.stream_async()`, an async generator that yields events as they happen. Here it powers a FastAPI streaming endpoint:
 

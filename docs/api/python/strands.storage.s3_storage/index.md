@@ -6,7 +6,7 @@ Amazon S3 storage implementation.
 class S3Storage()
 ```
 
-Defined in: [src/strands/storage/s3\_storage.py:19](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L19)
+Defined in: [src/strands/storage/s3\_storage.py:20](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L20)
 
 Persists bytes as objects in an Amazon S3 bucket.
 
@@ -33,7 +33,7 @@ def __init__(bucket: str,
              search_strategy: SearchStrategy[S3Storage] | None = None) -> None
 ```
 
-Defined in: [src/strands/storage/s3\_storage.py:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L34)
+Defined in: [src/strands/storage/s3\_storage.py:35](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L35)
 
 Initialize S3 storage.
 
@@ -56,7 +56,7 @@ Initialize S3 storage.
 async def write(key: str, data: bytes) -> None
 ```
 
-Defined in: [src/strands/storage/s3\_storage.py:71](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L71)
+Defined in: [src/strands/storage/s3\_storage.py:74](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L74)
 
 Store data as an S3 object.
 
@@ -75,7 +75,7 @@ Store data as an S3 object.
 async def read(key: str) -> bytes | None
 ```
 
-Defined in: [src/strands/storage/s3\_storage.py:96](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L96)
+Defined in: [src/strands/storage/s3\_storage.py:99](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L99)
 
 Read an S3 object.
 
@@ -97,7 +97,7 @@ The object contents as bytes, or None if the key does not exist.
 async def delete(key: str) -> None
 ```
 
-Defined in: [src/strands/storage/s3\_storage.py:123](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L123)
+Defined in: [src/strands/storage/s3\_storage.py:126](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L126)
 
 Delete an S3 object. No-op if the key does not exist.
 
@@ -115,7 +115,7 @@ Delete an S3 object. No-op if the key does not exist.
 async def list(query: str = "") -> builtins.list[str]
 ```
 
-Defined in: [src/strands/storage/s3\_storage.py:141](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L141)
+Defined in: [src/strands/storage/s3\_storage.py:144](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L144)
 
 List S3 objects matching the given prefix.
 
@@ -139,7 +139,7 @@ Matching keys sorted ascending, with the storage-level prefix stripped.
 async def search(query: str) -> builtins.list[StorageSearchResult]
 ```
 
-Defined in: [src/strands/storage/s3\_storage.py:192](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L192)
+Defined in: [src/strands/storage/s3\_storage.py:195](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L195)
 
 Search stored content using the configured strategy.
 
@@ -156,12 +156,16 @@ All matches with relevance scores, ranked best-first.
 #### namespace
 
 ```python
-def namespace(prefix: str) -> _NamespacedStorage
+def namespace(prefix: str) -> S3Storage
 ```
 
-Defined in: [src/strands/storage/s3\_storage.py:211](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L211)
+Defined in: [src/strands/storage/s3\_storage.py:214](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/s3_storage.py#L214)
 
-Return a view of this storage with all keys prefixed.
+Return an `S3Storage` scoped to `prefix` within this storage’s bucket and prefix.
+
+The scoped instance shares this instance’s S3 client and search strategy. Unlike a generic `_NamespacedStorage` wrapper, its `search()` only lists and reads objects under the prefix and scores keys without it, rather than scanning the whole bucket.
+
+The shared search strategy receives the scoped instance and keys relative to the prefix. A strategy that keeps its own index must not key it by those relative keys alone; see `SearchStrategy.index`.
 
 **Arguments**:
 
@@ -169,4 +173,4 @@ Return a view of this storage with all keys prefixed.
 
 **Returns**:
 
-A namespaced storage view.
+An `S3Storage` scoped to the prefix.

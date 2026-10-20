@@ -1,5 +1,3 @@
-## Overview
-
 The `SkillInstructionFollowingEvaluator` measures how fully the agent followed the steps of each skill it invoked. Loading a skill is one decision; carrying out its instructions is another. This evaluator reads the invoked skill’s body, breaks it into prescribed steps, and judges the trajectory against them, returning a rating grounded in per-step evidence.
 
 Where the [SkillSelectionAccuracyEvaluator](/docs/user-guide/evals-sdk/evaluators/skill_selection_accuracy_evaluator/index.md) asks whether picking a skill was right, this evaluator asks whether the agent then did what the skill told it to do.

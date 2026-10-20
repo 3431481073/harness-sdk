@@ -329,8 +329,8 @@ await agent.invoke('Find contact info for Acme Corp and send them a proposal')
 - [Interventions](/docs/user-guide/sdk/agents/interventions/index.md) (3 shared tags)
 - [Build a custom plugin](/docs/user-guide/sdk/plugins/custom-plugins/index.md) (2 shared tags)
 - [Plugins](/docs/user-guide/sdk/plugins/index.md) (2 shared tags)
+- [Middleware](/docs/user-guide/sdk/agents/middleware/index.md) (2 shared tags)
 - [Tool Executors](/docs/user-guide/sdk/tools/executors/index.md) (2 shared tags)
-- [Interrupts in Multi-Agent Systems](/docs/user-guide/sdk/interrupts-multi-agent/index.md) (2 shared tags)
 
 
 ## Implementation

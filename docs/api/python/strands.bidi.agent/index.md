@@ -69,7 +69,7 @@ Initialize bidirectional agent.
 def tool() -> _ToolCaller
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:218](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L218)
+Defined in: [src/strands/bidi/agent/agent.py:219](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L219)
 
 Call tool as a function.
 
@@ -91,7 +91,7 @@ agent.tool.calculator(expression="2+2")
 def tool_names() -> list[str]
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:233](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L233)
+Defined in: [src/strands/bidi/agent/agent.py:234](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L234)
 
 Get a list of all registered tool names.
 
@@ -106,7 +106,7 @@ Names of all tools available to this agent.
 def system_prompt() -> str | None
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:243](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L243)
+Defined in: [src/strands/bidi/agent/agent.py:244](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L244)
 
 Get the system prompt as a string.
 
@@ -117,7 +117,7 @@ Get the system prompt as a string.
 def system_prompt(value: str | list[SystemContentBlock] | None) -> None
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:248](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L248)
+Defined in: [src/strands/bidi/agent/agent.py:249](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L249)
 
 Set the system prompt and retain its structured content representation.
 
@@ -128,7 +128,7 @@ Set the system prompt and retain its structured content representation.
 def system_prompt_content() -> list[SystemContentBlock] | None
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:253](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L253)
+Defined in: [src/strands/bidi/agent/agent.py:254](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L254)
 
 Get the system prompt as structured content blocks.
 
@@ -139,7 +139,7 @@ Get the system prompt as structured content blocks.
 def session_id() -> str
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:258](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L258)
+Defined in: [src/strands/bidi/agent/agent.py:259](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L259)
 
 Get the conversation session identifier.
 
@@ -150,7 +150,7 @@ Get the conversation session identifier.
 def storage() -> Storage | None
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:263](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L263)
+Defined in: [src/strands/bidi/agent/agent.py:264](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L264)
 
 Default storage backend for agent subsystems.
 
@@ -161,7 +161,7 @@ Default storage backend for agent subsystems.
 def sandbox() -> Sandbox
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:268](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L268)
+Defined in: [src/strands/bidi/agent/agent.py:269](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L269)
 
 Execution environment for tool code: the host, with no isolation.
 
@@ -172,7 +172,7 @@ Execution environment for tool code: the host, with no isolation.
 def context_manager() -> "ContextManager | None"
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:273](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L273)
+Defined in: [src/strands/bidi/agent/agent.py:274](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L274)
 
 The ContextManager plugin; always None because bidirectional agents do not support plugins.
 
@@ -183,21 +183,28 @@ The ContextManager plugin; always None because bidirectional agents do not suppo
 def event_loop_metrics() -> "EventLoopMetrics"
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:278](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L278)
+Defined in: [src/strands/bidi/agent/agent.py:279](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L279)
 
 Raise because bidirectional agents do not collect event loop metrics yet.
 
 #### cancel
 
 ```python
-def cancel() -> None
+def cancel(*,
+           message: str | None = None,
+           after_current_tools: bool = False) -> None
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:286](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L286)
+Defined in: [src/strands/bidi/agent/agent.py:287](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L287)
 
 Request cancellation of the current conversation.
 
-This method is thread-safe and idempotent. Cancellation takes effect only after a tool group completes.
+Thread-safe and idempotent. Cancellation takes effect only after a tool group completes, so `after_current_tools` is accepted for API parity with `Agent.cancel()` but has no additional effect here. The `message` argument is stored for future use; BidiAgent does not yet surface it in output history.
+
+**Arguments**:
+
+-   `message` - Optional terminal message describing why cancellation was requested. When several callers set a message, the last write wins; a no-arg call leaves any stored message intact.
+-   `after_current_tools` - Accepted for signature parity with `Agent.cancel()`; BidiAgent cancellation is always deferred to the end of the current tool group.
 
 #### cancel\_signal
 
@@ -206,7 +213,7 @@ This method is thread-safe and idempotent. Cancellation takes effect only after 
 def cancel_signal() -> threading.Event
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:295](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L295)
+Defined in: [src/strands/bidi/agent/agent.py:309](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L309)
 
 The cancellation signal for the current conversation.
 
@@ -221,7 +228,7 @@ def add_hook(callback: HookCallback[TEvent],
              order: float = HookOrder.DEFAULT) -> None
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:302](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L302)
+Defined in: [src/strands/bidi/agent/agent.py:316](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L316)
 
 Register a callback function for a specific event type.
 
@@ -251,7 +258,7 @@ Callbacks can be either synchronous or asynchronous functions.
 async def start(invocation_state: dict[str, Any] | None = None) -> None
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:337](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L337)
+Defined in: [src/strands/bidi/agent/agent.py:351](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L351)
 
 Start a persistent bidirectional conversation connection.
 
@@ -281,7 +288,7 @@ await agent.start(invocation_state=\{
 async def send(input_data: BidiAgentInput) -> None
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:368](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L368)
+Defined in: [src/strands/bidi/agent/agent.py:382](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L382)
 
 Send user content to the model.
 
@@ -313,7 +320,7 @@ await agent.send(“Hello”) await agent.send(AudioDelta(format=“pcm”, sour
 async def receive() -> AsyncGenerator[BidiOutputEvent, None]
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:430](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L430)
+Defined in: [src/strands/bidi/agent/agent.py:444](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L444)
 
 Receive events from the model including audio, text, and tool calls.
 
@@ -335,7 +342,7 @@ Model output events processed by background tasks including audio output, text r
 async def stop() -> None
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:453](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L453)
+Defined in: [src/strands/bidi/agent/agent.py:467](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L467)
 
 End the conversation connection and clean up background tasks.
 
@@ -351,7 +358,7 @@ def take_snapshot(*,
                   app_data: dict[str, Any] | None = None) -> Snapshot
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:465](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L465)
+Defined in: [src/strands/bidi/agent/agent.py:480](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L480)
 
 Capture current agent state as an in-memory snapshot.
 
@@ -378,7 +385,7 @@ A Snapshot containing the captured agent state.
 def load_snapshot(snapshot: Snapshot) -> None
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:516](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L516)
+Defined in: [src/strands/bidi/agent/agent.py:531](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L531)
 
 Restore agent state from a previously captured snapshot.
 
@@ -400,7 +407,7 @@ async def __aenter__(
         invocation_state: dict[str, Any] | None = None) -> "BidiAgent"
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:545](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L545)
+Defined in: [src/strands/bidi/agent/agent.py:560](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L560)
 
 Async context manager entry point.
 
@@ -424,7 +431,7 @@ Self for use in the context.
 async def __aexit__(*_: Any) -> None
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:573](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L573)
+Defined in: [src/strands/bidi/agent/agent.py:588](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L588)
 
 Async context manager exit point.
 
@@ -438,7 +445,7 @@ async def run(inputs: list[InputStream],
               invocation_state: dict[str, Any] | None = None) -> None
 ```
 
-Defined in: [src/strands/bidi/agent/agent.py:582](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L582)
+Defined in: [src/strands/bidi/agent/agent.py:597](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/bidi/agent/agent.py#L597)
 
 Run the agent using provided I/O streams for bidirectional communication.
 

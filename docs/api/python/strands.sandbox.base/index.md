@@ -34,7 +34,7 @@ result = await sandbox.execute(“echo hello”) print(result.stdout)
 
 Streaming with stdout/stderr distinction::
 
-async for chunk in sandbox.execute\_streaming(“echo hello”): if isinstance(chunk, StreamChunk): print(f”\[{chunk.stream\_type}\] {chunk.data}”, end="") elif isinstance(chunk, ExecutionResult): print(f”Exit code: {chunk.exit\_code}“)
+async for chunk in sandbox.execute\_streaming(“echo hello”): if isinstance(chunk, StreamChunk): print(f”\[{chunk.stream\_type}\] {chunk.data}”, end="") elif isinstance(chunk, ExecutionResult): print(f”Exit code: {chunk.exit\_code}”)
 
 #### execute\_streaming
 

@@ -77,9 +77,9 @@ Our documentation uses a collaborative, developer-peer voice. We write as knowle
 
 | Principle | Example | Why |
 | --- | --- | --- |
-| Use “you” for the reader | ”You create an agent by…” not “An agent is created by…” | Direct and personal |
-| Use “we” collaboratively | ”Let’s install the SDK” not “Install the SDK” | Creates partnership |
-| Active voice, present tense | ”The agent returns a response” not “A response will be returned” | Clear and immediate |
+| Use “you” for the reader | “You create an agent by…” not “An agent is created by…” | Direct and personal |
+| Use “we” collaboratively | “Let’s install the SDK” not “Install the SDK” | Creates partnership |
+| Active voice, present tense | “The agent returns a response” not “A response will be returned” | Clear and immediate |
 | Explain why before how | Start with the problem, then the solution | Builds understanding |
 
 ### Writing style

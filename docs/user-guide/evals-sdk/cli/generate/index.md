@@ -56,7 +56,11 @@ strands-evals generate \
 The generated file feeds straight into [`run`](/docs/user-guide/evals-sdk/cli/run/index.md):
 
 ```bash
-strands-evals generate --context "$(cat tools.txt)" --num-cases 10 -o experiment.json
+strands-evals generate \
+  --context "$(cat tools.txt)" \
+  --num-cases 10 \
+  --evaluator OutputEvaluator \
+  -o experiment.json
 strands-evals run experiment.json --agent my_pkg.agents:build_agent --display
 ```
 

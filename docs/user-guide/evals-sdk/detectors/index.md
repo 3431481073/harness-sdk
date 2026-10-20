@@ -1,5 +1,3 @@
-## Overview
-
 Detectors answer **“why did my agent fail?”** by analyzing execution traces for failures, performing root cause analysis, and producing actionable fix recommendations. While evaluators tell you *whether* an agent performed well, detectors tell you *what went wrong and how to fix it*.
 
 Detectors operate on `Session` objects (the same trace format used by trace-based evaluators) and use LLM-based analysis to identify semantic failures that go beyond simple error codes: hallucinations, tool misuse, reasoning breakdowns, policy violations, and more.
@@ -85,7 +83,7 @@ for rec in result.recommendations:
 
 | Aspect | Evaluators | Detectors |
 | --- | --- | --- |
-| **Question** | ”How well did the agent do?" | "Why did it fail?” |
+| **Question** | “How well did the agent do?” | “Why did it fail?” |
 | **Output** | Score + pass/fail | Failures + root causes + fix recommendations |
 | **Granularity** | Per-case or per-session | Per-span |
 | **Purpose** | Measure quality | Diagnose problems |
@@ -151,6 +149,6 @@ Both phases handle large sessions that exceed LLM context limits through automat
 - [Production Lifecycle Controls](/docs/user-guide/sdk/agents/lifecycle-controls/index.md) (1 shared tag)
 - [Retry Strategies](/docs/user-guide/sdk/agents/retry-strategies/index.md) (1 shared tag)
 - [Chaos testing](/docs/user-guide/evals-sdk/chaos_testing/index.md) (1 shared tag)
+- [Structured output](/docs/user-guide/sdk/agents/structured-output-behavior/index.md) (1 shared tag)
 - [Operating Agents in Production](/docs/user-guide/sdk/deploy/operating-agents-in-production/index.md) (1 shared tag)
 - [Failure communication evaluator](/docs/user-guide/evals-sdk/evaluators/failure_communication_evaluator/index.md) (1 shared tag)
-- [Partial completion evaluator](/docs/user-guide/evals-sdk/evaluators/partial_completion_evaluator/index.md) (1 shared tag)

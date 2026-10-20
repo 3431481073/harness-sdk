@@ -1,531 +1,332 @@
-Use structured output when your application needs an object with specific fields. Define a schema, pass it to the agent, and read the validated object from the result.
+An agent answers in text, which works when a person reads it. When your code needs to act on the answer, text is hard to parse. Structured output returns an object instead. You describe the fields you need in a schema, and the agent returns an object with those fields, validated against the schema.
 
-> **Diagram:** How structured output works. Your schema is given to the model as a tool, inside the agent loop. The model calls the structured output tool, which validates the call's arguments against the schema. If validation fails, the errors go back to the model so it can retry. When the arguments are valid, the validated object is placed on the agent result.
+A schema lists each field’s name, type, and description. In Python, write it as a [Pydantic model](https://docs.pydantic.dev/latest/concepts/models/), which installs with `strands-agents`. In TypeScript, write it as a [Zod schema](https://zod.dev/) and install Zod with `npm install zod`.
 
-## Basic Usage
+## Request structured output
 
-To request structured output, pass a schema with `structured_output_model``structuredOutputSchema`. Read the validated object from `result.structured_output``result.structuredOutput`.
+This agent reads a customer support message and returns the category, priority, and summary that your code needs to route the ticket:
 
 (( tab "Python" ))
-Define the output fields with a [Pydantic model](https://docs.pydantic.dev/latest/concepts/models/):
-
 ```python
+from typing import Literal
+
 from pydantic import BaseModel, Field
 from strands import Agent
+from strands.types.exceptions import StructuredOutputException
 
 
-class PersonInfo(BaseModel):
-    name: str = Field(description="Name of the person")
-    age: int = Field(description="Age of the person")
-    occupation: str = Field(description="Occupation of the person")
+class TicketTriage(BaseModel):
+    """Routing decision for one customer support message."""
+
+    category: Literal["billing", "bug", "account", "other"] = Field(
+        description="The team that should handle the message"
+    )
+    priority: Literal["low", "medium", "high"] = Field(
+        description="high when the customer is blocked or losing money"
+    )
+    summary: str = Field(description="One sentence describing the problem")
 
 
-agent = Agent()
-result = agent(
-    "John Smith is a 30 year-old software engineer",
-    structured_output_model=PersonInfo
-)
+def triage(message: str) -> TicketTriage:
+    # A fresh agent per message keeps tickets from sharing conversation history
+    agent = Agent(callback_handler=None)
+    try:
+        result = agent(message, structured_output_model=TicketTriage)
+    except StructuredOutputException:
+        # Send anything the agent can't classify to a person
+        return TicketTriage(category="other", priority="medium", summary=message)
+    return result.structured_output
 
-person_info: PersonInfo = result.structured_output
-print(person_info.model_dump_json(indent=2))
+
+ticket = triage("I was charged twice this month and need one of the charges refunded.")
+print(f"{ticket.priority} | {ticket.category} | {ticket.summary}")
 ```
 
-Example output:
-
-```json
-{
-  "name": "John Smith",
-  "age": 30,
-  "occupation": "software engineer"
-}
-```
-
-For async code, pass `structured_output_model` to `await agent.invoke_async(...)`.
-
-**Migrating from deprecated methods:** Pass `structured_output_model` to the agent invocation instead of calling `Agent.structured_output()` or `Agent.structured_output_async()`. Read the model from `result.structured_output`.
+`invoke_async` takes the same argument.
 (( /tab "Python" ))
 
 (( tab "TypeScript" ))
-Define the output fields with a [Zod schema](https://zod.dev/) for runtime validation and type inference:
+```typescript
+import { Agent, StructuredOutputError } from '@strands-agents/sdk'
+import { z } from 'zod'
 
+const TicketTriageSchema = z
+  .object({
+    category: z
+      .enum(['billing', 'bug', 'account', 'other'])
+      .describe('The team that should handle the message'),
+    priority: z
+      .enum(['low', 'medium', 'high'])
+      .describe('high when the customer is blocked or losing money'),
+    summary: z.string().describe('One sentence describing the problem'),
+  })
+  .describe('Routing decision for one customer support message')
+
+type TicketTriage = z.infer<typeof TicketTriageSchema>
+
+async function triage(message: string): Promise<TicketTriage> {
+  // A fresh agent per message keeps tickets from sharing conversation history
+  const agent = new Agent({ printer: false })
+  try {
+    const result = await agent.invoke(message, {
+      structuredOutputSchema: TicketTriageSchema,
+    })
+    return result.structuredOutput as TicketTriage
+  } catch (error) {
+    if (error instanceof StructuredOutputError) {
+      // Send anything the agent can't classify to a person
+      return { category: 'other', priority: 'medium', summary: message }
+    }
+    throw error
+  }
+}
+
+const ticket = await triage(
+  'I was charged twice this month and need one of the charges refunded.'
+)
+console.log(`${ticket.priority} | ${ticket.category} | ${ticket.summary}`)
+```
+(( /tab "TypeScript" ))
+
+Typical output:
+
+```plaintext
+high | billing | Customer was charged twice this month and is requesting a refund.
+```
+
+`TicketTriage` lists the fields the routing code needs. `category` and `priority` accept only fixed values, so the agent can only pick a team and a priority you’ve defined. The model reads each field description, so describe what a field means, not only its type.
+
+Pass the schema as `structured_output_model``structuredOutputSchema` and read the object from `result.structured_output``result.structuredOutput`. In Python, the object is an instance of your model. In TypeScript, cast it to the `z.infer` type.
+
+If the agent doesn’t return an object, the call raises `StructuredOutputException``StructuredOutputError`. `triage` catches it and returns a ticket in the `other` category for a person to review.
+
+Invalid field values don’t raise. Strands sends the validation errors back to the agent, and the agent corrects them.
+
+## Use tools
+
+The agent can call tools before it returns the object. Here, it looks up the customer’s name and plan by email:
+
+(( tab "Python" ))
+```python
+from typing import Literal
+
+from pydantic import BaseModel
+from strands import Agent, tool
+
+
+@tool
+def lookup_customer(email: str) -> dict:
+    """Look up a customer's name and plan by email address."""
+    customers = {"dana@example.com": {"name": "Dana Ruiz", "plan": "enterprise"}}
+    return customers.get(email, {"name": "unknown", "plan": "free"})
+
+
+class CustomerTicket(BaseModel):
+    customer_name: str
+    plan: Literal["free", "pro", "enterprise"]
+    priority: Literal["low", "medium", "high"]
+
+
+agent = Agent(tools=[lookup_customer], callback_handler=None)
+result = agent(
+    "From dana@example.com: our dashboard has been down for an hour.",
+    structured_output_model=CustomerTicket,
+)
+print(result.structured_output)
+```
+
+Typical output:
+
+```plaintext
+customer_name='Dana Ruiz' plan='enterprise' priority='high'
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
+```typescript
+import { Agent, tool } from '@strands-agents/sdk'
+import { z } from 'zod'
+
+const customers: Record<string, { name: string; plan: string }> = {
+  'dana@example.com': { name: 'Dana Ruiz', plan: 'enterprise' },
+}
+
+const lookupCustomer = tool({
+  name: 'lookup_customer',
+  description: "Look up a customer's name and plan by email address.",
+  inputSchema: z.object({ email: z.string() }),
+  callback: ({ email }) => customers[email] ?? { name: 'unknown', plan: 'free' },
+})
+
+const CustomerTicketSchema = z.object({
+  customerName: z.string(),
+  plan: z.enum(['free', 'pro', 'enterprise']),
+  priority: z.enum(['low', 'medium', 'high']),
+})
+
+const agent = new Agent({ tools: [lookupCustomer], printer: false })
+const result = await agent.invoke(
+  'From dana@example.com: our dashboard has been down for an hour.',
+  { structuredOutputSchema: CustomerTicketSchema }
+)
+console.log(result.structuredOutput)
+```
+
+Typical output:
+
+```plaintext
+{ customerName: 'Dana Ruiz', plan: 'enterprise', priority: 'high' }
+```
+(( /tab "TypeScript" ))
+
+## Extract from a conversation
+
+A schema applies only to the call that passes it, so earlier turns return text as usual. The agent fills the fields from the whole conversation:
+
+(( tab "Python" ))
+```python
+from pydantic import BaseModel
+from strands import Agent
+
+
+class Escalation(BaseModel):
+    problem: str
+    steps_tried: list[str]
+
+
+agent = Agent(callback_handler=None)
+agent("Hi, I can't log in to my account.")
+agent("I reset my password twice, and the reset email never arrives.")
+
+result = agent(
+    "Summarize this conversation for the escalation team.",
+    structured_output_model=Escalation,
+)
+escalation = result.structured_output
+print(escalation.problem)
+for step in escalation.steps_tried:
+    print(f"- {step}")
+```
+(( /tab "Python" ))
+
+(( tab "TypeScript" ))
 ```typescript
 import { Agent } from '@strands-agents/sdk'
 import { z } from 'zod'
 
-const PersonSchema = z.object({
-  name: z.string().describe('Name of the person'),
-  age: z.number().describe('Age of the person'),
-  occupation: z.string().describe('Occupation of the person'),
+const EscalationSchema = z.object({
+  problem: z.string(),
+  stepsTried: z.array(z.string()),
 })
 
-type Person = z.infer<typeof PersonSchema>
+const agent = new Agent({ printer: false })
+await agent.invoke("Hi, I can't log in to my account.")
+await agent.invoke('I reset my password twice, and the reset email never arrives.')
 
-const agent = new Agent({
-  structuredOutputSchema: PersonSchema,
-})
-
-const result = await agent.invoke('John Smith is a 30 year-old software engineer')
-
-const person = result.structuredOutput as Person
-console.log(JSON.stringify(person, null, 2))
-```
-
-Example output:
-
-```json
-{
-  "name": "John Smith",
-  "age": 30,
-  "occupation": "software engineer"
-}
-```
-(( /tab "TypeScript" ))
-
-## How It Works
-
-Structured output converts your schema into a tool specification that guides the model toward a correctly formatted response. Every model provider Strands supports works with structured output.
-
-Strands accepts the `structured_output_model``structuredOutputSchema` parameter in agent invocations, which manages the conversion, validation, and response processing automatically. The validated result is available in the `AgentResult.structured_output``AgentResult.structuredOutput` field.
-
-## Error Handling
-
-When structured output validation fails, Strands throws a custom exception that can be caught and handled appropriately:
-
-(( tab "Python" ))
-```python
-from pydantic import ValidationError
-from strands.types.exceptions import StructuredOutputException
-
-try:
-    result = agent(prompt, structured_output_model=MyModel)
-except StructuredOutputException as e:
-    print(f"Structured output failed: {e}")
-```
-(( /tab "Python" ))
-
-(( tab "TypeScript" ))
-```typescript
-try {
-  const result = await agent.invoke('some prompt')
-} catch (error) {
-  if (error instanceof StructuredOutputError) {
-    console.log(`Structured output failed: ${error.message}`)
-  }
-}
-```
-(( /tab "TypeScript" ))
-
-## Best Practices
-
--   **Keep schemas focused**: Define specific schemas for clear purposes
--   **Use descriptive field names**: Include helpful descriptions with field metadata
--   **Handle errors gracefully**: Implement proper error handling strategies with fallbacks
-
-## Related Documentation
-
-(( tab "Python" ))
--   [Models and schema definition](https://docs.pydantic.dev/latest/concepts/models/)
--   [Field types and constraints](https://docs.pydantic.dev/latest/concepts/fields/)
--   [Custom validators](https://docs.pydantic.dev/latest/concepts/validators/)
-(( /tab "Python" ))
-
-(( tab "TypeScript" ))
--   [Zod documentation](https://zod.dev/)
--   [Schema types](https://zod.dev/?id=primitives)
--   [Schema methods](https://zod.dev/?id=strings)
-(( /tab "TypeScript" ))
-
-## Cookbook
-
-### Auto Retries with Validation
-
-Automatically retry validation when initial extraction fails due to schema validation:
-
-(( tab "Python" ))
-```python
-from strands.agent import Agent
-from pydantic import BaseModel, field_validator
-
-
-class Name(BaseModel):
-    first_name: str
-
-    @field_validator("first_name")
-    @classmethod
-    def validate_first_name(cls, value: str) -> str:
-        if not value.endswith('abc'):
-            raise ValueError("You must append 'abc' to the end of my name")
-        return value
-
-
-agent = Agent()
-result = agent("What is Aaron's name?", structured_output_model=Name)
-```
-(( /tab "Python" ))
-
-(( tab "TypeScript" ))
-```typescript
-const NameSchema = z.object({
-  firstName: z.string().refine((val) => val.endsWith('abc'), {
-    message: "You must append 'abc' to the end of my name",
-  }),
-})
-
-const agent = new Agent({ structuredOutputSchema: NameSchema })
-const result = await agent.invoke("What is Aaron's name?")
-```
-(( /tab "TypeScript" ))
-
-### Streaming Structured Output
-
-Stream agent execution while using structured output. The structured output is available in the final result:
-
-(( tab "Python" ))
-```python
-from strands import Agent
-from pydantic import BaseModel, Field
-
-class WeatherForecast(BaseModel):
-    """Weather forecast data."""
-    location: str
-    temperature: int
-    condition: str
-    humidity: int
-    wind_speed: int
-    forecast_date: str
-
-streaming_agent = Agent()
-
-async for event in streaming_agent.stream_async(
-    "Generate a weather forecast for Seattle: 68°F, partly cloudy, 55% humidity, 8 mph winds, for tomorrow",
-    structured_output_model=WeatherForecast
-):
-    if "data" in event:
-        print(event["data"], end="", flush=True)
-    elif "result" in event:
-        print(f'The forecast for today is: {event["result"].structured_output}')
-```
-(( /tab "Python" ))
-
-(( tab "TypeScript" ))
-```typescript
-const WeatherForecastSchema = z.object({
-  location: z.string(),
-  temperature: z.number(),
-  condition: z.string(),
-  humidity: z.number(),
-  windSpeed: z.number(),
-  forecastDate: z.string(),
-})
-
-type WeatherForecast = z.infer<typeof WeatherForecastSchema>
-
-const agent = new Agent({ structuredOutputSchema: WeatherForecastSchema })
-
-for await (const event of agent.stream(
-  'Generate a weather forecast for Seattle: 68°F, partly cloudy, 55% humidity, 8 mph winds, for tomorrow'
-)) {
-  if (event.type === 'agentResultEvent') {
-    const forecast = event.result.structuredOutput as WeatherForecast
-    console.log(`The forecast is: ${JSON.stringify(forecast)}`)
-  }
-}
-```
-(( /tab "TypeScript" ))
-
-### Combining with Tools
-
-Combine structured output with tool usage to format tool execution results:
-
-(( tab "Python" ))
-```python
-from strands import Agent
-from strands.vended_tools import notebook
-from pydantic import BaseModel, Field
-
-class NotesResult(BaseModel):
-    notebook_name: str = Field(description="the notebook that was updated")
-    item_count: int = Field(description="the number of items added")
-
-tool_agent = Agent(
-    tools=[notebook]
-)
-res = tool_agent(
-    'Create a notebook named "ideas" and add three project ideas.',
-    structured_output_model=NotesResult,
-)
-```
-(( /tab "Python" ))
-
-(( tab "TypeScript" ))
-```typescript
-const calculatorTool = tool({
-  name: 'calculator',
-  description: 'Perform basic arithmetic operations',
-  inputSchema: z.object({
-    operation: z.enum(['add', 'subtract', 'multiply', 'divide']),
-    a: z.number(),
-    b: z.number(),
-  }),
-  callback: (input) => {
-    const ops = {
-      add: input.a + input.b,
-      subtract: input.a - input.b,
-      multiply: input.a * input.b,
-      divide: input.a / input.b,
-    }
-    return ops[input.operation]
-  },
-})
-
-const MathResultSchema = z.object({
-  operation: z.string().describe('the performed operation'),
-  result: z.number().describe('the result of the operation'),
-})
-
-const agent = new Agent({
-  tools: [calculatorTool],
-  structuredOutputSchema: MathResultSchema,
-})
-const result = await agent.invoke('What is 42 + 8')
-```
-(( /tab "TypeScript" ))
-
-### Multiple Output Types
-
-Reuse a single agent instance with different structured output schemas for varied extraction tasks:
-
-(( tab "Python" ))
-```python
-from strands import Agent
-from pydantic import BaseModel, Field
-from typing import Optional
-
-class Person(BaseModel):
-    """A person's basic information"""
-    name: str = Field(description="Full name")
-    age: int = Field(description="Age in years", ge=0, le=150)
-    email: str = Field(description="Email address")
-    phone: Optional[str] = Field(description="Phone number", default=None)
-
-class Task(BaseModel):
-    """A task or todo item"""
-    title: str = Field(description="Task title")
-    description: str = Field(description="Detailed description")
-    priority: str = Field(description="Priority level: low, medium, high")
-    completed: bool = Field(description="Whether task is completed", default=False)
-
-
-agent = Agent()
-person_res = agent("Extract person: John Doe, 35, john@test.com", structured_output_model=Person)
-task_res = agent("Create task: Review code, high priority, completed", structured_output_model=Task)
-```
-(( /tab "Python" ))
-
-(( tab "TypeScript" ))
-```typescript
-const PersonSchema = z.object({
-  name: z.string().describe('Full name'),
-  age: z.number().min(0).max(150).describe('Age in years'),
-  email: z.string().email().describe('Email address'),
-  phone: z.string().optional().describe('Phone number'),
-})
-
-const TaskSchema = z.object({
-  title: z.string().describe('Task title'),
-  description: z.string().describe('Detailed description'),
-  priority: z.enum(['low', 'medium', 'high']).describe('Priority level'),
-  completed: z.boolean().default(false).describe('Whether task is completed'),
-})
-
-type Person = z.infer<typeof PersonSchema>
-type Task = z.infer<typeof TaskSchema>
-
-const personAgent = new Agent({ structuredOutputSchema: PersonSchema })
-const taskAgent = new Agent({ structuredOutputSchema: TaskSchema })
-
-const personResult = await personAgent.invoke(
-  'Extract person: John Doe, 35, john@test.com'
-)
-const taskResult = await taskAgent.invoke(
-  'Create task: Review code, high priority, completed'
-)
-```
-(( /tab "TypeScript" ))
-
-### Using Conversation History
-
-Extract structured information from prior conversation context without repeating questions:
-
-(( tab "Python" ))
-```python
-from strands import Agent
-from pydantic import BaseModel
-from typing import Optional
-
-agent = Agent()
-
-# Build up conversation context
-agent("What do you know about Paris, France?")
-agent("Tell me about the weather there in spring.")
-
-class CityInfo(BaseModel):
-    city: str
-    country: str
-    population: Optional[int] = None
-    climate: str
-
-# Extract structured information from the conversation
-result = agent(
-    "Extract structured information about Paris from our conversation",
-    structured_output_model=CityInfo
-)
-
-print(f"City: {result.structured_output.city}")     # "Paris"
-print(f"Country: {result.structured_output.country}") # "France"
-```
-(( /tab "Python" ))
-
-(( tab "TypeScript" ))
-```typescript
-const CityInfoSchema = z.object({
-  city: z.string(),
-  country: z.string(),
-  population: z.number().optional(),
-  climate: z.string(),
-})
-
-type CityInfo = z.infer<typeof CityInfoSchema>
-
-const agent = new Agent({ structuredOutputSchema: CityInfoSchema })
-
-// Build up conversation context
-await agent.invoke('What do you know about Paris, France?')
-await agent.invoke('Tell me about the weather there in spring.')
-
-// Extract structured information from the conversation
 const result = await agent.invoke(
-  'Extract structured information about Paris from our conversation'
+  'Summarize this conversation for the escalation team.',
+  { structuredOutputSchema: EscalationSchema }
 )
-
-const cityInfo = result.structuredOutput as CityInfo
-console.log(`City: ${cityInfo.city}`) // "Paris"
-console.log(`Country: ${cityInfo.country}`) // "France"
+const escalation = result.structuredOutput as z.infer<typeof EscalationSchema>
+console.log(escalation.problem)
+for (const step of escalation.stepsTried) {
+  console.log(`- ${step}`)
+}
 ```
 (( /tab "TypeScript" ))
 
-### Agent-Level Defaults
+Typical output:
 
-You can also set a default structured output schema that applies to all agent invocations:
+```plaintext
+The user is unable to log in and is not receiving password reset emails.
+- User reset their password twice but never received the reset email.
+- Agent suggested checking the spam folder for the reset email.
+```
+
+## Stream the response
+
+Pass the schema to a stream the same way. Text arrives in chunks as the model writes it, and the object arrives once, on the final result:
 
 (( tab "Python" ))
 ```python
-class PersonInfo(BaseModel):
-    name: str
-    age: int
-    occupation: str
+import asyncio
 
-# Set default structured output model for all invocations
-agent = Agent(structured_output_model=PersonInfo)
-result = agent("John Smith is a 30 year-old software engineer")
+from pydantic import BaseModel
+from strands import Agent
 
-print(f"Name: {result.structured_output.name}")      # "John Smith"
-print(f"Age: {result.structured_output.age}")        # 30
-print(f"Job: {result.structured_output.occupation}") # "software engineer"
+
+class ReplyDraft(BaseModel):
+    subject: str
+    body: str
+
+
+async def main():
+    agent = Agent(callback_handler=None)
+    async for event in agent.stream_async(
+        "Draft a reply apologizing for a delayed refund.",
+        structured_output_model=ReplyDraft,
+    ):
+        if "data" in event:
+            print(event["data"], end="", flush=True)
+        elif "result" in event:
+            draft = event["result"].structured_output
+            print(f"\nSubject: {draft.subject}")
+
+
+asyncio.run(main())
 ```
 (( /tab "Python" ))
 
 (( tab "TypeScript" ))
 ```typescript
-const PersonSchema = z.object({
-  name: z.string(),
-  age: z.number(),
-  occupation: z.string(),
+import { Agent } from '@strands-agents/sdk'
+import { z } from 'zod'
+
+const ReplyDraftSchema = z.object({
+  subject: z.string(),
+  body: z.string(),
 })
 
-type Person = z.infer<typeof PersonSchema>
+type ReplyDraft = z.infer<typeof ReplyDraftSchema>
 
-// Set default structured output schema for all invocations
-const agent = new Agent({ structuredOutputSchema: PersonSchema })
-const result = await agent.invoke('John Smith is a 30 year-old software engineer')
+const agent = new Agent({ printer: false })
+const stream = agent.stream('Draft a reply apologizing for a delayed refund.', {
+  structuredOutputSchema: ReplyDraftSchema,
+})
 
-const person = result.structuredOutput as Person
-console.log(`Name: ${person.name}`) // "John Smith"
-console.log(`Age: ${person.age}`) // 30
-console.log(`Job: ${person.occupation}`) // "software engineer"
+for await (const event of stream) {
+  if (
+    event.type === 'modelStreamUpdateEvent' &&
+    event.event.type === 'modelContentBlockDeltaEvent' &&
+    event.event.delta.type === 'textDelta'
+  ) {
+    process.stdout.write(event.event.delta.text)
+  } else if (event.type === 'agentResultEvent') {
+    const draft = event.result.structuredOutput as ReplyDraft
+    console.log(`\nSubject: ${draft.subject}`)
+  }
+}
 ```
 (( /tab "TypeScript" ))
 
-Note
+Typical output:
 
-Because you set the schema at the agent-init level rather than per invocation, the agent attempts structured output on every invocation.
-
-### Overriding Agent Defaults
-
-Even when you set a default schema at the agent initialization level, you can override it for specific invocations:
-
-(( tab "Python" ))
-```python
-class PersonInfo(BaseModel):
-    name: str
-    age: int
-    occupation: str
-
-class CompanyInfo(BaseModel):
-    name: str
-    industry: str
-    employees: int
-
-# Agent with default PersonInfo model
-agent = Agent(structured_output_model=PersonInfo)
-
-# Override with CompanyInfo for this specific call
-result = agent(
-    "TechCorp is a software company with 500 employees",
-    structured_output_model=CompanyInfo
-)
-
-print(f"Company: {result.structured_output.name}")      # "TechCorp"
-print(f"Industry: {result.structured_output.industry}") # "software"
-print(f"Size: {result.structured_output.employees}")    # 500
+```plaintext
+I'd be happy to help draft a reply apologizing for a delayed refund!
+Subject: Apology for Your Delayed Refund
 ```
-(( /tab "Python" ))
 
-(( tab "TypeScript" ))
-```typescript
-const PersonSchema = z.object({
-  name: z.string(),
-  age: z.number(),
-  occupation: z.string(),
-})
+## Next steps
 
-const CompanySchema = z.object({
-  name: z.string(),
-  industry: z.string(),
-  employees: z.number(),
-})
-
-type Company = z.infer<typeof CompanySchema>
-
-// Agent with default PersonInfo schema
-const personAgent = new Agent({ structuredOutputSchema: PersonSchema })
-
-// Create a new agent with CompanyInfo schema for this specific use case
-const companyAgent = new Agent({ structuredOutputSchema: CompanySchema })
-const result = await companyAgent.invoke(
-  'TechCorp is a software company with 500 employees'
-)
-
-const company = result.structuredOutput as Company
-console.log(`Company: ${company.name}`) // "TechCorp"
-console.log(`Industry: ${company.industry}`) // "software"
-console.log(`Size: ${company.employees}`) // 500
-```
-(( /tab "TypeScript" ))
+-   [Structured output](/docs/user-guide/sdk/agents/structured-output-behavior/index.md): agent-level schemas, how a schema becomes a tool, validation retries, and errors.
+-   [Stream responses](/docs/user-guide/sdk/streaming/index.md): every event type a stream carries.
+-   [Create custom tools](/docs/user-guide/sdk/tools/custom-tools/index.md): write tools like `lookup_customer`.
 
 ## Related pages
 
 - [LiteLLM](/docs/user-guide/sdk/model-providers/litellm/index.md) (1 shared tag)
+- [Structured output similarity evaluator](/docs/user-guide/evals-sdk/evaluators/structured_output_evaluator/index.md) (1 shared tag)
+- [Structured output](/docs/user-guide/sdk/agents/structured-output-behavior/index.md) (1 shared tag)
 - [OpenAI](/docs/user-guide/sdk/model-providers/openai/index.md) (1 shared tag)
 - [Writer](/docs/user-guide/sdk/model-providers/writer/index.md) (1 shared tag)
 - [Anthropic](/docs/user-guide/sdk/model-providers/anthropic/index.md) (1 shared tag)
@@ -539,4 +340,4 @@ console.log(`Size: ${company.employees}`) // 500
 
 ### TypeScript
 
-- [harness-sdk/strands-ts/src/tools/structured-output-tool.ts](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/structured-output-tool.ts)
+- [harness-sdk/strands-ts/src/agent/agent.ts](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/agent/agent.ts)

@@ -363,13 +363,13 @@ Choose candidates with comparable context windows and tokenizers so context esti
 - [Production Lifecycle Controls](/docs/user-guide/sdk/agents/lifecycle-controls/index.md) (1 shared tag)
 - [Retry Strategies](/docs/user-guide/sdk/agents/retry-strategies/index.md) (1 shared tag)
 - [Chaos testing](/docs/user-guide/evals-sdk/chaos_testing/index.md) (1 shared tag)
+- [Structured output](/docs/user-guide/sdk/agents/structured-output-behavior/index.md) (1 shared tag)
 - [Detectors](/docs/user-guide/evals-sdk/detectors/index.md) (1 shared tag)
 - [Failure detection](/docs/user-guide/evals-sdk/detectors/failure_detection/index.md) (1 shared tag)
 - [Operating Agents in Production](/docs/user-guide/sdk/deploy/operating-agents-in-production/index.md) (1 shared tag)
 - [Failure communication evaluator](/docs/user-guide/evals-sdk/evaluators/failure_communication_evaluator/index.md) (1 shared tag)
 - [Partial completion evaluator](/docs/user-guide/evals-sdk/evaluators/partial_completion_evaluator/index.md) (1 shared tag)
 - [Recovery strategy evaluator](/docs/user-guide/evals-sdk/evaluators/recovery_strategy_evaluator/index.md) (1 shared tag)
-- [Root cause analysis](/docs/user-guide/evals-sdk/detectors/root_cause_analysis/index.md) (1 shared tag)
 
 
 ## Implementation

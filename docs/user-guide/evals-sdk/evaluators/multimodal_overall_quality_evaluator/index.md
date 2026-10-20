@@ -1,5 +1,3 @@
-## Overview
-
 The `MultimodalOverallQualityEvaluator` assesses the overall quality of an agent response across four dimensions: visual accuracy, instruction adherence, completeness, and coherence/helpfulness. It produces a single Likert-5 score.
 
 ## Key features

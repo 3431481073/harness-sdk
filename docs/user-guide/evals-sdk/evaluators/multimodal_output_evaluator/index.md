@@ -1,5 +1,3 @@
-## Overview
-
 The `MultimodalOutputEvaluator` assesses the quality of agent outputs for tasks that involve images or documents alongside text. It uses an MLLM as the judge and evaluates responses against a user-defined rubric, extending [`OutputEvaluator`](/docs/user-guide/evals-sdk/evaluators/output_evaluator/index.md) with multimodal input support. A complete example can be found [here](https://github.com/strands-agents/harness-sdk/blob/main/site/docs/examples/evals-sdk/multimodal_output_evaluator.py).
 
 ## Key features

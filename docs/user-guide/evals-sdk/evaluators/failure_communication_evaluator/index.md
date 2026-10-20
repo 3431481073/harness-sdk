@@ -1,5 +1,3 @@
-## Overview
-
 The `FailureCommunicationEvaluator` assesses how well an agent communicates failures to the user when tools or services fail. It uses an LLM-as-judge approach with a five-level scoring rubric to evaluate clarity, actionability, transparency, and tone of failure messages. A complete example can be found [here](https://github.com/strands-agents/harness-sdk/blob/main/site/docs/examples/evals-sdk/chaos_failure_communication_evaluator.py).
 
 ## Key features

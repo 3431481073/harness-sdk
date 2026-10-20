@@ -1,4 +1,4 @@
-Defined in: [src/models/bedrock.ts:179](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L179)
+Defined in: [src/models/bedrock.ts:202](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L202)
 
 Configuration for Bedrock guardrails.
 
@@ -14,7 +14,7 @@ Configuration for Bedrock guardrails.
 guardrailIdentifier: string;
 ```
 
-Defined in: [src/models/bedrock.ts:181](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L181)
+Defined in: [src/models/bedrock.ts:204](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L204)
 
 Guardrail identifier
 
@@ -26,7 +26,7 @@ Guardrail identifier
 guardrailVersion: string;
 ```
 
-Defined in: [src/models/bedrock.ts:184](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L184)
+Defined in: [src/models/bedrock.ts:207](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L207)
 
 Guardrail version (e.g., “1”, “DRAFT”)
 
@@ -38,7 +38,7 @@ Guardrail version (e.g., “1”, “DRAFT”)
 optional trace?: "enabled" | "disabled" | "enabled_full";
 ```
 
-Defined in: [src/models/bedrock.ts:187](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L187)
+Defined in: [src/models/bedrock.ts:210](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L210)
 
 Trace mode for evaluation.
 
@@ -56,7 +56,7 @@ Trace mode for evaluation.
 optional streamProcessingMode?: "sync" | "async";
 ```
 
-Defined in: [src/models/bedrock.ts:190](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L190)
+Defined in: [src/models/bedrock.ts:213](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L213)
 
 Stream processing mode
 
@@ -68,7 +68,7 @@ Stream processing mode
 optional redaction?: BedrockGuardrailRedactionConfig;
 ```
 
-Defined in: [src/models/bedrock.ts:193](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L193)
+Defined in: [src/models/bedrock.ts:216](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L216)
 
 Redaction behavior when content is blocked
 
@@ -80,7 +80,7 @@ Redaction behavior when content is blocked
 optional guardLatestUserMessage?: boolean;
 ```
 
-Defined in: [src/models/bedrock.ts:207](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L207)
+Defined in: [src/models/bedrock.ts:230](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L230)
 
 Only evaluate the latest user message with guardrails. When true, wraps the latest user message’s text/image content in guardContent blocks. This can improve performance and reduce costs in multi-turn conversations.
 

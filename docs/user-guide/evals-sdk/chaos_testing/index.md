@@ -1,5 +1,3 @@
-## Overview
-
 Chaos testing evaluates agent resilience by injecting controlled failures into tool execution. With `ChaosPlugin`, `ChaosCase`, and `ChaosExperiment`, you test how agents handle tool timeouts, network errors, and corrupted responses without changing agent code. See the [complete example](https://github.com/strands-agents/harness-sdk/blob/main/site/docs/examples/evals-sdk/chaos_tool_testing.py).
 
 This enables you to answer questions like:

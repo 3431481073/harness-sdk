@@ -1,5 +1,3 @@
-## Overview
-
 Installing `strands-agents-evals` also installs the `strands-evals` console script: a thin wrapper over the public Python API for CI gates and one-off use. It exposes six subcommands that map directly to library calls, so behavior in CI matches what you get from a Python script.
 
 | Command | Purpose |

@@ -27,7 +27,7 @@ skill = Skill.from\_content(”---\\nname: my-skill\\n…”)
 
 # Load all skills from a parent directory
 
-skills = Skill.from\_directory(”./skills/“)
+skills = Skill.from\_directory(”./skills/”)
 
 # From an HTTPS URL
 

@@ -1,5 +1,3 @@
-## Overview
-
 The `CoherenceEvaluator` assesses whether an agent’s response maintains logical consistency, flows naturally, and presents ideas in a well-organized manner. It uses an LLM-as-judge approach with a five-level scoring rubric.
 
 ## Key features

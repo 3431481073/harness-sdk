@@ -696,6 +696,7 @@ Map your API’s failures onto the SDK’s exceptions so the agent loop can reac
 ## Related pages
 
 - [Tools](/docs/user-guide/sdk/bidi/tools/index.md) (1 shared tag)
+- [Middleware](/docs/user-guide/sdk/agents/middleware/index.md) (1 shared tag)
 - [Tool Executors](/docs/user-guide/sdk/tools/executors/index.md) (1 shared tag)
 - [Available Sandboxes](/docs/user-guide/sdk/sandbox/available-sandboxes/index.md) (1 shared tag)
 - [Building a Custom Sandbox](/docs/user-guide/sdk/sandbox/custom-sandbox/index.md) (1 shared tag)
@@ -704,7 +705,6 @@ Map your API’s failures onto the SDK’s exceptions so the agent loop can reac
 - [Agent Loop](/docs/user-guide/sdk/agents/agent-loop/index.md) (1 shared tag)
 - [Hook events](/docs/user-guide/sdk/agents/hooks-events/index.md) (1 shared tag)
 - [Hooks](/docs/user-guide/sdk/agents/hooks/index.md) (1 shared tag)
-- [Cedar Authorization](/docs/user-guide/sdk/agents/interventions/cedar-authorization/index.md) (1 shared tag)
 
 
 ## Implementation

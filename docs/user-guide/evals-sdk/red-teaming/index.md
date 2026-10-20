@@ -6,8 +6,6 @@ Use only on systems you are authorized to test
 
 These strategies generate adversarial prompts designed to make a model misbehave. Run them only against agents you own or have explicit permission to test, in an environment where the outputs stay contained. The breaching transcripts can contain the very content the attack elicited, so handle reports accordingly.
 
-## Overview
-
 Red teaming answers **“can an attacker make my agent misbehave?”** It runs *jailbreaks* (prompts crafted to get a model to do something its instructions forbid) against your agent and scores whether each one got through. While evaluators measure whether an agent does the right thing on cooperative input, red teaming probes what it does under deliberately hostile input: prompts engineered to leak its system prompt, extract data it should keep private, produce harmful content, or trigger tool calls beyond its authority. An attack that gets through is a **breach**.
 
 You assemble adversarial cases and one or more attack strategies against your agent in a `RedTeamExperiment`, run it, and read the breaches off the report. Each attack is driven by an `AttackStrategy` (a technique drawn from published jailbreak research) and scored by an LLM judge, but you only interact with the experiment.
@@ -84,7 +82,7 @@ The [Quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) walks through e
 
 | Aspect | Evaluators | Red Teaming |
 | --- | --- | --- |
-| **Question** | ”How well did the agent do?" | "Can an attacker make it misbehave?” |
+| **Question** | “How well did the agent do?” | “Can an attacker make it misbehave?” |
 | **Input** | Cooperative test cases | Adversarial attacks (multi-turn or scripted) |
 | **Output** | Score + pass/fail | Attack success score + breaching conversations |
 | **Driver** | A fixed task function | An `AttackStrategy` that adapts per turn |

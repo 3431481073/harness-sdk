@@ -116,6 +116,28 @@ If you encounter the error `ModuleNotFoundError: No module named 'anthropic'`, t
 If you encounter import errors for `@anthropic-ai/sdk`, ensure the package is installed: `npm install @anthropic-ai/sdk`.
 (( /tab "TypeScript" ))
 
+### Thinking block is bound to a different conversation
+
+When the Anthropic API rejects a request with this 400 error:
+
+> The block is bound to a different conversation.
+
+The provider retries the request once and logs this warning:
+
+```plaintext
+model_id=<...> | history edit invalidated replayed thinking blocks, retrying with drop_block
+```
+
+Claude models that preserve thinking bind each thinking block to the conversation that came before it. Summarizing or removing messages with [context management](/docs/user-guide/sdk/context-management/index.md) or a conversation manager, restoring a session, or editing messages from a hook changes that earlier conversation, so the thinking blocks that remain in the history no longer match it. Accounts that enforce this binding, the default for accounts created on or after August 31, 2026, reject the next request.
+
+The retry sets `prefix_mismatch_behavior` to `drop_block` in the `thinking.block_binding` request field and adds the `thinking-binding-controls-2026-08-01` beta to the `anthropic-beta` header. Claude then skips the stale thinking blocks instead of rejecting the request. The stale blocks stay in the history, so the provider keeps sending `drop_block` for that model ID until the model instance is discarded. Requests before the first rejection are sent unchanged.
+
+-   **Thinking must be configured.** The retry applies only when `thinking` is set in `params`. Other errors, and this error without a thinking configuration, are raised as is.
+-   **Your `block_binding` wins.** If the thinking configuration already contains `block_binding`, the provider sends it as written and does not retry. Set it yourself to choose the behavior up front or to keep the error.
+-   **Existing betas are kept.** The beta is added to the betas the model already sends, from `extra_headers``betas` or, when that is not set, from the `anthropic-beta` default header of the client. A pre-configured client does not expose its default headers, so set its betas with `extra_headers``betas`.
+-   **Dropping has a cost.** Claude loses the reasoning in the dropped blocks, the prompt cache restarts at the edited message, and responses can use more output tokens.
+-   **Some models require adaptive thinking.** Claude Sonnet 5.5 and Claude Haiku 5.5 accept `drop_block` only with `"type": "adaptive"`. With any other thinking type, the retry fails and its error is raised.
+
 ## Advanced Features
 
 ### Custom Client
@@ -399,6 +421,8 @@ When disabled (or if the API call fails), falls back to estimation with a charac
 - [Result caching](/docs/user-guide/evals-sdk/how-to/result_caching/index.md) (1 shared tag)
 - [LiteLLM](/docs/user-guide/sdk/model-providers/litellm/index.md) (1 shared tag)
 - [Return structured output](/docs/user-guide/sdk/agents/structured-output/index.md) (1 shared tag)
+- [Structured output similarity evaluator](/docs/user-guide/evals-sdk/evaluators/structured_output_evaluator/index.md) (1 shared tag)
+- [Structured output](/docs/user-guide/sdk/agents/structured-output-behavior/index.md) (1 shared tag)
 - [OpenAI](/docs/user-guide/sdk/model-providers/openai/index.md) (1 shared tag)
 - [Writer](/docs/user-guide/sdk/model-providers/writer/index.md) (1 shared tag)
 - [Amazon Bedrock](/docs/user-guide/sdk/model-providers/amazon-bedrock/index.md) (1 shared tag)

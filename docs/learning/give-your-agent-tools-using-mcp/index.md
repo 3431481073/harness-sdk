@@ -1,17 +1,17 @@
+Before you follow along
+
+This video is a snapshot in time. Some APIs and examples have changed since recording. Follow the code on this page, and look for “Changed since recording” notices below.
+
 *[Watch on YouTube](https://www.youtube.com/watch?v=Pucmy0GZkeI&list=PLDzwjhH-4yhU&index=3)*
-
-About this lesson
-
-The videos in this course are a snapshot in time. Strands is under active development, so the code featured on this page reflects the most up-to-date patterns, but the concepts covered in the video still apply. When in doubt, trust the code.
 
 *Code for this lesson: [`samples/03-mcp-tools`](https://github.com/aws-samples/sample-building-with-strands-course/tree/main/samples/03-mcp-tools)*
 
-## Where Tools Come From
+## Where tools come from
 
 Tools give agents the ability to take actions and access information beyond what’s in the model’s training data. There isn’t one way to define a tool. Tools can come from different places, and they all sit side by side in the same agent’s `tools` list:
 
 -   **Custom tools** you write yourself with the `@tool` decorator (you saw this in lesson 1)
--   **Vended tools** that ship with the SDK in `strands.vended_tools`: file editing, shell, web fetch
+-   **Vended tools** that ship with the SDK in `strands.vended_tools`: file editing, shell, web fetch (requires the `web-fetch` extra)
 -   **MCP servers** that expose tools over a standard protocol, whether you run them or someone else does
 -   **Other agents**, which you’ll see in lesson 10 when we cover agents as tools
 
@@ -50,7 +50,7 @@ agent("What AWS services should I use for a serverless FastAPI backend?")
 
 The `prefix` argument namespaces tool names from each server so two servers exposing a tool with the same name don’t collide.
 
-## Mixing MCP Tools with Vended Tools
+## Mixing MCP tools with vended tools
 
 An MCP client sits in the `tools` list alongside any other tool. Here a coding assistant gets AWS documentation through MCP plus local file and shell access through vended tools:
 
@@ -79,7 +79,7 @@ agent("I need to build a serverless FastAPI backend with authentication "
 
 📂 [mcp\_coding\_agent.py](https://github.com/aws-samples/sample-building-with-strands-course/tree/main/samples/03-mcp-tools/mcp_coding_agent.py)
 
-## Tool Filtering
+## Tool filtering
 
 Too many tools leads to worse tool selection, hallucinated tool names, and wasted context. In production, restrict which tools an agent can access using `tool_filters` and only expose what the agent actually needs:
 
@@ -103,7 +103,7 @@ agent = Agent(
 
 📂 [tool\_filtering.py](https://github.com/aws-samples/sample-building-with-strands-course/tree/main/samples/03-mcp-tools/tool_filtering.py)
 
-## Controlling Tool Execution
+## Controlling tool execution
 
 By default Strands runs multiple tool calls from a single model turn concurrently. When tools have side effects that depend on each other, switch to a sequential executor:
 
@@ -133,7 +133,7 @@ agent("Run step one and then step two.")
 
 📂 [tool\_executor.py](https://github.com/aws-samples/sample-building-with-strands-course/tree/main/samples/03-mcp-tools/tool_executor.py)
 
-## The Security Boundary
+## The security boundary
 
 Tools execute with the permissions of the host process. If you give an agent the `shell` tool, you’ve given it access to your machine. With MCP, you’re handing your agent tools that someone else controls. Be thoughtful about what you connect.
 

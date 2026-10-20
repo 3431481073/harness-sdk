@@ -1,4 +1,4 @@
-Defined in: [src/models/bedrock.ts:404](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L404)
+Defined in: [src/models/bedrock.ts:427](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L427)
 
 AWS Bedrock model provider implementation.
 
@@ -41,7 +41,7 @@ for await (const event of provider.stream(messages)) {
 new BedrockModel(options?): BedrockModel;
 ```
 
-Defined in: [src/models/bedrock.ts:448](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L448)
+Defined in: [src/models/bedrock.ts:472](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L472)
 
 Creates a new BedrockModel instance.
 
@@ -143,7 +143,7 @@ Model providers that support server-side state management should override this t
 updateConfig(modelConfig): void;
 ```
 
-Defined in: [src/models/bedrock.ts:593](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L593)
+Defined in: [src/models/bedrock.ts:617](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L617)
 
 Updates the model configuration. Merges the provided configuration with existing settings.
 
@@ -179,7 +179,7 @@ provider.updateConfig({
 getConfig(): BedrockModelConfig;
 ```
 
-Defined in: [src/models/bedrock.ts:608](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L608)
+Defined in: [src/models/bedrock.ts:632](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L632)
 
 Retrieves the current model configuration.
 
@@ -208,7 +208,7 @@ console.log(config.modelId)
 countTokens(messages, options?): Promise<number>;
 ```
 
-Defined in: [src/models/bedrock.ts:622](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L622)
+Defined in: [src/models/bedrock.ts:646](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L646)
 
 Count tokens using Bedrock’s native CountTokens API.
 
@@ -239,7 +239,7 @@ Total input token count
 stream(messages, options?): AsyncIterable<ModelStreamEvent>;
 ```
 
-Defined in: [src/models/bedrock.ts:703](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L703)
+Defined in: [src/models/bedrock.ts:727](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L727)
 
 Streams a conversation with the Bedrock model. Returns an async iterable that yields streaming events as they occur.
 

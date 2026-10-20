@@ -38,7 +38,7 @@
   - [Quickstart](https://strandsagents.com/docs/user-guide/sdk/quickstart/typescript/index.md): Get an AI agent running in TypeScript in under 5 minutes. Install the SDK, pick a model provider, run the agent, then give it a tool.
   - [build-with-ai](https://strandsagents.com/docs/user-guide/build-with-ai/index.md): Install the Strands plugin in Claude Code, Codex, or Cursor so your coding agent can choose Strands, use current APIs, and add agents to your project.
 - Migrate
-  - [Choosing an agent foundation](https://strandsagents.com/docs/user-guide/migrate/choosing-an-agent-foundation/index.md): Framework or your own agent loop? How Strands compares to a hand-written loop, OpenAI Agents SDK, LangGraph, Vercel AI SDK, and Pydantic AI.
+  - [Choosing an agent foundation](https://strandsagents.com/docs/user-guide/migrate/choosing-an-agent-foundation/index.md): Choose between a direct model call, a custom agent loop, or another framework, and follow a practical migration path to Strands Agents without breaking callers.
   - [Migrate from LangGraph](https://strandsagents.com/docs/user-guide/migrate/langgraph/index.md): Move a LangGraph app to Strands Agents: map StateGraph to a Strands graph, swap checkpointers for session managers, and port interrupts, limits, and tracing.
   - [Migrate from OpenAI](https://strandsagents.com/docs/user-guide/migrate/openai/index.md): Move an OpenAI app to Strands Agents: turn a hand-written chat.completions tool loop into an Agent, and map the OpenAI Agents SDK (Runner, handoffs, guardrails, sessions) concept for concept, all while keeping your OpenAI models.
 - Build guides
@@ -53,7 +53,7 @@
     - [Overview](https://strandsagents.com/docs/user-guide/sdk/memory/overview/index.md): Give agents long-term memory across sessions: store facts to configurable backends, recall them via tools or injection, and extract them automatically.
     - [Control what the agent remembers](https://strandsagents.com/docs/user-guide/sdk/memory/managing-memory/index.md): Configure a Strands memory manager: recall through a tool, automatic prompt injection, extraction from the conversation, programmatic reads and writes, and custom stores.
   - Responses
-    - [Return structured output](https://strandsagents.com/docs/user-guide/sdk/agents/structured-output/index.md): Define an output schema to receive typed, validated agent responses, handle validation errors, and use structured data directly in your application.
+    - [Return structured output](https://strandsagents.com/docs/user-guide/sdk/agents/structured-output/index.md): Return a typed, validated object from a Strands agent instead of text, so your code can act on the answer.
     - [Stream responses](https://strandsagents.com/docs/user-guide/sdk/streaming/index.md): Stream AI agent responses in real time. Handle partial results, tool invocations, and token-by-token output as the agent works.
   - [Manage the context window](https://strandsagents.com/docs/user-guide/sdk/context-management/index.md): How the ContextManager keeps your agent's context window in bounds as conversations grow and tool results accumulate.
   - [Pause for input and control](https://strandsagents.com/docs/user-guide/sdk/agents/interventions/human-in-the-loop/index.md): Gate agent tool execution behind human approval. Configurable modes for CLI, web, and custom UIs with optional session trust.
@@ -99,6 +99,7 @@
   - [Prompts](https://strandsagents.com/docs/user-guide/sdk/agents/prompts/index.md): Write system prompts and user messages for Strands agents. Covers multi-modal prompting, direct tool calls, and prompt engineering with agent SOPs.
   - [Hooks](https://strandsagents.com/docs/user-guide/sdk/agents/hooks/index.md): Intercept and customize agent behavior at every step. Hooks let you add logging, validation, guardrails, and custom logic to the agent loop.
   - [Hook events](https://strandsagents.com/docs/user-guide/sdk/agents/hooks-events/index.md): Reference for every hook event a Strands agent emits: when each fires across the single-agent and multi-agent lifecycle, and which event properties you can modify.
+  - [Middleware](https://strandsagents.com/docs/user-guide/sdk/agents/middleware/index.md): Intercept and transform model calls and tool execution with composable middleware that can retry, cache, short-circuit, reroute, and gate agent stages.
   - Context management
     - [Overview](https://strandsagents.com/docs/user-guide/sdk/context-management/index.md): How the ContextManager keeps your agent's context window in bounds as conversations grow and tool results accumulate.
     - [built-in-modes](https://strandsagents.com/docs/user-guide/sdk/context-management/built-in-modes/index.md): Auto and agentic context management modes with tuned defaults for most agents.
@@ -106,6 +107,7 @@
     - [presets](https://strandsagents.com/docs/user-guide/sdk/context-management/presets/index.md): Named strategy presets that expand to preconfigured Offload strategies for common context management patterns.
     - [context-estimation](https://strandsagents.com/docs/user-guide/sdk/context-management/context-estimation/index.md): How the SDK estimates token counts, context window utilization, and context window limits.
   - [Retry strategies](https://strandsagents.com/docs/user-guide/sdk/agents/retry-strategies/index.md): Handle model provider rate limits in Strands agents. Configure retry strategies with exponential backoff, custom parameters, or your own retry logic.
+  - [Structured output](https://strandsagents.com/docs/user-guide/sdk/agents/structured-output-behavior/index.md): How structured output works in Strands: define a schema, set it on an agent or a call, and read the validated object. Covers validation retries and errors.
   - Interrupts
     - [Overview](https://strandsagents.com/docs/user-guide/sdk/interrupts/index.md): Pause AI agents mid-execution for human approval, input, or review. Build human-in-the-loop workflows with interrupt and resume patterns.
     - [interrupts-multi-agent](https://strandsagents.com/docs/user-guide/sdk/interrupts-multi-agent/index.md): Pause swarm and graph orchestration for human approval or input. Raise and resume interrupts across multi-agent systems with the same interfaces as single agents.
@@ -288,6 +290,7 @@
       - [skill_selection_accuracy_evaluator](https://strandsagents.com/docs/user-guide/evals-sdk/evaluators/skill_selection_accuracy_evaluator/index.md): Judge whether each skill your agent chose to load was the right call with SkillSelectionAccuracyEvaluator, one binary verdict per invoked skill.
       - [skill_instruction_following_evaluator](https://strandsagents.com/docs/user-guide/evals-sdk/evaluators/skill_instruction_following_evaluator/index.md): Measure how fully your agent followed each invoked skill's steps with SkillInstructionFollowingEvaluator, a five-point rating grounded in per-step evidence.
     - [Deterministic](https://strandsagents.com/docs/user-guide/evals-sdk/evaluators/deterministic_evaluators/index.md): Run fast, code-based checks without LLM judges: deterministic evaluators match outputs, verify tool calls, and compare state for CI/CD pipelines.
+    - [Structured output similarity](https://strandsagents.com/docs/user-guide/evals-sdk/evaluators/structured_output_evaluator/index.md): Score structured agent output field by field with StructuredOutputSimilarity, a deterministic evaluator with order-independent lists and per-field metrics.
     - [Custom](https://strandsagents.com/docs/user-guide/evals-sdk/evaluators/custom_evaluator/index.md): Build domain-specific evaluation logic by extending the Evaluator base class: custom scoring, external services, and specialized data analysis.
   - Detectors
     - [Overview](https://strandsagents.com/docs/user-guide/evals-sdk/detectors/index.md): Find out why your agent failed: detectors analyze execution traces to detect failures, classify root causes, and recommend concrete fixes.
@@ -328,20 +331,20 @@
 - Labs
   - [labs](https://strandsagents.com/docs/labs/index.md): Explore Strands Labs, the experimental arm of Strands Agents: open source projects covering robotics, world models, agentic benchmarks, harness optimization, audio processing, and decision models.
 - Learning
-  - [Lesson 1: How Agents Really Work](https://strandsagents.com/docs/learning/how-agents-really-work/index.md): A ground-up look at the agent loop: how a model, a set of tools, and a running context combine to let an agent reason, act, and observe until a task is done.
-  - [Lesson 2: Switching Model Providers](https://strandsagents.com/docs/learning/switching-model-providers/index.md): This covers model providers: how Strands abstracts the underlying LLM so your agent logic stays the same regardless of which model you're calling.
-  - [Lesson 3: Give Your Agent Tools Using MCP](https://strandsagents.com/docs/learning/give-your-agent-tools-using-mcp/index.md): This chapter covers MCP and how it changes the way you think about equipping your agent with capabilities.
-  - [Lesson 4: Adding Callbacks & Response Streaming](https://strandsagents.com/docs/learning/adding-callbacks-and-response-streaming/index.md): This chapter is about making the agent's work visible while it's happening, not just dumping a final answer after 15 seconds of silence.
-  - [Lesson 5: Control Your Agent With Hooks](https://strandsagents.com/docs/learning/control-your-agent-with-hooks/index.md): Hooks fire at the same event points as callbacks (before/after tool calls, before/after model calls, cycle boundaries) but they can modify or cancel what's about to happen.
-  - [Lesson 6: Agent Plugins & Skills](https://strandsagents.com/docs/learning/agent-plugins-and-skills/index.md): Individual tools solve individual problems. But some capabilities require multiple tools working together with specific hooks and prompt instructions to function correctly. That's what a plugin is: a packaged bundle of tools + hooks + system prompt additions that you attach to an agent as a unit.
-  - [Lesson 7: Improve Agent Reliability With Strands Steering](https://strandsagents.com/docs/learning/improve-agent-reliability-with-strands-steering/index.md): System prompts set the agent's general personality and rules, but they're blunt. You can't easily say 'only for this next tool call, format the output as JSON' or 'when the user mentions billing, always check their account status first' without bloating the prompt with conditionals the model has to parse every single turn.
-  - [Lesson 8: Context Engineering & Conversation Management](https://strandsagents.com/docs/learning/context-engineering-and-conversation-management/index.md): Every turn, the model receives the full conversation history plus system prompt plus tool results. That window fills up fast. Once it does, you either hit token limits, start paying significantly more per request, or the model starts missing information buried in the middle.
-  - [Lesson 9: Persistent Memory With Session Managers](https://strandsagents.com/docs/learning/persistent-memory-with-session-managers/index.md): Without persistence, every conversation starts from zero. The agent has no memory of prior interactions, no accumulated knowledge about the user, no awareness of decisions made yesterday. Session managers handle the storage and retrieval of conversation state so continuity works automatically.
-  - [Lesson 10: Multi-Agent Patterns: Agents as Tools](https://strandsagents.com/docs/learning/multi-agent-patterns-agents-as-tools/index.md): This is where we cross from single-agent patterns into multi-agent orchestration, and we start with the most intuitive version: an agent that can call other agents the same way it calls any other tool.
-  - [Lesson 11: Multi-Agent Patterns: Graph Workflows](https://strandsagents.com/docs/learning/multi-agent-patterns-graph-workflows/index.md): Some workflows have a fixed structure: step A feeds into step B, step B branches based on a condition, both branches converge at step C. You don't want the model deciding whether to run step B. You want it guaranteed.
-  - [Lesson 12: Multi-Agent Patterns: Agent Swarms](https://strandsagents.com/docs/learning/multi-agent-patterns-agent-swarms/index.md): In a swarm, multiple agents share a workspace or communication channel. Each agent has its own tools, its own prompt, its own specialization.
-  - [Lesson 13: Evaluating Agents](https://strandsagents.com/docs/learning/evaluating-agents/index.md): Agent evaluation is harder than traditional software testing. The output is non-deterministic.
-  - [Lesson 14: Deploying Agents to the Cloud](https://strandsagents.com/docs/learning/deploying-agents-to-the-cloud/index.md): We'll deploy an agent to AWS using Amazon Bedrock AgentCore. AgentCore is a collection of components for building, deploying and operating agents in production. The main components we will focus on in this video is AgentCore Runtime and AgentCore Memory.
+  - [Lesson 1: How agents really work](https://strandsagents.com/docs/learning/how-agents-really-work/index.md): A ground-up look at the agent loop: how a model, a set of tools, and a running context combine to let an agent reason, act, and observe until a task is done.
+  - [Lesson 2: Switching model providers](https://strandsagents.com/docs/learning/switching-model-providers/index.md): This covers model providers: how Strands abstracts the underlying LLM so your agent logic stays the same regardless of which model you're calling.
+  - [Lesson 3: Give your agent tools using MCP](https://strandsagents.com/docs/learning/give-your-agent-tools-using-mcp/index.md): This chapter covers MCP and how it changes the way you think about equipping your agent with capabilities.
+  - [Lesson 4: Adding callbacks & response streaming](https://strandsagents.com/docs/learning/adding-callbacks-and-response-streaming/index.md): This chapter is about making the agent's work visible while it's happening, not just dumping a final answer after 15 seconds of silence.
+  - [Lesson 5: Control your agent with hooks](https://strandsagents.com/docs/learning/control-your-agent-with-hooks/index.md): Hooks fire at the same event points as callbacks (before/after tool calls, before/after model calls, cycle boundaries) but they can modify or cancel what's about to happen.
+  - [Lesson 6: Agent plugins & skills](https://strandsagents.com/docs/learning/agent-plugins-and-skills/index.md): Individual tools solve individual problems. But some capabilities require multiple tools working together with specific hooks and prompt instructions to function correctly. That's what a plugin is: a packaged bundle of tools + hooks + system prompt additions that you attach to an agent as a unit.
+  - [Lesson 7: Improve agent reliability with Strands steering](https://strandsagents.com/docs/learning/improve-agent-reliability-with-strands-steering/index.md): System prompts set the agent's general personality and rules, but they're blunt. You can't easily say 'only for this next tool call, format the output as JSON' or 'when the user mentions billing, always check their account status first' without bloating the prompt with conditionals the model has to parse every single turn.
+  - [Lesson 8: Context engineering & conversation management](https://strandsagents.com/docs/learning/context-engineering-and-conversation-management/index.md): Every turn, the model receives the full conversation history plus system prompt plus tool results. That window fills up fast. Once it does, you either hit token limits, start paying significantly more per request, or the model starts missing information buried in the middle.
+  - [Lesson 9: Persistent memory with session managers](https://strandsagents.com/docs/learning/persistent-memory-with-session-managers/index.md): Without persistence, every conversation starts from zero. The agent has no memory of prior interactions, no accumulated knowledge about the user, no awareness of decisions made yesterday. Session managers handle the storage and retrieval of conversation state so continuity works automatically.
+  - [Lesson 10: Multi-agent patterns: agents as tools](https://strandsagents.com/docs/learning/multi-agent-patterns-agents-as-tools/index.md): This is where we cross from single-agent patterns into multi-agent orchestration, and we start with the most intuitive version: an agent that can call other agents the same way it calls any other tool.
+  - [Lesson 11: Multi-agent patterns: graph workflows](https://strandsagents.com/docs/learning/multi-agent-patterns-graph-workflows/index.md): Some workflows have a fixed structure: step A feeds into step B, step B branches based on a condition, both branches converge at step C. You don't want the model deciding whether to run step B. You want it guaranteed.
+  - [Lesson 12: Multi-agent patterns: agent swarms](https://strandsagents.com/docs/learning/multi-agent-patterns-agent-swarms/index.md): In a swarm, multiple agents share a workspace or communication channel. Each agent has its own tools, its own prompt, its own specialization.
+  - [Lesson 13: Evaluating agents](https://strandsagents.com/docs/learning/evaluating-agents/index.md): Agent evaluation is harder than traditional software testing. The output is non-deterministic.
+  - [Lesson 14: Deploying agents to the cloud](https://strandsagents.com/docs/learning/deploying-agents-to-the-cloud/index.md): We'll deploy an agent to AWS using Amazon Bedrock AgentCore. AgentCore is a collection of components for building, deploying and operating agents in production. The main components we will focus on in this video is AgentCore Runtime and AgentCore Memory.
 
 ## Api Python
 
@@ -365,7 +368,6 @@
 - [strands.event_loop.streaming](https://strandsagents.com/docs/api/python/strands.event_loop.streaming/index.md)
 - [strands.experimental.agent_config](https://strandsagents.com/docs/api/python/strands.experimental.agent_config/index.md)
 - [strands.experimental.checkpoint.checkpoint](https://strandsagents.com/docs/api/python/strands.experimental.checkpoint.checkpoint/index.md)
-- [strands.experimental.tools.stop.stop](https://strandsagents.com/docs/api/python/strands.experimental.tools.stop.stop/index.md)
 - [strands.handlers.callback_handler](https://strandsagents.com/docs/api/python/strands.handlers.callback_handler/index.md)
 - [strands.hooks.events](https://strandsagents.com/docs/api/python/strands.hooks.events/index.md)
 - [strands.hooks.registry](https://strandsagents.com/docs/api/python/strands.hooks.registry/index.md)
@@ -380,6 +382,8 @@
 - [strands.memory.extraction.types](https://strandsagents.com/docs/api/python/strands.memory.extraction.types/index.md)
 - [strands.memory.memory_manager](https://strandsagents.com/docs/api/python/strands.memory.memory_manager/index.md)
 - [strands.memory.types](https://strandsagents.com/docs/api/python/strands.memory.types/index.md)
+- [strands.middleware.stages](https://strandsagents.com/docs/api/python/strands.middleware.stages/index.md)
+- [strands.middleware.types](https://strandsagents.com/docs/api/python/strands.middleware.types/index.md)
 - [strands.models](https://strandsagents.com/docs/api/python/strands.models/index.md)
 - [strands.models.anthropic](https://strandsagents.com/docs/api/python/strands.models.anthropic/index.md)
 - [strands.models.bedrock](https://strandsagents.com/docs/api/python/strands.models.bedrock/index.md)
@@ -454,6 +458,7 @@
 - [strands.types.collections](https://strandsagents.com/docs/api/python/strands.types.collections/index.md)
 - [strands.types.content](https://strandsagents.com/docs/api/python/strands.types.content/index.md)
 - [strands.types.event_loop](https://strandsagents.com/docs/api/python/strands.types.event_loop/index.md)
+- [strands.types.events](https://strandsagents.com/docs/api/python/strands.types.events/index.md)
 - [strands.types.exceptions](https://strandsagents.com/docs/api/python/strands.types.exceptions/index.md)
 - [strands.types.guardrails](https://strandsagents.com/docs/api/python/strands.types.guardrails/index.md)
 - [strands.types.interrupt](https://strandsagents.com/docs/api/python/strands.types.interrupt/index.md)
@@ -501,8 +506,10 @@
 - [strands.vended_tools.shell.types](https://strandsagents.com/docs/api/python/strands.vended_tools.shell.types/index.md)
 - [strands.vended_tools.sleep.sleep](https://strandsagents.com/docs/api/python/strands.vended_tools.sleep.sleep/index.md)
 - [strands.vended_tools.sleep.types](https://strandsagents.com/docs/api/python/strands.vended_tools.sleep.types/index.md)
+- [strands.vended_tools.stop.stop](https://strandsagents.com/docs/api/python/strands.vended_tools.stop.stop/index.md)
 - [strands.vended_tools.subagent.subagent](https://strandsagents.com/docs/api/python/strands.vended_tools.subagent.subagent/index.md)
 - [strands.vended_tools.subagent.types](https://strandsagents.com/docs/api/python/strands.vended_tools.subagent.types/index.md)
+- [strands.vended_tools.swarm.swarm](https://strandsagents.com/docs/api/python/strands.vended_tools.swarm.swarm/index.md)
 - [strands.vended_tools.web_fetch.types](https://strandsagents.com/docs/api/python/strands.vended_tools.web_fetch.types/index.md)
 - [strands.vended_tools.web_fetch.web_fetch](https://strandsagents.com/docs/api/python/strands.vended_tools.web_fetch.web_fetch/index.md)
 
@@ -872,6 +879,7 @@
 
 ## Blog
 
+- [Evaluating structured agent output, field by field, with Strands Evals](https://strandsagents.com/blog/structured-output-similarity-strands-evals/index.md): StructuredOutputSimilarity scores structured agent output field by field with Stickler: deterministic, per-field accuracy with no LLM judge in the default path.
 - [Strands Decider adds four Gemma 4 models](https://strandsagents.com/blog/strands-decider-gemma-4-models/index.md): Four new Strands Decider models built on Gemma 4 let developers compare sizes for routing, guardrails, evaluation, and other agent decisions.
 - [We ran 94,000 trials to measure the cost of harness choice](https://strandsagents.com/blog/we-ran-94000-trials-to-measure-the-cost-of-harness-choice/index.md): We analyzed 94,000 benchmark trials to measure how harness choice affects token usage, estimated costs, and accuracy with Claude, GPT, and open-weight models.
 - [Strands Box: The Big Picture](https://strandsagents.com/blog/strands-box-the-big-picture/index.md): Strands Box, now in developer preview, is an open source local sandbox for AI agents that pairs operating-system isolation with Dogwood semantic policy. Here's why semantic policy matters, and how Box's design follows from it.
@@ -907,9 +915,14 @@
 
 ## Changelog
 
-- [Changelog](https://strandsagents.com/changelog/index.md): All releases across the SDK and Evals SDK
+- [Changelog](https://strandsagents.com/changelog/index.md): All releases across the SDK, Harness, Harness CLI, Evals, and Box
 - SDK Python
+  - [v1.61.1](https://strandsagents.com/changelog/sdk/python-v1.61.1/index.md): SDK Python v1.61.1 (2026-10-15)
+  - [v1.61.0](https://strandsagents.com/changelog/sdk/python-v1.61.0/index.md): SDK Python v1.61.0 (2026-10-14)
   - [v1.60.0](https://strandsagents.com/changelog/sdk/python-v1.60.0/index.md): SDK Python v1.60.0 (2026-10-12)
+  - [v1.59.0](https://strandsagents.com/changelog/sdk/python-v1.59.0/index.md): SDK Python v1.59.0 (2026-10-08)
+  - [v1.58.1](https://strandsagents.com/changelog/sdk/python-v1.58.1/index.md): SDK Python v1.58.1 (2026-10-06)
+  - [v1.58.0](https://strandsagents.com/changelog/sdk/python-v1.58.0/index.md): SDK Python v1.58.0 (2026-10-05)
   - [v1.57.2](https://strandsagents.com/changelog/sdk/python-v1.57.2/index.md): SDK Python v1.57.2 (2026-10-01)
   - [v1.57.1](https://strandsagents.com/changelog/sdk/python-v1.57.1/index.md): SDK Python v1.57.1 (2026-09-25)
   - [v1.57.0](https://strandsagents.com/changelog/sdk/python-v1.57.0/index.md): SDK Python v1.57.0 (2026-09-22)
@@ -989,7 +1002,15 @@
   - [v0.1.2](https://strandsagents.com/changelog/sdk/python-v0.1.2/index.md): SDK Python v0.1.2 (2025-05-18)
   - [v0.1.1](https://strandsagents.com/changelog/sdk/python-v0.1.1/index.md): SDK Python v0.1.1 (2025-05-17)
   - [v0.1.0](https://strandsagents.com/changelog/sdk/python-v0.1.0/index.md): SDK Python v0.1.0 (2025-05-16)
+- Harness Python
+  - [v0.3.1](https://strandsagents.com/changelog/harness/python-v0.3.1/index.md): Harness Python v0.3.1 (2026-10-15)
+  - [v0.3.0](https://strandsagents.com/changelog/harness/python-v0.3.0/index.md): Harness Python v0.3.0 (2026-10-14)
+  - [v0.2.0](https://strandsagents.com/changelog/harness/python-v0.2.0/index.md): Harness Python v0.2.0 (2026-10-08)
+  - [v0.1.2](https://strandsagents.com/changelog/harness/python-v0.1.2/index.md): Harness Python v0.1.2 (2026-09-22)
+  - [v0.1.1](https://strandsagents.com/changelog/harness/python-v0.1.1/index.md): Harness Python v0.1.1 (2026-09-21)
+  - [v0.1.0](https://strandsagents.com/changelog/harness/python-v0.1.0/index.md): Harness Python v0.1.0 (2026-09-21)
 - SDK TypeScript
+  - [v1.21.0](https://strandsagents.com/changelog/sdk/typescript-v1.21.0/index.md): SDK TypeScript v1.21.0 (2026-10-14)
   - [v1.20.0](https://strandsagents.com/changelog/sdk/typescript-v1.20.0/index.md): SDK TypeScript v1.20.0 (2026-10-08)
   - [v1.19.0](https://strandsagents.com/changelog/sdk/typescript-v1.19.0/index.md): SDK TypeScript v1.19.0 (2026-09-22)
   - [v1.18.0](https://strandsagents.com/changelog/sdk/typescript-v1.18.0/index.md): SDK TypeScript v1.18.0 (2026-09-15)
@@ -1035,6 +1056,8 @@
   - [v0.1.1](https://strandsagents.com/changelog/sdk/typescript-v0.1.1/index.md): SDK TypeScript v0.1.1 (2025-12-03)
   - [v0.1.0](https://strandsagents.com/changelog/sdk/typescript-v0.1.0/index.md): SDK TypeScript v0.1.0 (2025-12-03)
 - Evals
+  - [v1.6.0](https://strandsagents.com/changelog/evals/v1.6.0/index.md): Evals v1.6.0 (2026-10-14)
+  - [v1.5.0](https://strandsagents.com/changelog/evals/v1.5.0/index.md): Evals v1.5.0 (2026-10-08)
   - [v1.4.0](https://strandsagents.com/changelog/evals/v1.4.0/index.md): Evals v1.4.0 (2026-09-22)
   - [v1.3.0](https://strandsagents.com/changelog/evals/v1.3.0/index.md): Evals v1.3.0 (2026-09-15)
   - [v1.2.0](https://strandsagents.com/changelog/evals/v1.2.0/index.md): Evals v1.2.0 (2026-08-21)
@@ -1065,3 +1088,18 @@
   - [v0.1.2](https://strandsagents.com/changelog/evals/v0.1.2/index.md): Evals v0.1.2 (2026-01-13)
   - [v0.1.1](https://strandsagents.com/changelog/evals/v0.1.1/index.md): Evals v0.1.1 (2025-12-15)
   - [v0.1.0](https://strandsagents.com/changelog/evals/v0.1.0/index.md): Evals v0.1.0 (2025-12-03)
+- Harness TypeScript
+  - [v0.3.0](https://strandsagents.com/changelog/harness/typescript-v0.3.0/index.md): Harness TypeScript v0.3.0 (2026-10-14)
+  - [v0.2.0](https://strandsagents.com/changelog/harness/typescript-v0.2.0/index.md): Harness TypeScript v0.2.0 (2026-10-08)
+  - [v0.1.1](https://strandsagents.com/changelog/harness/typescript-v0.1.1/index.md): Harness TypeScript v0.1.1 (2026-09-22)
+  - [v0.1.0](https://strandsagents.com/changelog/harness/typescript-v0.1.0/index.md): Harness TypeScript v0.1.0 (2026-09-21)
+- Harness CLI
+  - [v0.2.1](https://strandsagents.com/changelog/cli/v0.2.1/index.md): Harness CLI v0.2.1 (2026-10-14)
+  - [v0.2.0](https://strandsagents.com/changelog/cli/v0.2.0/index.md): Harness CLI v0.2.0 (2026-10-08)
+  - [v0.1.4](https://strandsagents.com/changelog/cli/v0.1.4/index.md): Harness CLI v0.1.4 (2026-09-25)
+  - [v0.1.3](https://strandsagents.com/changelog/cli/v0.1.3/index.md): Harness CLI v0.1.3 (2026-09-24)
+  - [v0.1.2](https://strandsagents.com/changelog/cli/v0.1.2/index.md): Harness CLI v0.1.2 (2026-09-23)
+  - [v0.1.1](https://strandsagents.com/changelog/cli/v0.1.1/index.md): Harness CLI v0.1.1 (2026-09-22)
+  - [v0.1.0](https://strandsagents.com/changelog/cli/v0.1.0/index.md): Harness CLI v0.1.0 (2026-09-21)
+- Box
+  - [v0.1.0](https://strandsagents.com/changelog/box/v0.1.0/index.md): Box v0.1.0 (2026-10-07)

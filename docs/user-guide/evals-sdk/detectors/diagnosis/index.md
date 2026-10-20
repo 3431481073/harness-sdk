@@ -1,5 +1,3 @@
-## Overview
-
 `diagnose_session` runs the full detection-and-analysis pipeline in a single call: it detects failures, performs root cause analysis on any failures found, and returns a combined `DiagnosisResult` with deduplicated fix recommendations. It also integrates directly into the `Experiment` class via `DiagnosisConfig` for automatic diagnosis of failing evaluation cases.
 
 ## Key features

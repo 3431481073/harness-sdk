@@ -158,7 +158,7 @@ async def count_tokens(
         system_prompt_content: list[SystemContentBlock] | None = None) -> int
 ```
 
-Defined in: [src/strands/models/llamacpp.py:555](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamacpp.py#L555)
+Defined in: [src/strands/models/llamacpp.py:557](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamacpp.py#L557)
 
 Count tokens using llama.cpp’s native /tokenize endpoint.
 
@@ -187,7 +187,7 @@ async def stream(messages: Messages,
                  **kwargs: Any) -> AsyncGenerator[StreamEvent, None]
 ```
 
-Defined in: [src/strands/models/llamacpp.py:612](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamacpp.py#L612)
+Defined in: [src/strands/models/llamacpp.py:614](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamacpp.py#L614)
 
 Stream conversation with the llama.cpp model.
 
@@ -219,7 +219,7 @@ async def structured_output(
         **kwargs: Any) -> AsyncGenerator[dict[str, T | Any], None]
 ```
 
-Defined in: [src/strands/models/llamacpp.py:815](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamacpp.py#L815)
+Defined in: [src/strands/models/llamacpp.py:817](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamacpp.py#L817)
 
 Get structured output using llama.cpp’s native JSON schema support.
 

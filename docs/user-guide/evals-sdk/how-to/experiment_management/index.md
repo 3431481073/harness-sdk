@@ -1,5 +1,3 @@
-## Overview
-
 Strands Evals organizes test cases into `Experiment` objects. This guide covers practical patterns for managing experiments and test cases.
 
 ## Organizing test cases

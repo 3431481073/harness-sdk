@@ -1,14 +1,12 @@
+Before you follow along
+
+This video is a snapshot in time. Some APIs and examples have changed since recording. Follow the code on this page, and look for “Changed since recording” notices below.
+
 *[Watch on YouTube](https://www.youtube.com/watch?v=6zbbYm902MQ&list=PLDzwjhH-4yhU&index=8)*
-
-About this lesson
-
-The videos in this course are a snapshot in time. Strands is under active development, so the code featured on this page reflects the most up-to-date patterns, but the concepts covered in the video still apply. When in doubt, trust the code.
-
-In particular, this video demonstrates `SummarizingConversationManager` and the `ContextOffloader` plugin. Those have been superseded by the unified `ContextManager` and `Offload` strategies shown below. The ideas (summarize old history, offload large tool results, compress proactively) are the same; the API is now one system instead of two.
 
 *Code for this lesson: [`samples/08-context-management`](https://github.com/aws-samples/sample-building-with-strands-course/tree/main/samples/08-context-management)*
 
-## What Context Engineering Is
+## What context engineering is
 
 Context engineering is the discipline of deciding **what information enters the model’s context window, when, and in what form**. Unlike prompt engineering (which focuses on instructions), context engineering ensures the model has the right data at the right time without overflowing the window or wasting tokens.
 
@@ -18,10 +16,14 @@ It breaks down into four categories:
 | --- | --- | --- |
 | **Select** | Choose what enters context, inject relevant info, filter out noise | `ContextInjector` plugin |
 | **Compress** | Shrink what’s already in context, summarize history, truncate results | `ContextManager` strategies (truncate, summarize, drop) |
-| **Isolate** | Separate concerns, give sub-agents their own context windows | Multi-agent patterns, `context_manager="agentic"` |
+| **Isolate** | Separate concerns, give sub-agents their own context windows | Multi-agent patterns with separate agent contexts |
 | **Externalize** | Move large data out of context, store externally, keep a compact reference | `ContextManager` stash + retrieval tool |
 
-## The One-Line Default: `context_manager="auto"`
+## The one-line default: `context_manager="auto"`
+
+Changed since recording
+
+The video uses `SummarizingConversationManager` and `ContextOffloader`. The updated starting point is `context_manager="auto"`. For custom behavior, use `ContextManager` and `Offload` from `strands.experimental.context_manager`, as shown below. Truncation keeps previews; it does not simply drop whole messages.
 
 For most use cases, start here:
 
@@ -37,11 +39,11 @@ This single parameter enables:
 -   **Summarization** of old messages into structured summaries (not dropped)
 -   **Proactive compression** firing at 85% context usage to stay ahead of overflow
 
-In benchmarks on real code investigation tasks, costs dropped 55% while accuracy went from 68% to 98%. Half the tokens, better results.
+The effect on cost and answer quality depends on the workload. Measure both with your own evaluation cases.
 
 For agents that need to protect specific context across long conversations, use `context_manager="agentic"`. The model gets tools to summarize, truncate, or pin messages itself, trading some tokens for judgment.
 
-## Context Injector
+## Context injector
 
 The `ContextInjector` plugin folds ephemeral text into the model input before each call. The text is never written to conversation history; it augments one call only. Use it for context the agent should always have but that doesn’t belong in stored history: current time, environment facts, retrieval lookups.
 
@@ -65,7 +67,7 @@ Control when injection fires:
 -   `trigger="everyTurn"`: before every model call, including mid-task tool-result turns
 -   Custom predicate: `trigger=lambda context: context.state.get("recall_enabled") is True`
 
-## ContextManager and Offload Strategies
+## ContextManager and Offload strategies
 
 The `ContextManager` is the engine behind `context_manager="auto"`. When you need custom control over how context is managed, build your own strategy pipeline using `Offload` strategies.
 
@@ -100,16 +102,15 @@ And `.when(...)` sets the conditions:
 -   `utilization=0.85`: fire when the context window is 85% full (per-message mode)
 -   `preserve_recent=N`: skip the N most recent matching messages
 
-### Truncate Strategy (Drop Oldest)
+### Truncate strategy (keep previews)
 
-The simplest approach. Remove old messages when context gets full:
+Truncate matching content to head/tail previews when context gets full:
 
 ```python
 from strands import Agent
 from strands.experimental.context_manager import ContextManager, Offload
 
 agent = Agent(
-    tools=[...],
     context_manager=ContextManager(
         strategies=[
             Offload.truncate("tool_results").when(threshold=2500),
@@ -121,15 +122,15 @@ agent = Agent(
 
 📂 [sliding\_window.py](https://github.com/aws-samples/sample-building-with-strands-course/tree/main/samples/08-context-management/sliding_window.py)
 
-### Summarize Strategy
+### Summarize strategy
 
 Instead of dropping old messages, compress them into summaries. Preserves more information, but summaries are lossy:
 
 ```python
+from strands import Agent
 from strands.experimental.context_manager import ContextManager, Offload
 
 agent = Agent(
-    tools=[...],
     context_manager=ContextManager(
         strategies=[
             Offload.truncate("tool_results").when(threshold=2500),
@@ -141,18 +142,18 @@ agent = Agent(
 
 📂 [summarizing.py](https://github.com/aws-samples/sample-building-with-strands-course/tree/main/samples/08-context-management/summarizing.py)
 
-### Custom Summarizer (Cheaper Model)
+### Custom summarizer (cheaper model)
 
 Summarizing history doesn’t require your most capable model. Pass a cheaper one, and a domain-specific prompt, via the config dict:
 
 ```python
+from strands import Agent
 from strands.models import BedrockModel
 from strands.experimental.context_manager import ContextManager, Offload
 
 summarizer_model = BedrockModel(model_id="us.anthropic.claude-haiku-4-5-20251001-v1:0")
 
 agent = Agent(
-    tools=[...],
     context_manager=ContextManager(
         strategies=[
             Offload.truncate("tool_results").when(threshold=2500),
@@ -173,13 +174,13 @@ agent = Agent(
 
 📂 [custom\_summarizer.py](https://github.com/aws-samples/sample-building-with-strands-course/tree/main/samples/08-context-management/custom_summarizer.py)
 
-## Strategy Comparison
+## Strategy comparison
 
 | Strategy | Tradeoff |
 | --- | --- |
 | `context_manager="auto"` | Best default. Offloading + summarization + proactive compression |
 | `context_manager="agentic"` | Model self-manages context. Trades tokens for judgment |
-| `Offload.truncate(...)` | Simple, predictable. Loses old info entirely |
+| `Offload.truncate(...)` | Keeps a preview; originals remain recoverable when stash is enabled |
 | `Offload.summarize(...)` | Preserves more info. Lossy compression, costs an LLM call |
 | `Offload.drop(...)` | Most aggressive. Content goes to stash only |
 | Context injection | Ephemeral per-call data. Never persisted to history |

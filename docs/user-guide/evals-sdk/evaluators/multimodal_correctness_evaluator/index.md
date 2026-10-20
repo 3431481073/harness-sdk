@@ -1,5 +1,3 @@
-## Overview
-
 The `MultimodalCorrectnessEvaluator` assesses whether an agent response is factually correct given the image content. It catches errors in objects, counts, colors, positions, readable text, and described actions.
 
 ## Key features

@@ -1,5 +1,3 @@
-## Overview
-
 To evaluate your agent over a multi-turn conversation, you need something to play the user. `ActorSimulator` does that: it generates goal-oriented user messages, reacts to each agent response, and stops when the goal is met or a turn limit is reached.
 
 The `from_case_for_user_simulator()` factory builds a user simulator from a `Case`, generating a user profile and goal from the case input and its `task_description` metadata:

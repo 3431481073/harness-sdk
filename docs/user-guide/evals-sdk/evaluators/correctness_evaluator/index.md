@@ -1,5 +1,3 @@
-## Overview
-
 The `CorrectnessEvaluator` assesses whether an agent’s response is factually correct. It supports two modes: a basic mode that evaluates correctness from conversation context alone, and a reference mode that compares the response against an expected answer.
 
 ## Key features

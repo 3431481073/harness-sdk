@@ -93,8 +93,7 @@ experiment = Experiment[str, str](cases=test_cases, evaluators=[evaluator])
 report = experiment.run_evaluations(get_response)
 
 # Display results
-print("=== Basic Output Evaluation Results ===")
-report.run_display()
+report.display()
 
 # Save experiment for later analysis
 experiment.to_file("basic_evaluation")
@@ -107,7 +106,9 @@ Run it:
 python -u basic_eval.py
 ```
 
-`run_display()` prints each case’s score, whether it passed, and the judge’s reasoning, followed by the overall statistics. The experiment is saved to `basic_evaluation.json`, so you can reload or compare it later. Evaluating many cases? `Experiment` also offers `run_evaluations_async` to run them concurrently and return the same report.
+`display()` clears the terminal and prints the overall score and pass rate, then a table with each case’s score and whether it passed. To read the judge’s reasoning, call `report.run_display()` instead: it opens an interactive view where you expand a case by typing its number, and type `q` to quit.
+
+The experiment is saved to `basic_evaluation.json`, so you can reload or compare it later. Evaluating many cases? `Experiment` also offers `run_evaluations_async` to run them concurrently and return the same report.
 
 The @eval\_task decorator
 

@@ -41,6 +41,9 @@
         -   [Types](/docs/api/python/strands.memory.extraction.types)
     -   [Memory Manager](/docs/api/python/strands.memory.memory_manager)
     -   [Types](/docs/api/python/strands.memory.types)
+-   **Middleware**
+    -   [Stages](/docs/api/python/strands.middleware.stages)
+    -   [Types](/docs/api/python/strands.middleware.types)
 -   **Models**
     -   [Overview](/docs/api/python/strands.models)
     -   [Anthropic](/docs/api/python/strands.models.anthropic)
@@ -130,6 +133,7 @@
     -   [Collections](/docs/api/python/strands.types.collections)
     -   [Content](/docs/api/python/strands.types.content)
     -   [Event Loop](/docs/api/python/strands.types.event_loop)
+    -   [Events](/docs/api/python/strands.types.events)
     -   [Exceptions](/docs/api/python/strands.types.exceptions)
     -   [Guardrails](/docs/api/python/strands.types.guardrails)
     -   [Interrupt](/docs/api/python/strands.types.interrupt)
@@ -204,9 +208,13 @@
     -   **Sleep**
         -   [Sleep](/docs/api/python/strands.vended_tools.sleep.sleep)
         -   [Types](/docs/api/python/strands.vended_tools.sleep.types)
+    -   **Stop**
+        -   [Stop](/docs/api/python/strands.vended_tools.stop.stop)
     -   **Subagent**
         -   [Subagent](/docs/api/python/strands.vended_tools.subagent.subagent)
         -   [Types](/docs/api/python/strands.vended_tools.subagent.types)
+    -   **Swarm**
+        -   [Swarm](/docs/api/python/strands.vended_tools.swarm.swarm)
     -   **Web Fetch**
         -   [Types](/docs/api/python/strands.vended_tools.web_fetch.types)
         -   [Web Fetch](/docs/api/python/strands.vended_tools.web_fetch.web_fetch)
@@ -214,6 +222,3 @@
     -   [Agent Config](/docs/api/python/strands.experimental.agent_config)
     -   **Checkpoint**
         -   [Checkpoint](/docs/api/python/strands.experimental.checkpoint.checkpoint)
-    -   **Tools**
-        -   **Stop**
-            -   [Stop](/docs/api/python/strands.experimental.tools.stop.stop)

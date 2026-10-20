@@ -327,13 +327,13 @@ console.log(response)
 - [Writer](/docs/user-guide/sdk/model-providers/writer/index.md) (2 shared tags)
 - [LiteLLM](/docs/user-guide/sdk/model-providers/litellm/index.md) (1 shared tag)
 - [Return structured output](/docs/user-guide/sdk/agents/structured-output/index.md) (1 shared tag)
+- [Structured output similarity evaluator](/docs/user-guide/evals-sdk/evaluators/structured_output_evaluator/index.md) (1 shared tag)
 - [Google](/docs/user-guide/sdk/model-providers/google/index.md) (1 shared tag)
 - [Vercel](/docs/user-guide/sdk/model-providers/vercel/index.md) (1 shared tag)
+- [Structured output](/docs/user-guide/sdk/agents/structured-output-behavior/index.md) (1 shared tag)
 - [Anthropic](/docs/user-guide/sdk/model-providers/anthropic/index.md) (1 shared tag)
 - [Multimodal correctness evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_correctness_evaluator/index.md) (1 shared tag)
 - [Multimodal faithfulness evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_faithfulness_evaluator/index.md) (1 shared tag)
-- [Multimodal instruction following evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_instruction_following_evaluator/index.md) (1 shared tag)
-- [Multimodal output evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_output_evaluator/index.md) (1 shared tag)
 
 
 ## Implementation

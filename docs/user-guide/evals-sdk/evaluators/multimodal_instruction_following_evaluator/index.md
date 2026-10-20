@@ -1,5 +1,3 @@
-## Overview
-
 The `MultimodalInstructionFollowingEvaluator` assesses whether an agent response satisfies the explicit constraints in the user’s instruction (count, format, scope, order, completeness, and style), independently of factual accuracy.
 
 ## Key features

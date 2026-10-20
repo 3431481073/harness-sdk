@@ -1,5 +1,3 @@
-## Overview
-
 Strands Evals provides JSON serialization for experiments and reports, enabling you to save, load, version, and share evaluation work.
 
 ## Saving experiments

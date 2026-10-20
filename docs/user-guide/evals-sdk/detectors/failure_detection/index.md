@@ -1,5 +1,3 @@
-## Overview
-
 `detect_failures` analyzes an agent execution `Session` and identifies semantic failures: hallucinations, tool errors, policy violations, repetitive behavior, and more. It uses an LLM to evaluate each span against a 20+ category failure taxonomy and returns structured results with span locations, failure categories, confidence levels, and evidence.
 
 ## Key features
@@ -172,6 +170,6 @@ If the pre-flight check passes but the model still returns a context error, the 
 - [Production Lifecycle Controls](/docs/user-guide/sdk/agents/lifecycle-controls/index.md) (1 shared tag)
 - [Retry Strategies](/docs/user-guide/sdk/agents/retry-strategies/index.md) (1 shared tag)
 - [Chaos testing](/docs/user-guide/evals-sdk/chaos_testing/index.md) (1 shared tag)
+- [Structured output](/docs/user-guide/sdk/agents/structured-output-behavior/index.md) (1 shared tag)
 - [Operating Agents in Production](/docs/user-guide/sdk/deploy/operating-agents-in-production/index.md) (1 shared tag)
 - [Failure communication evaluator](/docs/user-guide/evals-sdk/evaluators/failure_communication_evaluator/index.md) (1 shared tag)
-- [Partial completion evaluator](/docs/user-guide/evals-sdk/evaluators/partial_completion_evaluator/index.md) (1 shared tag)

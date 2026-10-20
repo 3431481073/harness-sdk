@@ -1,4 +1,4 @@
-Turn a function you write into a tool the agent can call. Strands gives you a few ways to define one, and the Python and TypeScript forms differ slightly.
+Turn a function you write into a tool the agent can call. Strands gives you a few ways to define one.
 
 (( tab "Python" ))
 Python supports three approaches to defining tools:
@@ -15,7 +15,7 @@ TypeScript supports two main approaches:
 
 -   **tool() function with [Zod](https://zod.dev/) or JSON schemas**: Create tools using the `tool()` function with either Zod schemas for type-safe validated input, or plain JSON Schema objects for schema-only definitions without runtime validation.
     
--   **Class-based tools extending FunctionTool**: Create tools within classes to maintain shared state and resources.
+-   **Class-based tools extending [`FunctionTool`](/docs/api/typescript/FunctionTool/index.md)**: Create tools within classes to maintain shared state and resources.
 (( /tab "TypeScript" ))
 
 ## Tool Creation Examples
@@ -127,24 +127,24 @@ Tool names must match `^[a-zA-Z0-9_-]+$` and be 1 to 64 characters long. Names t
 Provide a custom JSON schema to override the automatically generated one:
 
 ```python
-@tool(
-    inputSchema={
-        "json": {
-            "type": "object",
-            "properties": {
-                "shape": {
-                    "type": "string",
-                    "enum": ["circle", "rectangle"],
-                    "description": "The shape type"
-                },
-                "radius": {"type": "number", "description": "Radius for circle"},
-                "width": {"type": "number", "description": "Width for rectangle"},
-                "height": {"type": "number", "description": "Height for rectangle"}
+AREA_SCHEMA = {
+    "json": {
+        "type": "object",
+        "properties": {
+            "shape": {
+                "type": "string",
+                "enum": ["circle", "rectangle"],
+                "description": "The shape type"
             },
-            "required": ["shape"]
-        }
+            "radius": {"type": "number", "description": "Radius for circle"},
+            "width": {"type": "number", "description": "Width for rectangle"},
+            "height": {"type": "number", "description": "Height for rectangle"}
+        },
+        "required": ["shape"]
     }
-)
+}
+
+@tool(inputSchema=AREA_SCHEMA)
 def calculate_area(shape: str, radius: float = None, width: float = None, height: float = None) -> float:
     """Calculate area of a shape."""
     if shape == "circle":
@@ -307,7 +307,7 @@ const insertDataTool = tool({
 
 ### ToolContext
 
-Tools can access their execution context to interact with the invoking agent, current tool use data, and invocation state. The [`ToolContext`](/docs/api/python/strands.types.tools#ToolContext) provides this access:
+Tools can interact with their invoking agent, current tool use data, and invocation state through [`ToolContext`](/docs/api/python/strands.types.tools#ToolContext):
 
 (( tab "Python" ))
 Set `context=True` in the decorator and include a `tool_context` parameter:
@@ -331,7 +331,7 @@ agent = Agent(tools=[get_self_name, get_tool_use_id, get_invocation_state], name
 
 agent("What is your name?")
 agent("What is the tool use id?")
-agent("What is the invocation state?", custom_data="You're the best agent ;)")
+agent("What is the invocation state?", invocation_state={"custom_data": "You're the best agent ;)"})
 ```
 (( /tab "Python" ))
 
@@ -365,17 +365,17 @@ await agent.invoke('What is the tool use id?')
 ```
 (( /tab "TypeScript" ))
 
-### Custom ToolContext Parameter Name
+#### Custom ToolContext Parameter Name
 
 (( tab "Python" ))
-To use a different parameter name for `ToolContext`, pass that name as the value of the `context` argument:
+To use a different parameter name for `ToolContext`, pass that name as the `context` argument:
 
 ```python
 from strands import tool, Agent, ToolContext
 
-@tool(context="context")
-def get_self_name(context: ToolContext) -> str:
-    return f"The agent name is {context.agent.name}"
+@tool(context="run_info")
+def get_self_name(run_info: ToolContext) -> str:
+    return f"The agent name is {run_info.agent.name}"
 
 agent = Agent(tools=[get_self_name], name="Best agent")
 
@@ -394,9 +394,9 @@ agent("What is your name?")
 (( tab "Python" ))
 The `invocation_state` attribute in `ToolContext` provides access to data passed through the agent invocation. Use it for:
 
-1.  **Request Context**: Access session IDs, user information, or request-specific data
-2.  **Multi-Agent Shared State**: In [Graph](/docs/user-guide/sdk/multi-agent/graph/index.md) and [Swarm](/docs/user-guide/sdk/multi-agent/swarm/index.md) patterns, access state shared across all agents
-3.  **Per-Invocation Overrides**: Override behavior or settings for specific requests
+1.  **Request Context**: Access session IDs, user information, or request-specific data without polluting model context
+2.  **Multi-Agent Shared State**: Access state shared across all agents in [Graph](/docs/user-guide/sdk/multi-agent/graph/index.md) and [Swarm](/docs/user-guide/sdk/multi-agent/swarm/index.md) patterns
+3.  **Cross-Hook Counters**: Track tool call counts, model calls, or custom metrics across hooks and tools within a single invocation
 
 ```python
 from strands import tool, Agent, ToolContext
@@ -421,7 +421,7 @@ def api_call(query: str, tool_context: ToolContext) -> dict:
     return response.json()
 
 agent = Agent(tools=[api_call])
-result = agent("Get my profile data", user_id="user123")
+result = agent("Get my profile data", invocation_state={"user_id": "user123"})
 ```
 
 **Invocation State Compared To Other Approaches**
@@ -470,10 +470,10 @@ const result = await agent.invoke('Get my profile data', {
 })
 ```
 
-Invocation state is useful for:
+Invocation state is useful to:
 
 1.  **Request Context**: Access session IDs, user information, or request-specific data without polluting model context
-2.  **Multi-Agent Shared State**: In [Graph](/docs/user-guide/sdk/multi-agent/graph/index.md) and [Swarm](/docs/user-guide/sdk/multi-agent/swarm/index.md) patterns, access state shared across all agents
+2.  **Multi-Agent Shared State**: Access state shared across all agents in [Graph](/docs/user-guide/sdk/multi-agent/graph/index.md) and [Swarm](/docs/user-guide/sdk/multi-agent/swarm/index.md) patterns
 3.  **Cross-Hook Counters**: Track tool call counts, model calls, or custom metrics across hooks and tools within a single invocation
 
 **Invocation State Compared To Other Approaches**
@@ -563,6 +563,8 @@ asyncio.run(tool_stream_example())
 (( /tab "Python" ))
 
 (( tab "TypeScript" ))
+Async tools can yield intermediate results to provide real-time progress updates. Each yielded value becomes a [streaming event](/docs/user-guide/sdk/streaming/index.md).
+
 ```typescript
 const processDatasetTool = tool({
   name: 'process_dataset',
@@ -600,7 +602,7 @@ for await (const event of agent.stream('Process 50 records')) {
 
 ## Class-Based Tools
 
-Class-based tools maintain state and use object-oriented patterns. Reach for them when your tools need to share resources, keep context between invocations, follow object-oriented design, customize a tool before passing it to an agent, or create different tool configurations for different agents.
+Class-based tools maintain state and use object-oriented patterns. Use them when your tools need to share resources, keep context between invocations, follow object-oriented design, customize a tool before passing it to an agent, or create different tool configurations for different agents.
 
 ### Example with Multiple Tools in a Class
 
@@ -701,27 +703,22 @@ async function useDatabaseTools() {
 Create tools within a class and store them as properties. The tools access the class’s private state through closures.
 (( /tab "TypeScript" ))
 
-## Module Based Tools (python only)
-
 (( tab "Python" ))
+## Module Based Tools
+
 An alternative approach is to define a tool as a Python module with a specific structure. This enables creating tools that don’t depend on the SDK directly.
 
 A Python module tool requires two key components:
 
 1.  A `TOOL_SPEC` variable that defines the tool’s name, description, and input schema
 2.  A function with the same name as specified in the tool spec that implements the tool’s functionality
-(( /tab "Python" ))
 
-### Basic Example
-
-(( tab "Python" ))
 Here’s how you would implement the same weather forecast tool as a module:
 
 weather\_forecast.py
 
 ```python
 from typing import Any
-
 
 # 1. Tool Specification
 TOOL_SPEC = {
@@ -766,11 +763,9 @@ def weather_forecast(tool, **kwargs: Any):
         "content": [{"text": result}]
     }
 ```
-(( /tab "Python" ))
 
 ### Loading Module Tools
 
-(( tab "Python" ))
 To use a module-based tool, import the module and pass it to the agent:
 
 ```python
@@ -791,11 +786,9 @@ agent = Agent(
     tools=["./weather_forecast.py"]
 )
 ```
-(( /tab "Python" ))
 
 ### Async Invocation
 
-(( tab "Python" ))
 Like decorated tools, module tools can be async.
 
 ```python

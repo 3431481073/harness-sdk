@@ -8,7 +8,7 @@ Stores knowledge as markdown files under a `memory/` storage namespace. Provides
 class FileMemoryStore(MemoryStore)
 ```
 
-Defined in: [src/strands/vended\_memory\_stores/file\_memory\_store/store.py:82](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/file_memory_store/store.py#L82)
+Defined in: [src/strands/vended\_memory\_stores/file\_memory\_store/store.py:86](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/file_memory_store/store.py#L86)
 
 A file-based memory store backed by the unified Storage interface.
 
@@ -37,7 +37,7 @@ agent = Agent(
 def __init__(**config: Unpack[FileMemoryStoreConfig]) -> None
 ```
 
-Defined in: [src/strands/vended\_memory\_stores/file\_memory\_store/store.py:107](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/file_memory_store/store.py#L107)
+Defined in: [src/strands/vended\_memory\_stores/file\_memory\_store/store.py:111](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/file_memory_store/store.py#L111)
 
 Initialize the FileMemoryStore.
 
@@ -52,9 +52,11 @@ async def search(query: str,
                  options: SearchOptions | None = None) -> list[MemoryEntry]
 ```
 
-Defined in: [src/strands/vended\_memory\_stores/file\_memory\_store/store.py:138](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/file_memory_store/store.py#L138)
+Defined in: [src/strands/vended\_memory\_stores/file\_memory\_store/store.py:142](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/file_memory_store/store.py#L142)
 
-Search knowledge files by keyword token-overlap scoring.
+Search knowledge files through the storage backend’s `search()`.
+
+Uses the search strategy configured on the backend (keyword token-overlap scoring by default). Entries that cannot be read are skipped.
 
 **Arguments**:
 
@@ -71,7 +73,7 @@ Top matches ranked by relevance.
 async def add(content: str, metadata: Metadata | None = None) -> str
 ```
 
-Defined in: [src/strands/vended\_memory\_stores/file\_memory\_store/store.py:172](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/file_memory_store/store.py#L172)
+Defined in: [src/strands/vended\_memory\_stores/file\_memory\_store/store.py:189](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/file_memory_store/store.py#L189)
 
 Add a knowledge entry to the store.
 

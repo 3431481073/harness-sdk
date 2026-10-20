@@ -1,5 +1,3 @@
-## Overview
-
 Write evaluation task functions without wiring up telemetry, session mapping, and result normalization yourself. Decorate a function with `@eval_task` and it handles that boilerplate.
 
 ## Basic usage

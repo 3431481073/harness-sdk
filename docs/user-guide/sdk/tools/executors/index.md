@@ -108,6 +108,7 @@ Custom tool executors are not currently supported but are planned for a future r
 
 ## Related pages
 
+- [Middleware](/docs/user-guide/sdk/agents/middleware/index.md) (2 shared tags)
 - [Agent Loop](/docs/user-guide/sdk/agents/agent-loop/index.md) (2 shared tags)
 - [Hook events](/docs/user-guide/sdk/agents/hooks-events/index.md) (2 shared tags)
 - [Hooks](/docs/user-guide/sdk/agents/hooks/index.md) (2 shared tags)
@@ -117,7 +118,6 @@ Custom tool executors are not currently supported but are planned for a future r
 - [Interventions](/docs/user-guide/sdk/agents/interventions/index.md) (2 shared tags)
 - [Production Lifecycle Controls](/docs/user-guide/sdk/agents/lifecycle-controls/index.md) (1 shared tag)
 - [Retry Strategies](/docs/user-guide/sdk/agents/retry-strategies/index.md) (1 shared tag)
-- [Build a custom plugin](/docs/user-guide/sdk/plugins/custom-plugins/index.md) (1 shared tag)
 
 
 ## Implementation

@@ -20,18 +20,15 @@ Release: https://github.com/strands-agents/harness-sdk/releases/tag/python/v1.57
 - include cache tokens in totalTokens [context, model] (https://github.com/strands-agents/harness-sdk/pull/4219)
 - map cache\_write\_tokens to cacheWriteInputTokens [model] (https://github.com/strands-agents/harness-sdk/pull/4193)
 - defer OpenAI responses during user speech [model, bidirectional-streaming] (https://github.com/strands-agents/harness-sdk/pull/4642)
-- reject caching values other than 'auto', a bool, or None [devx, model] (https://github.com/strands-agents/harness-sdk/pull/4631)
 - return portable filename from FileStorage.store instead of host path [persistence] (https://github.com/strands-agents/harness-sdk/pull/4568)
 - deliver tool results that finish after a connection restart [tool, bidirectional-streaming] (https://github.com/strands-agents/harness-sdk/pull/4677)
 - normalize tool inputs before replay [model, tool] (https://github.com/strands-agents/harness-sdk/pull/4625)
 - add context window limits for Sonnet 5.5, Opus 5.5, Fable 5.1 (py + ts) [context, model] (https://github.com/strands-agents/harness-sdk/pull/4694)
 - skip location-source documents in OpenAIResponsesModel message formatting [model] (https://github.com/strands-agents/harness-sdk/pull/4706)
 - keep stashed originals when backfilling after session resume [context, sessions] (https://github.com/strands-agents/harness-sdk/pull/4699)
-- remove context offloader plugin from harness in favor of context manager's stash (https://github.com/strands-agents/harness-sdk/pull/4701)
 
 ## Other
 - bump cedar-policy-mcp-schema-generator from 0.6.0 to 0.6.1 in /strands-py (https://github.com/strands-agents/harness-sdk/pull/4650)
-- update default model (https://github.com/strands-agents/harness-sdk/pull/4661)
 - remove session manager configuration [bidirectional-streaming, sessions] (https://github.com/strands-agents/harness-sdk/pull/4698)
 - add Human Overview sections to templates per AI usage reflection (https://github.com/strands-agents/harness-sdk/pull/4696)
 - make tool execution internals private [devx, bidirectional-streaming] (https://github.com/strands-agents/harness-sdk/pull/4708)

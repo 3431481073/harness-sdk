@@ -94,7 +94,7 @@ The [`OllamaModel`](/docs/api/python/strands.models.ollama) supports various [co
 | --- | --- | --- |
 | `host` | The address of the Ollama server | Required |
 | `model_id` | The Ollama model identifier | Required |
-| `keep_alive` | How long the model stays loaded in memory | ”5m” |
+| `keep_alive` | How long the model stays loaded in memory | “5m” |
 | `max_tokens` | Maximum number of tokens to generate | None |
 | `temperature` | Controls randomness (higher = more random) | None |
 | `top_p` | Controls diversity via nucleus sampling | None |

@@ -29,7 +29,6 @@ Release: https://github.com/strands-agents/harness-sdk/releases/tag/python/v1.54
 - count cached tokens in context-size and compaction baseline [context] (https://github.com/strands-agents/harness-sdk/pull/3886)
 
 ## Other
-- refresh dependencies and isolate test results (https://github.com/strands-agents/harness-sdk/pull/3900)
 - bump dorny/paths-filter from 3.0.2 to 4.0.3 (https://github.com/strands-agents/harness-sdk/pull/3907)
 - harden bedrock kb integ tests [persistence] (https://github.com/strands-agents/harness-sdk/pull/3954)
 - consolidate development configuration [bidirectional-streaming] (https://github.com/strands-agents/harness-sdk/pull/3960)

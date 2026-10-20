@@ -12,7 +12,6 @@ def make_subagent(
         default_preset: str | None = None,
         instructions: Open | Choice | Fixed | None = None,
         tools: Choice | Fixed | Inherit | None = None,
-        mcp_servers: Choice | Fixed | Inherit | None = None,
         model: Inherit | Choice | Fixed | None = None,
         context: Fixed | Choice | None = None,
         max_depth: int = DEFAULT_SUBAGENT_MAX_DEPTH,
@@ -20,7 +19,7 @@ def make_subagent(
         description: str = DEFAULT_SUBAGENT_DESCRIPTION) -> AgentTool
 ```
 
-Defined in: [src/strands/vended\_tools/subagent/subagent.py:366](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/subagent/subagent.py#L366)
+Defined in: [src/strands/vended\_tools/subagent/subagent.py:347](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/subagent/subagent.py#L347)
 
 Build a `subagent` tool whose schema is derived from the axis modes and presets.
 

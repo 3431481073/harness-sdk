@@ -1,5 +1,3 @@
-## Overview
-
 The `MultimodalFaithfulnessEvaluator` assesses whether an agent response is grounded in the image content, detecting hallucinations such as invented details, unsupported assumptions, external knowledge, and speculation.
 
 ## Key features

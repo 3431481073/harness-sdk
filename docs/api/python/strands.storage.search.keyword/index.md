@@ -1,12 +1,16 @@
 Keyword search strategy using token-overlap scoring.
 
+#### STOP\_WORDS
+
+Common English words dropped from queries before matching.
+
 #### tokenize
 
 ```python
 def tokenize(text: str) -> set[str]
 ```
 
-Defined in: [src/strands/storage/search/keyword.py:13](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/keyword.py#L13)
+Defined in: [src/strands/storage/search/keyword.py:151](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/keyword.py#L151)
 
 Lowercase and split text into a set of word tokens, dropping empties.
 
@@ -26,7 +30,7 @@ A set of lowercased word tokens.
 def token_overlap_score(query_tokens: set[str], content: str) -> int
 ```
 
-Defined in: [src/strands/storage/search/keyword.py:28](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/keyword.py#L28)
+Defined in: [src/strands/storage/search/keyword.py:166](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/keyword.py#L166)
 
 Lexical relevance score: distinct query tokens present in the content.
 
@@ -47,11 +51,11 @@ Number of distinct query tokens found in the content.
 class KeywordSearchStrategy()
 ```
 
-Defined in: [src/strands/storage/search/keyword.py:44](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/keyword.py#L44)
+Defined in: [src/strands/storage/search/keyword.py:182](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/keyword.py#L182)
 
 Keyword search strategy using token-overlap scoring.
 
-Tokenizes the query and each stored entry (key + content), then scores by the number of distinct query tokens that appear. Works on any storage backend with `list()` and `read()` — no index or embedding model required.
+Tokenizes the query and each stored entry (key without its file extension + content), then scores by the number of distinct query tokens that appear. Stop words in the query (`the`, `is`, `what`, …) are ignored. Works on any storage backend with `list()` and `read()` — no index or embedding model required. Entries are read in small concurrent batches, and each result carries the bytes read during the scan. Entries whose `read()` raises `StorageError` are skipped.
 
 This is the default search strategy for all shipped storage backends.
 
@@ -71,7 +75,7 @@ async def index(storage: Storage, key: str, data: bytes,
                 **kwargs: Any) -> None
 ```
 
-Defined in: [src/strands/storage/search/keyword.py:64](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/keyword.py#L64)
+Defined in: [src/strands/storage/search/keyword.py:205](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/keyword.py#L205)
 
 No-op — keyword search scans storage on the fly.
 
@@ -82,7 +86,7 @@ async def search(storage: Storage, query: str,
                  **kwargs: Any) -> builtins.list[StorageSearchResult]
 ```
 
-Defined in: [src/strands/storage/search/keyword.py:67](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/keyword.py#L67)
+Defined in: [src/strands/storage/search/keyword.py:208](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/keyword.py#L208)
 
 Search content in storage by keyword token-overlap scoring.
 

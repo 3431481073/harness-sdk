@@ -13,13 +13,13 @@ Zero external dependencies — uses Python’s stdlib `sqlite3` module which shi
 class Bm25SearchStrategyConfig()
 ```
 
-Defined in: [src/strands/storage/search/bm25.py:179](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/bm25.py#L179)
+Defined in: [src/strands/storage/search/bm25.py:52](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/bm25.py#L52)
 
 Configuration for :class:`Bm25SearchStrategy`.
 
 **Attributes**:
 
--   `db_path` - Path to the SQLite database file for the FTS5 index. Defaults to `.<dir>-fts5.sqlite` alongside the storage directory.
+-   `db_path` - Path to the SQLite database file for the FTS5 index. Defaults to `.<dir>-fts5.sqlite` alongside the storage directory, which gives each directory its own index. An explicit `db_path` holds one directory’s index, so a strategy with `db_path` set raises `ValueError` if it is then used with a second directory (for example a second `FileMemoryStore` on the same storage).
 
 ## Bm25SearchStrategy
 
@@ -27,7 +27,7 @@ Configuration for :class:`Bm25SearchStrategy`.
 class Bm25SearchStrategy()
 ```
 
-Defined in: [src/strands/storage/search/bm25.py:190](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/bm25.py#L190)
+Defined in: [src/strands/storage/search/bm25.py:67](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/bm25.py#L67)
 
 BM25 full-text search strategy powered by SQLite FTS5.
 
@@ -36,6 +36,8 @@ Maintains a SQLite-backed inverted index over the storage contents and uses BM25
 Indexes entries at write time via :meth:`index` — consumers call `strategy.index(storage, key, data)` on each write, and `search()` queries the pre-built index. Only entries passed through `index()` are searchable; pre-existing storage contents are not backfilled automatically.
 
 The FTS5 index is persisted on the host filesystem via the storage’s `base_dir` and is not sandbox-aware.
+
+Keeps one index per storage directory, so one instance can serve several namespaced storages, such as multiple `FileMemoryStore` instances on the same `LocalFileStorage`, and :meth:`close` closes all of them.
 
 **Example**:
 
@@ -57,7 +59,7 @@ await strategy.close()
 def __init__(config: Bm25SearchStrategyConfig | None = None) -> None
 ```
 
-Defined in: [src/strands/storage/search/bm25.py:221](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/bm25.py#L221)
+Defined in: [src/strands/storage/search/bm25.py:102](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/bm25.py#L102)
 
 Initialize the BM25 search strategy.
 
@@ -72,7 +74,7 @@ async def index(storage: LocalFileStorage, key: str, data: bytes,
                 **kwargs: Any) -> None
 ```
 
-Defined in: [src/strands/storage/search/bm25.py:232](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/bm25.py#L232)
+Defined in: [src/strands/storage/search/bm25.py:114](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/bm25.py#L114)
 
 Index a single entry for future searches.
 
@@ -92,7 +94,7 @@ async def search(storage: LocalFileStorage, query: str,
                  **kwargs: Any) -> list[StorageSearchResult]
 ```
 
-Defined in: [src/strands/storage/search/bm25.py:255](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/bm25.py#L255)
+Defined in: [src/strands/storage/search/bm25.py:137](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/bm25.py#L137)
 
 Search the index using BM25 full-text search.
 
@@ -116,6 +118,6 @@ Matched keys with BM25 relevance scores, ranked best-first.
 async def close() -> None
 ```
 
-Defined in: [src/strands/storage/search/bm25.py:277](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/bm25.py#L277)
+Defined in: [src/strands/storage/search/bm25.py:159](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/storage/search/bm25.py#L159)
 
-Close the SQLite connection and release resources.
+Close every SQLite connection this strategy has opened and release resources.

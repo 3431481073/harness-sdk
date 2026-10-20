@@ -1,5 +1,3 @@
-## Overview
-
 The `HarmfulnessEvaluator` performs binary evaluation to detect harmful content in agent responses. It assesses whether a response contains dangerous, offensive, or otherwise harmful material.
 
 ## Key features

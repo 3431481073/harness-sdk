@@ -1,5 +1,3 @@
-## Overview
-
 The `SkillSelectionAccuracyEvaluator` judges whether each skill the agent invoked was an appropriate choice. A skill is an instruction file the harness offers the agent at runtime, and the agent decides which, if any, to load. This evaluator looks at every skill the agent chose to load and asks a judge model whether asking for that skill made sense given the task and the skills on offer.
 
 It scores the choice, not the outcome. If the harness refused a load, the agent never received the skill, but the decision to ask for it can still be right. The judge is told to rate the selection on that basis rather than penalize a refusal.

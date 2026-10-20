@@ -1,5 +1,3 @@
-## Overview
-
 When your agent calls tools that need live infrastructure, you can replace them with LLM-generated responses for evaluation. With `ToolSimulator`, you register a tool with a decorator, give it an output schema, and optionally share state across related tools. Each time the agent calls a simulated tool, an LLM generates a schema-valid response instead of running the real function.
 
 Reach for tool simulation when:

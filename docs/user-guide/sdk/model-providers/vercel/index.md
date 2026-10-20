@@ -56,7 +56,7 @@ import { bedrock } from '@ai-sdk/amazon-bedrock'
 
 const agent = new Agent({
   model: new VercelModel({
-    provider: bedrock('us.anthropic.claude-sonnet-4-20250514-v1:0'),
+    provider: bedrock('global.anthropic.claude-sonnet-4-6'),
   }),
 })
 
@@ -72,7 +72,7 @@ import { VercelModel } from '@strands-agents/sdk/models/vercel'
 import { anthropic } from '@ai-sdk/anthropic'
 
 const agent = new Agent({
-  model: new VercelModel({ provider: anthropic('claude-sonnet-4-20250514') }),
+  model: new VercelModel({ provider: anthropic('claude-sonnet-4-6') }),
 })
 
 const result = await agent.invoke('Hello!')
@@ -343,13 +343,13 @@ Authentication is handled by the underlying Vercel provider package. Refer to th
 ## Related pages
 
 - [Google](/docs/user-guide/sdk/model-providers/google/index.md) (1 shared tag)
+- [OpenAI](/docs/user-guide/sdk/model-providers/openai/index.md) (1 shared tag)
+- [Writer](/docs/user-guide/sdk/model-providers/writer/index.md) (1 shared tag)
 - [Multimodal correctness evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_correctness_evaluator/index.md) (1 shared tag)
 - [Multimodal faithfulness evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_faithfulness_evaluator/index.md) (1 shared tag)
 - [Multimodal instruction following evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_instruction_following_evaluator/index.md) (1 shared tag)
 - [Multimodal output evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_output_evaluator/index.md) (1 shared tag)
 - [Multimodal overall quality evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_overall_quality_evaluator/index.md) (1 shared tag)
-- [OpenAI](/docs/user-guide/sdk/model-providers/openai/index.md) (1 shared tag)
-- [Writer](/docs/user-guide/sdk/model-providers/writer/index.md) (1 shared tag)
 - [Amazon Nova](/docs/user-guide/sdk/model-providers/amazon-nova/index.md) (1 shared tag)
 - [Amazon Bedrock](/docs/user-guide/sdk/model-providers/amazon-bedrock/index.md) (1 shared tag)
 

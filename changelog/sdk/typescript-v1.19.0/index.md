@@ -7,9 +7,7 @@ Release: https://github.com/strands-agents/harness-sdk/releases/tag/typescript/v
 - non-clobbering seam for Anthropic-direct server-side tools (web search) [devx, model] (https://github.com/strands-agents/harness-sdk/pull/3568)
 - port handoff\_to\_user tool to TypeScript [hil, tool] (https://github.com/strands-agents/harness-sdk/pull/4382)
 - requestTimeout option on BedrockModel [devx, model] (https://github.com/strands-agents/harness-sdk/pull/4408)
-- merge in the Strands harness (https://github.com/strands-agents/harness-sdk/pull/4447)
 - launch the redesigned Strands website (https://github.com/strands-agents/harness-sdk/pull/4446)
-- opus 5 and high thinking by default [model] (https://github.com/strands-agents/harness-sdk/pull/4460)
 
 ## Fixes
 - deliver background results through the registered management tool [async, tool] (https://github.com/strands-agents/harness-sdk/pull/4347)
@@ -19,21 +17,12 @@ Release: https://github.com/strands-agents/harness-sdk/releases/tag/typescript/v
 - pin the strands command to the commit it was issued against (https://github.com/strands-agents/harness-sdk/pull/4393)
 - keep only text when re-roling a summary as a user message [context] (https://github.com/strands-agents/harness-sdk/pull/4421)
 - accept a ContextManager instance in Agent contextManager [context, devx] (https://github.com/strands-agents/harness-sdk/pull/4459)
-- align Node requirement and default model docs [devx] (https://github.com/strands-agents/harness-sdk/pull/4469)
-- depend on the published harness in exported projects [devx, server] (https://github.com/strands-agents/harness-sdk/pull/4478)
-- default effort back to 'auto' so no-reasoning models resolve [model] (https://github.com/strands-agents/harness-sdk/pull/4473)
-- let an explicit web\_search: 'exa' win over native search [model, tool] (https://github.com/strands-agents/harness-sdk/pull/4491)
 - preserve UTF-8 across stream chunk boundaries [server] (https://github.com/strands-agents/harness-sdk/pull/4157)
-- install provider SDKs with the CLI [devx, model] (https://github.com/strands-agents/harness-sdk/pull/4508)
 
 ## Other
 - Rename file number appropriately for design doc 0018-shared-agent-model-types.md (https://github.com/strands-agents/harness-sdk/pull/4376)
 - remove duplicate docs-strands-command workflow (https://github.com/strands-agents/harness-sdk/pull/4380)
-- add CI for the merged harness-py and harness-ts packages (https://github.com/strands-agents/harness-sdk/pull/4450)
-- add strands-harness (harness-py) PyPI release pipeline (https://github.com/strands-agents/harness-sdk/pull/4453)
-- Strands CLI and some text nits (https://github.com/strands-agents/harness-sdk/pull/4457)
 - add @strands-agents/harness (harness-ts) npm release pipeline (https://github.com/strands-agents/harness-sdk/pull/4455)
-- add @strands-agents/cli CI + npm release pipeline (https://github.com/strands-agents/harness-sdk/pull/4468)
 - remove stale test issue references (https://github.com/strands-agents/harness-sdk/pull/4467)
 - use Strands wordmarks in package READMEs (https://github.com/strands-agents/harness-sdk/pull/4475)
 - bump fast-uri from 3.1.5 to 3.1.8 (https://github.com/strands-agents/harness-sdk/pull/4385)

@@ -13,4 +13,3 @@ Release: https://github.com/strands-agents/harness-sdk/releases/tag/python/v1.50
 - add model routing design doc (0016) [model] (https://github.com/strands-agents/harness-sdk/pull/3217)
 - run the sync backstop every 2 hours (https://github.com/strands-agents/harness-sdk/pull/3475)
 - enforce single-increment versions and verify publish on the registry (https://github.com/strands-agents/harness-sdk/pull/3473)
-- add automated release workflow [mcp] (https://github.com/strands-agents/harness-sdk/pull/3413)

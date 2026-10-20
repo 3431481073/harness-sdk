@@ -569,13 +569,13 @@ When disabled (or if the API call fails), falls back to estimation using the cha
 ## Related pages
 
 - [Vercel](/docs/user-guide/sdk/model-providers/vercel/index.md) (1 shared tag)
+- [OpenAI](/docs/user-guide/sdk/model-providers/openai/index.md) (1 shared tag)
+- [Writer](/docs/user-guide/sdk/model-providers/writer/index.md) (1 shared tag)
 - [Multimodal correctness evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_correctness_evaluator/index.md) (1 shared tag)
 - [Multimodal faithfulness evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_faithfulness_evaluator/index.md) (1 shared tag)
 - [Multimodal instruction following evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_instruction_following_evaluator/index.md) (1 shared tag)
 - [Multimodal output evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_output_evaluator/index.md) (1 shared tag)
 - [Multimodal overall quality evaluator](/docs/user-guide/evals-sdk/evaluators/multimodal_overall_quality_evaluator/index.md) (1 shared tag)
-- [OpenAI](/docs/user-guide/sdk/model-providers/openai/index.md) (1 shared tag)
-- [Writer](/docs/user-guide/sdk/model-providers/writer/index.md) (1 shared tag)
 - [Amazon Nova](/docs/user-guide/sdk/model-providers/amazon-nova/index.md) (1 shared tag)
 - [Amazon Bedrock](/docs/user-guide/sdk/model-providers/amazon-bedrock/index.md) (1 shared tag)
 

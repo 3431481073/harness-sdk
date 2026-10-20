@@ -29,6 +29,7 @@ strands-evals run \
 strands-evals generate \
   --context "$(cat tools.txt)" \
   --num-cases 10 \
+  --evaluator OutputEvaluator \
   -o experiment.json
 strands-evals run experiment.json --agent my_agent:build_agent --display
 ```
@@ -61,7 +62,7 @@ evaluator = OutputEvaluator(rubric="Score 1.0 if the answer is correct, else 0.0
 report = Experiment[str, str](cases=cases, evaluators=[evaluator]).run_evaluations(
     get_response
 )
-report.run_display()
+report.display()
 ```
 
 The [quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) runs this end to end and reads the results.

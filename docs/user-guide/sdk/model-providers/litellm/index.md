@@ -179,6 +179,8 @@ print(f"Rating: {result.rating}")
 ## Related pages
 
 - [Return structured output](/docs/user-guide/sdk/agents/structured-output/index.md) (1 shared tag)
+- [Structured output similarity evaluator](/docs/user-guide/evals-sdk/evaluators/structured_output_evaluator/index.md) (1 shared tag)
+- [Structured output](/docs/user-guide/sdk/agents/structured-output-behavior/index.md) (1 shared tag)
 - [OpenAI](/docs/user-guide/sdk/model-providers/openai/index.md) (1 shared tag)
 - [Writer](/docs/user-guide/sdk/model-providers/writer/index.md) (1 shared tag)
 - [Anthropic](/docs/user-guide/sdk/model-providers/anthropic/index.md) (1 shared tag)

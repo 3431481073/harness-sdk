@@ -1,16 +1,16 @@
+Before you follow along
+
+This video is a snapshot in time. Some APIs and examples have changed since recording. Follow the code on this page, and look for “Changed since recording” notices below.
+
 *[Watch on YouTube](https://www.youtube.com/watch?v=NAEX4ORLkbQ&list=PLDzwjhH-4yhU&index=2)*
-
-About this lesson
-
-The videos in this course are a snapshot in time. Strands is under active development, so the code featured on this page reflects the most up-to-date patterns, but the concepts covered in the video still apply. When in doubt, trust the code.
 
 *Code for this lesson: [`samples/02-model-providers`](https://github.com/aws-samples/sample-building-with-strands-course/tree/main/samples/02-model-providers)*
 
-## Model Choice Is an Architecture Decision
+## Model choice is an architecture decision
 
 Different models have different strengths, costs, latency characteristics, and tool-use behavior. Strands abstracts providers behind a common interface so your agent code stays the same regardless of the underlying model. Your tools, system prompt, and orchestration logic don’t change when you swap the model.
 
-## Configuring Providers
+## Configuring providers
 
 All providers follow the same pattern: instantiate a model class, pass it to the agent.
 
@@ -62,7 +62,7 @@ agent("Explain the agent loop in one paragraph.")
 | OpenAI | `pip install "strands-agents[openai]"` | `OPENAI_API_KEY` |
 | Ollama (local) | `pip install "strands-agents[ollama]"` | None, runs on your machine |
 
-## Multi-Model Architectures
+## Multi-model architectures
 
 In sophisticated systems, different agents use different models:
 
@@ -71,7 +71,7 @@ In sophisticated systems, different agents use different models:
 -   Specialized model for code generation
 -   A different provider entirely for evaluation/verification (avoids same-model bias)
 
-## Ollama Setup
+## Ollama setup
 
 Ollama lets you run models entirely on your machine. Useful for development, offline use, or avoiding API costs.
 

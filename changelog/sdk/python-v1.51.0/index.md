@@ -4,7 +4,6 @@ Released 2026-08-07
 Release: https://github.com/strands-agents/harness-sdk/releases/tag/python/v1.51.0 · Package: https://pypi.org/project/strands-agents/1.51.0/
 
 ## Features
-- hydrate search snippets concurrently [async, mcp] (https://github.com/strands-agents/harness-sdk/pull/3435)
 - support the interrupt round trip over A2A [hil, a2a] (https://github.com/strands-agents/harness-sdk/pull/3486)
 - add BeforeToolsEvent and AfterToolsEvent batch hooks [hooks, hil] (https://github.com/strands-agents/harness-sdk/pull/3508)
 - add telemetry and metrics [otel, bidirectional-streaming] (https://github.com/strands-agents/harness-sdk/pull/3282)
@@ -20,12 +19,10 @@ Release: https://github.com/strands-agents/harness-sdk/releases/tag/python/v1.51
 
 ## Fixes
 - refresh eviction cycle on retrieve for unified Storage backends [context] (https://github.com/strands-agents/harness-sdk/pull/3487)
-- pin mcp dependency below v2.0.0 [mcp] (https://github.com/strands-agents/harness-sdk/pull/3524)
 - exclude bootstrap tools from MCP audit (https://github.com/strands-agents/harness-sdk/pull/3565)
 - skip guardContent wrap for unsupported image formats [model, interventions] (https://github.com/strands-agents/harness-sdk/pull/3607)
 - count usage from hook-retried model calls [otel, hooks] (https://github.com/strands-agents/harness-sdk/pull/3627)
 - record gen\_ai.tool.call.arguments/result on execute\_tool spans [otel] (https://github.com/strands-agents/harness-sdk/pull/3550)
-- index document content on hydration with thread safety [mcp] (https://github.com/strands-agents/harness-sdk/pull/3502)
 - resolve a default region for the store's clients so it works in cloud envs [model, persistence] (https://github.com/strands-agents/harness-sdk/pull/3583)
 - correct crash-restart resume for handoff and completed swarms [multiagent] (https://github.com/strands-agents/harness-sdk/pull/3391)
 - reject redundant languages in astro frontmatter [devx] (https://github.com/strands-agents/harness-sdk/pull/3678)
@@ -41,7 +38,6 @@ Release: https://github.com/strands-agents/harness-sdk/releases/tag/python/v1.51
 - bump fast-uri from 3.1.2 to 3.1.4 (https://github.com/strands-agents/harness-sdk/pull/3405)
 - rename sandbox-routed bash tool to shell [tool, server] (https://github.com/strands-agents/harness-sdk/pull/3574)
 - update litellm requirement from \<=1.91.1,\>=1.75.9 to \>=1.75.9,\<=1.93.0 in /strands-py (https://github.com/strands-agents/harness-sdk/pull/3587)
-- run the package build test on pull requests [mcp] (https://github.com/strands-agents/harness-sdk/pull/3592)
 - mark make\_bash with typing\_extensions.deprecated [devx, tool] (https://github.com/strands-agents/harness-sdk/pull/3595)
 - update litellm requirement from \<=1.93.0,\>=1.75.9 to \>=1.75.9,\<=1.95.0 in /strands-py (https://github.com/strands-agents/harness-sdk/pull/3649)
 - bump hono from 4.12.32 to 4.13.0 (https://github.com/strands-agents/harness-sdk/pull/3643)

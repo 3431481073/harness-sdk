@@ -24,7 +24,6 @@ Release: https://github.com/strands-agents/harness-sdk/releases/tag/typescript/v
 - count cached tokens in context-size and compaction baseline [context] (https://github.com/strands-agents/harness-sdk/pull/3886)
 
 ## Other
-- refresh dependencies and isolate test results (https://github.com/strands-agents/harness-sdk/pull/3900)
 - bump dorny/paths-filter from 3.0.2 to 4.0.3 (https://github.com/strands-agents/harness-sdk/pull/3907)
 - bump the production-minor group across 1 directory with 2 updates (https://github.com/strands-agents/harness-sdk/pull/3880)
 - bump the production-minor group across 1 directory with 3 updates (https://github.com/strands-agents/harness-sdk/pull/3942)

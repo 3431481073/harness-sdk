@@ -29,11 +29,12 @@ const agent = new Agent({
 | [MCP Router](#mcp-router) | Connect to Model Context Protocol servers on a developer-set allowlist | Python, TypeScript (Node.js) |
 | [Sleep](#sleep) | Pause execution for a bounded, cancellable duration | Python, TypeScript (Node.js, browsers) |
 | [Handoff to User](#handoff-to-user) | Pause the agent loop and surface a message to the user | Python, TypeScript (Node.js, browsers) |
-| [Stop](#stop-experimental) | Gracefully end the agent loop when the task is complete | Python, TypeScript (Node.js, browsers) |
+| [Stop](#stop) | Gracefully end the agent loop when the task is complete | Python, TypeScript (Node.js, browsers) |
 | [Web Fetch](#web-fetch) | Fetch a URL and return cleaned markdown for a model to read | Python, TypeScript (Node.js) |
 | [A2A Client](#a2a-client) | Discover and send messages to remote A2A-protocol agents | Python, TypeScript (Node.js, browsers) |
 | [Python REPL](#python-repl) | Execute Python code through the agent’s sandbox | Python, TypeScript (Node.js, Unix/Linux/macOS) |
 | [Subagent](#subagent) | Delegate a self-contained task to a child agent | Python, TypeScript (Node.js, browsers) |
+| [Swarm](#swarm) | Spin up a team of agents that collaborate via the swarm pattern | Python |
 
 ### File editor
 
@@ -429,9 +430,7 @@ resumed = agent([
 
 ---
 
-### Stop (experimental)
-
-> This tool is experimental and subject to change in future revisions without notice.
+### Stop
 
 Lets the model gracefully end the agent loop with an optional final message. The default loop already terminates when the model returns without any tool call; the stop tool is useful when you want an explicit “I am done” affordance, when a workflow enforces that termination is a deliberate model decision, or when a sub-agent needs to signal completion back to a coordinator via the loop’s last assistant message.
 
@@ -439,7 +438,7 @@ Lets the model gracefully end the agent loop with an optional final message. The
 
 This is a cooperative stop, not an abort. Any other tools the model requested in the same turn still run to completion; the loop halts after that batch without calling the model again. The final message defaults to a 4096-character cap; pass `max_message_length` / `maxMessageLength` to `make_stop` / `makeStop` when a longer summary is legitimate.
 
-The two SDKs shim onto different loop-termination primitives, which produces a small difference in the final `AgentResult`. TypeScript halts via `AfterToolsEvent.endTurn` and returns `stopReason: "endTurn"` with the stop text as the last assistant message. Python halts via `invocation_state["request_state"]["stop_event_loop"]` and returns `stop_reason: "tool_use"` with the model’s tool-use message as the final message; the stop text lives in history as the tool result, not as a new assistant turn.
+The two SDKs shim onto different loop-termination primitives, which produces a small difference in the final `AgentResult`’s stop reason. TypeScript halts via `AfterToolsEvent.endTurn` and returns `stopReason: "endTurn"`. Python halts via `agent.cancel(message=..., after_current_tools=True)` and returns `stop_reason: "cancelled"`. In both cases the stop text is appended as the last assistant message.
 
 **Example:**
 
@@ -459,7 +458,7 @@ await agent.invoke('Summarize the changes in ./CHANGELOG.md')
 (( tab "Python" ))
 ```python
 from strands import Agent
-from strands.experimental.tools import stop
+from strands.vended_tools import stop
 
 agent = Agent(
     tools=[stop],
@@ -807,7 +806,7 @@ agent = Agent(tools=[python_repl])
 
 Delegates a self-contained task to a child agent that runs in its own context and returns a final report. Use it when a subtask would otherwise flood the parent’s context with intermediate work and you only need the conclusion. The model writes the task each time it calls the tool; the child cannot ask follow-up questions, so the task must include all the context it needs.
 
-The `make_subagent``makeSubagent` factory uses [axis policies](#axis-policies) to control what the model can configure on each child. The configurable axes are `instructions`, `tools`, `mcp_servers``mcpServers`, `model`, and `context`. The parent also passes a task to the child.
+The `make_subagent``makeSubagent` factory uses [axis policies](#axis-policies) to control what the model can configure on each child. The configurable axes are `instructions`, `tools`, `model`, and `context`. The parent also passes a task to the child.
 
 By default, the child sees only the task (`context=Fixed("none")``context: new Fixed('none')`), but you can share the parent’s conversation by setting `context` to a `Choice` over `"none"`, `"all"` (full history including tool calls), and `"no_tools"` (text turns only). When a non-`"none"` option is available, the model can also pass `last_messages` to limit how many parent messages to share.
 
@@ -861,8 +860,8 @@ const subagent = makeSubagent({
     }),
   },
   model: new Choice([
-    new Option('fast', 'us.anthropic.claude-sonnet-4-20250514-v1:0', 'quick tasks'),
-    new Option('deep', 'us.anthropic.claude-opus-4-20250514-v1:0', 'hard problems'),
+    new Option('fast', 'global.anthropic.claude-sonnet-4-6', 'quick tasks'),
+    new Option('deep', 'global.anthropic.claude-opus-4-6-v1', 'hard problems'),
   ]),
   context: new Choice(['none', 'all', 'no_tools']),
   tools: new Choice(['read', 'shell', 'write'], true),
@@ -891,8 +890,8 @@ subagent = make_subagent(
         ),
     },
     model=Choice([
-        Option("fast", "us.anthropic.claude-sonnet-4-20250514-v1:0", "quick tasks"),
-        Option("deep", "us.anthropic.claude-opus-4-20250514-v1:0", "hard problems"),
+        Option("fast", "global.anthropic.claude-sonnet-4-6", "quick tasks"),
+        Option("deep", "global.anthropic.claude-opus-4-6-v1", "hard problems"),
     ]),
     context=Choice(["none", "all", "no_tools"]),
     tools=Choice(["read", "shell", "write"], multiple=True),
@@ -904,6 +903,64 @@ agent("Review the changes in src/main.py for correctness.")
 (( /tab "Python" ))
 
 Full API reference: [TypeScript](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/vended-tools/subagent/README.md)
+
+---
+
+### Swarm
+
+Lets your agent spin up a team of specialised sub-agents that collaborate autonomously via handoffs to solve a complex task. This is a meta-agent tool where the model defines each agent’s name and role; the tool resolves those specs through an authority-mode system, builds the agents, runs the swarm, and returns a consolidated result.
+
+Use `make_swarm` to control safety limits (max agents, timeouts, handoff caps), lock down instructions or tools with authority modes, or supply named presets the model can select from.
+
+*Supported in: Python.*
+
+**Example:**
+
+(( tab "Python" ))
+```python
+from strands import Agent
+from strands.vended_tools import swarm
+
+agent = Agent(tools=[swarm])
+agent("Research the pros and cons of microservices vs monoliths and write a summary")
+```
+
+Custom configuration with `make_swarm`:
+
+```python
+from strands import Agent
+from strands.multiagent.spec import Choice, Fixed, Inherit, Preset
+from strands.vended_tools import make_swarm
+from strands.vended_tools import http_request, web_fetch
+
+swarm = make_swarm(
+    presets={
+        "researcher": Preset(
+            instructions="You search for and synthesise information.",
+            tools=["http_request", "web_fetch"],
+            description="Gathers raw information from the web.",
+        ),
+        "writer": Preset(
+            instructions="You write clear, engaging prose.",
+            description="Turns research into polished text.",
+        ),
+    },
+    default_preset="researcher",
+    instructions=Choice(["You are a researcher.", "You are a writer.", "You are an editor."]),
+    tools=Inherit(),
+    model=Fixed("us.amazon.nova-pro-v1:0"),
+    max_agents=5,
+    max_handoffs=10,
+    max_iterations=15,
+    execution_timeout=300.0,
+    node_timeout=120.0,
+    repetitive_handoff_detection_window=6,
+    repetitive_handoff_min_unique_agents=3,
+)
+agent = Agent(tools=[swarm, http_request, web_fetch])
+agent("Write a blog post about AI agents")
+```
+(( /tab "Python" ))
 
 ---
 
@@ -920,7 +977,7 @@ Some vended tools let the model configure child agents at runtime. Axis policies
 
 Use `Option` inside a `Choice` to map model-facing names to runtime values. Bundle axis defaults into a `Preset` that the model selects via `agent_type`.
 
-Tools that accept axis policies use a default builder to turn resolved specs into child agents. By default, it produces child agents that inherit the parent’s tools, model, and MCP servers. Each child gets `context_manager="auto"``contextManager: 'auto'` (unless its model is stateful) in place of the parent’s context-management tools, and accesses the parent’s long-term memory through inherited memory tools.
+Tools that accept axis policies use a default builder to turn resolved specs into child agents. By default, it produces child agents that inherit the parent’s tools and model. Each child gets `context_manager="auto"``contextManager: 'auto'` (unless its model is stateful) in place of the parent’s context-management tools, and accesses the parent’s long-term memory through inherited memory tools.
 
 To replace the default builder, pass any callable that takes an `AgentSpec` and returns an `Agent`.
 
@@ -1009,5 +1066,6 @@ Tool names are stable and will not change. In minor versions, a tool’s descrip
 - [harness-sdk/strands-py/src/strands/vended_tools/web_fetch/web_fetch.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/web_fetch/web_fetch.py)
 - [harness-sdk/strands-py/src/strands/vended_tools/a2a_client/a2a_client.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/a2a_client/a2a_client.py)
 - [harness-sdk/strands-py/src/strands/vended_tools/subagent/subagent.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/subagent/subagent.py)
-- [harness-sdk/strands-py/src/strands/experimental/tools/stop/stop.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/experimental/tools/stop/stop.py)
+- [harness-sdk/strands-py/src/strands/vended_tools/stop/stop.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/stop/stop.py)
+- [harness-sdk/strands-py/src/strands/vended_tools/swarm/swarm.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/swarm/swarm.py)
 - [harness-sdk/strands-py/src/strands/vended_tools/python_repl/python_repl.py](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/python_repl/python_repl.py)

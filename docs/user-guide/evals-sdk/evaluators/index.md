@@ -102,6 +102,8 @@ For agents that load skills at runtime, measure both halves of that behavior: wh
 
 Run fast, code-based checks with no LLM judge, for regression tests and CI. The [Deterministic Evaluators](/docs/user-guide/evals-sdk/evaluators/deterministic_evaluators/index.md) page covers `Equals`, `Contains`, `StartsWith`, `ToolCalled`, `StateEquals`, and `SkillInvoked`. They operate at OUTPUT\_LEVEL or SESSION\_LEVEL.
 
+[StructuredOutputSimilarity](/docs/user-guide/evals-sdk/evaluators/structured_output_evaluator/index.md) is deterministic too, but scores a structured output field by field rather than comparing whole objects, so a partially correct extraction reports which field to fix. It operates at OUTPUT\_LEVEL and needs the `stickler` extra.
+
 ## Custom
 
 When no built-in fits, extend the base `Evaluator` class to implement your own logic. See [Custom Evaluators](/docs/user-guide/evals-sdk/evaluators/custom_evaluator/index.md).

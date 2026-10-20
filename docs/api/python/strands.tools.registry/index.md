@@ -134,7 +134,7 @@ Get all tool directory paths.
 
 **Returns**:
 
-A list of Path objects for current working directory’s ”./tools/“.
+A list of Path objects for current working directory’s ”./tools/”.
 
 #### discover\_tool\_modules
 

@@ -456,12 +456,12 @@ Use `HumanInTheLoop` when you want tool-level approval gating with minimal code:
 - [Interventions](/docs/user-guide/sdk/agents/interventions/index.md) (2 shared tags)
 - [Creating a Custom Model Provider](/docs/user-guide/sdk/model-providers/custom_model_provider/index.md) (1 shared tag)
 - [Tools](/docs/user-guide/sdk/bidi/tools/index.md) (1 shared tag)
+- [Middleware](/docs/user-guide/sdk/agents/middleware/index.md) (1 shared tag)
 - [Tool Executors](/docs/user-guide/sdk/tools/executors/index.md) (1 shared tag)
 - [Available Sandboxes](/docs/user-guide/sdk/sandbox/available-sandboxes/index.md) (1 shared tag)
 - [Building a Custom Sandbox](/docs/user-guide/sdk/sandbox/custom-sandbox/index.md) (1 shared tag)
 - [Sandbox](/docs/user-guide/sdk/sandbox/index.md) (1 shared tag)
 - [Agent Loop](/docs/user-guide/sdk/agents/agent-loop/index.md) (1 shared tag)
-- [Hook events](/docs/user-guide/sdk/agents/hooks-events/index.md) (1 shared tag)
 
 
 ## Implementation

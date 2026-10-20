@@ -50,7 +50,7 @@ Defined in: [src/strands/tools/loader.py:151](https://github.com/strands-agents/
 
 Load tools from a module.
 
-First checks if the passed in module has instances of DecoratedToolFunction classes as atributes to the module. If so, then it returns them as a list of tools. If not, then it attempts to load the module as a module based tool.
+First checks if the passed in module has instances of DecoratedToolFunction classes as attributes to the module. If so, then it returns them as a list of tools. If not, then it attempts to load the module as a module based tool.
 
 ## ToolLoader
 
