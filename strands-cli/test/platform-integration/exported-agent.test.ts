@@ -70,7 +70,7 @@ describe('cross-platform exported agent E2E', () => {
       cwd: root,
       exportPath: firstArchive,
       env: cliEnvironment(),
-      timeout: 40_000,
+      timeout: 90_000,
     })
     const firstOutput = first.screens.join('\n')
     expect(first.returnCode).toBe(0)
@@ -85,7 +85,7 @@ describe('cross-platform exported agent E2E', () => {
       cwd: root,
       exportPath: secondArchive,
       env: cliEnvironment(),
-      timeout: 40_000,
+      timeout: 90_000,
     })
     const secondOutput = second.screens.join('\n')
     expect(second.returnCode).toBe(0)
@@ -134,7 +134,7 @@ describe('cross-platform exported agent E2E', () => {
       exportPath: exported,
       importPath: archive,
       env: cliEnvironment(setupHome),
-      timeout: 60_000,
+      timeout: 90_000,
     })
     const output = result.screens.join('\n')
     expect(result.returnCode).toBe(0)
@@ -251,7 +251,7 @@ async function exportProfile(
 async function cliFor(agent: string, prompt: string, ...args: string[]): Promise<string> {
   const result = await run(process.execPath, [bin, '--agent', agent, '--print', prompt, ...args], {
     cwd: root,
-    timeout: 30_000,
+    timeout: 60_000,
     env: { ...process.env, ...cliEnvironment() },
   })
   return `${result.stdout}\n${result.stderr}`

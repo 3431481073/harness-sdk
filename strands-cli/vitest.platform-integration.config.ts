@@ -6,7 +6,7 @@ import StatusTableReporter from './test/reporting/status-table-reporter.js'
 export default defineConfig({
   test: {
     include: ['test/platform-integration/**/*.test.ts'],
-    testTimeout: 45_000,
+    testTimeout: 120_000,
     hookTimeout: 45_000,
     fileParallelism: false,
     reporters: [

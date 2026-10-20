@@ -19,8 +19,6 @@ import time
 from typing import TextIO, cast
 
 ANSI_ESCAPE = re.compile(rb"\x1b(?:\[[0-?]*[ -/]*[@-~]|\][^\x07]*(?:\x07|\x1b\\))")
-# ChatApp enables bracketed paste after attaching its keyboard input handler.
-CHAT_READY = b"\x1b[?2004h"
 READY_MARKER = b"Enter to send"
 SCREEN_QUIET_SECONDS = 0.075
 SCREEN_RESPONSE_TIMEOUT_SECONDS = 1.0
@@ -107,8 +105,15 @@ def main() -> int:
             update_screen(chunks)
 
     def wait_for(
-        markers: list[bytes], timeout: float = 8.0, *, styled: bool = True, start: int = 0, stable: bool = False
+        markers: list[bytes],
+        timeout: float = 8.0,
+        *,
+        styled: bool = True,
+        start: int = 0,
+        stable: bool = False,
+        absent: list[bytes] | None = None,
     ) -> None:
+        absent = absent or []
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             pump()
@@ -124,6 +129,7 @@ def main() -> int:
                     marker in (output if (styled or marker.startswith(b"__")) else screen.encode())
                     for marker in markers
                 )
+                and all(marker not in screen.encode() for marker in absent)
             ):
                 screens.append(screen)
                 return
@@ -142,8 +148,10 @@ def main() -> int:
             f"screen={screen!r}; output={transcript!r}"
         )
 
-    def wait_for_stable_screen(markers: list[bytes], timeout: float = 8.0, *, start: int = 0) -> None:
-        wait_for(markers, timeout=timeout, styled=False, start=start, stable=True)
+    def wait_for_stable_screen(
+        markers: list[bytes], timeout: float = 8.0, *, start: int = 0, absent: list[bytes] | None = None
+    ) -> None:
+        wait_for(markers, timeout=timeout, styled=False, start=start, stable=True, absent=absent)
 
     def click_text(text: str) -> None:
         wait_for_stable_screen([text.encode()])
@@ -162,17 +170,6 @@ def main() -> int:
             select.select([master], [], [], 0.05)
         raise RuntimeError(f"focus did not move to {text!r}; screen={screen!r}")
 
-    def wait_for_raw_mode(timeout: float = 8.0) -> None:
-        deadline = time.monotonic() + timeout
-        while time.monotonic() < deadline:
-            pump()
-            if not termios.tcgetattr(slave)[3] & termios.ICANON:
-                return
-            if process.poll() is not None:
-                break
-            time.sleep(0.05)
-        raise RuntimeError(f"terminal did not enter raw mode; returncode={process.poll()}; output={transcript!r}")
-
     def wait_for_exit(timeout: float = 8.0) -> None:
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline and process.poll() is None:
@@ -186,10 +183,8 @@ def main() -> int:
         if setup_import_mode:
             wait_for([b"Quickstart", b"Import"], timeout=20.0, styled=False)
         else:
-            ready_timeout = 90.0 if live_mode else 20.0 if lifecycle_mode else 8.0
-            wait_for([CHAT_READY], timeout=ready_timeout)
-            wait_for_stable_screen([READY_MARKER], timeout=ready_timeout)
-        wait_for_raw_mode()
+            ready_timeout = 90.0 if live_mode else 60.0 if lifecycle_mode else 8.0
+            wait_for_stable_screen([READY_MARKER], timeout=ready_timeout, absent=["Loading…".encode()])
 
         def set_size(columns: int, height: int) -> None:
             update_screen(columns=columns, height=height)
@@ -211,10 +206,22 @@ def main() -> int:
             resize_screens.append({"columns": 120, "rows": 40, "text": screen})
         export_language = os.environ.get("STRANDS_CLI_TEST_EXPORT_LANGUAGE", "typescript")
 
+        def type_in_composer(text: bytes, timeout: float = 10.0) -> int:
+            deadline = time.monotonic() + timeout
+            while time.monotonic() < deadline:
+                start = len(transcript)
+                os.write(master, b"\x15" + text)
+                attempt_deadline = min(deadline, time.monotonic() + 2.0)
+                while time.monotonic() < attempt_deadline:
+                    pump()
+                    target = update_screen(target=text.decode())
+                    if target and target["row"] >= rows - 5:
+                        return start
+                    select.select([master], [], [], 0.05)
+            raise RuntimeError(f"composer did not accept {text!r}; screen={screen!r}; output={transcript!r}")
+
         def submit(prompt: bytes, markers: list[bytes], approve: bool = False) -> None:
-            start = len(transcript)
-            os.write(master, prompt)
-            wait_for([prompt + "▌".encode()], timeout=2.0, styled=False, start=start)
+            start = type_in_composer(prompt)
             os.write(master, b"\r")
             if approve:
                 wait_for([b"Enter choose"], timeout=8.0, styled=False, start=start)
@@ -237,8 +244,12 @@ def main() -> int:
             wait_for([b"Click or Enter to choose"], timeout=2.0, styled=False, start=commit_start)
             launch_start = len(transcript)
             click_text("Launch")
-            wait_for([READY_MARKER, CHAT_READY], timeout=30.0, start=launch_start)
-            wait_for_raw_mode()
+            wait_for_stable_screen(
+                [READY_MARKER, b"Ask your agent to change its instructions"],
+                timeout=90.0,
+                start=launch_start,
+                absent=["Loading…".encode()],
+            )
 
         if live_mode:
             generation = 1

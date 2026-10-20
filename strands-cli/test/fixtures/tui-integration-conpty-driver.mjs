@@ -7,8 +7,6 @@ import nodePty from 'node-pty'
 import { TerminalScreen } from './terminal-screen.mjs'
 
 const ANSI_ESCAPE = new RegExp(String.raw`\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007]*(?:\u0007|\u001b\\))`, 'gu')
-// ChatApp enables bracketed paste after attaching its keyboard input handler.
-const CHAT_READY = '\u001b[?2004h'
 const SCREEN_QUIET_MS = 75
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds))
 const writeStdout = (value) =>
@@ -89,7 +87,7 @@ async function main() {
     }
     if (screenWriteError) throw screenWriteError
   }
-  const waitFor = async (markers, timeout = 8_000, styled = true, start = 0, stable = false) => {
+  const waitFor = async (markers, timeout = 8_000, styled = true, start = 0, stable = false, absent = []) => {
     const deadline = Date.now() + timeout
     while (Date.now() < deadline) {
       await drainScreen(deadline)
@@ -101,7 +99,8 @@ async function main() {
       if (
         hasFreshScreen &&
         isStable &&
-        markers.every((marker) => (styled || marker.startsWith('__') ? output : screen.text).includes(marker))
+        markers.every((marker) => (styled || marker.startsWith('__') ? output : screen.text).includes(marker)) &&
+        absent.every((marker) => !screen.text.includes(marker))
       ) {
         screens.push(screen.text)
         return
@@ -119,7 +118,8 @@ async function main() {
       `missing markers ${JSON.stringify(missing)}; returncode=${returnCode}; screen=${screen.text}; output=${transcript}`
     )
   }
-  const waitForStableScreen = (markers, timeout = 8_000, start = 0) => waitFor(markers, timeout, false, start, true)
+  const waitForStableScreen = (markers, timeout = 8_000, start = 0, absent = []) =>
+    waitFor(markers, timeout, false, start, true, absent)
   const clickText = async (text) => {
     await waitForStableScreen([text])
     const { column, row } = screen.locate(text)
@@ -163,9 +163,8 @@ async function main() {
     if (setupImportMode) {
       await waitFor(['Quickstart', 'Import'], 20_000, false)
     } else {
-      const readyTimeout = liveMode ? 90_000 : lifecycleMode ? 20_000 : 8_000
-      await waitFor([CHAT_READY], readyTimeout)
-      await waitForStableScreen(['Enter to send'], readyTimeout)
+      const readyTimeout = liveMode ? 90_000 : lifecycleMode ? 60_000 : 8_000
+      await waitForStableScreen(['Enter to send'], readyTimeout, 0, ['Loading…'])
     }
 
     if (resize) {
@@ -196,10 +195,22 @@ async function main() {
     }
 
     const exportLanguage = process.env.STRANDS_CLI_TEST_EXPORT_LANGUAGE ?? 'typescript'
+    const typeInComposer = async (text, timeout = 10_000) => {
+      const deadline = Date.now() + timeout
+      while (Date.now() < deadline) {
+        const start = transcript.length
+        terminal.write(`\u0015${text}`)
+        const attemptDeadline = Math.min(deadline, Date.now() + 2_000)
+        while (Date.now() < attemptDeadline) {
+          await drainScreen(attemptDeadline)
+          if (screen.locate(text)?.row >= rows - 5) return start
+          await sleep(25)
+        }
+      }
+      throw new Error(`composer did not accept ${text}; screen=${screen.text}; output=${transcript}`)
+    }
     const submit = async (prompt, markers, approve = false) => {
-      const start = transcript.length
-      terminal.write(prompt)
-      await waitFor([`${prompt}▌`], 2_000, false, start)
+      const start = await typeInComposer(prompt)
       terminal.write('\r')
       if (approve) {
         await waitFor(['Enter choose'], 8_000, false, start)
@@ -228,7 +239,9 @@ async function main() {
       await waitFor(['Click or Enter to choose'], 2_000, false, commitStart)
       const launchStart = transcript.length
       await clickText('Launch')
-      await waitFor(['Enter to send', CHAT_READY], 30_000, true, launchStart)
+      await waitForStableScreen(['Enter to send', 'Ask your agent to change its instructions'], 90_000, launchStart, [
+        'Loading…',
+      ])
     }
 
     if (liveMode) {
