@@ -101,15 +101,31 @@ def test_invalid_attempt_raises(backoff, attempt):
     [
         (ConstantBackoff, "delay"),
         (LinearBackoff, "base_delay"),
-        (LinearBackoff, "max_delay"),
         (ExponentialBackoff, "base_delay"),
-        (ExponentialBackoff, "max_delay"),
         (ExponentialBackoff, "multiplier"),
     ],
 )
 def test_invalid_numeric_argument_raises_at_construction(backoff_class, name, value):
     with pytest.raises(ValueError, match=f"{backoff_class.__name__}: {name} must be a non-negative finite number"):
         backoff_class(**{name: value})
+
+
+@pytest.mark.parametrize("value", [-1, math.nan, True, "1"])
+@pytest.mark.parametrize("backoff_class", [LinearBackoff, ExponentialBackoff])
+def test_invalid_max_delay_raises_at_construction(backoff_class, value):
+    with pytest.raises(ValueError, match=f"{backoff_class.__name__}: max_delay must be a non-negative number"):
+        backoff_class(max_delay=value)
+
+
+@pytest.mark.parametrize("backoff_class", [LinearBackoff, ExponentialBackoff])
+def test_infinite_max_delay_disables_cap(backoff_class):
+    backoff = backoff_class(base_delay=100, max_delay=math.inf, jitter="none")
+    assert _delays(backoff, [1, 2]) == [100, 200]
+
+
+def test_exponential_backoff_returns_max_delay_when_raw_delay_overflows():
+    backoff = ExponentialBackoff(base_delay=0.5, max_delay=60, multiplier=1.5, jitter="none")
+    assert _delays(backoff, [2000]) == [60]
 
 
 @pytest.mark.parametrize(

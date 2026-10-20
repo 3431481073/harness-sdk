@@ -128,7 +128,7 @@ TypeScript backoff strategies take delays in milliseconds. `ExponentialBackoff` 
 --8<-- "user-guide/sdk/agents/retry-strategies.ts:custom_backoff"
 ```
 
-For delay math outside the built-in strategies, implement the `BackoffStrategy` interface. `nextDelay` receives a `BackoffContext` with the 1-based `attempt`, the `elapsedMs` since the first attempt, and the `lastDelayMs`:
+For delay math outside the built-in strategies, implement the `BackoffStrategy` interface. `nextDelay` receives a `BackoffContext` with the 1-based `attempt`, the `elapsedMs` since the first retryable failure, and the `lastDelayMs`:
 
 ```typescript
 --8<-- "user-guide/sdk/agents/retry-strategies_imports.ts:custom_backoff_strategy_imports"
@@ -197,7 +197,7 @@ agent = Agent(
 )
 ```
 
-For full control over the retry decision, override `compute_retry_decision` and return a `RetryDecision`. It is called only for failed model calls that no other hook has already marked for retry. The override may be synchronous or `async`; the strategy sleeps for the returned `wait` (in seconds) before retrying. The base implementation consumes one attempt from the `max_attempts` budget per retryable failure; an override that returns its own `RetryDecision` without calling `super()` is not bounded by `max_attempts`, so it must enforce its own limit.
+For full control over the retry decision, override `compute_retry_decision` and return a `RetryDecision`. It is called only for failed model calls that no other hook has already marked for retry. The override is `async`; the strategy sleeps for the returned `wait` (in seconds) before retrying. The base implementation consumes one attempt from the `max_attempts` budget per retryable failure; an override that returns its own `RetryDecision` without calling `super()` is not bounded by `max_attempts`, so it must enforce its own limit.
 
 ```python
 from strands import Agent, ModelRetryStrategy
@@ -205,10 +205,10 @@ from strands.hooks import AfterModelCallEvent
 from strands.retry import RetryDecision
 
 class TimeoutRetryStrategy(ModelRetryStrategy):
-    def compute_retry_decision(self, event: AfterModelCallEvent):
+    async def compute_retry_decision(self, event: AfterModelCallEvent) -> RetryDecision:
         if isinstance(event.exception, TimeoutError) and event.attempt_count < 3:
             return RetryDecision(retry=True, wait=1)
-        return super().compute_retry_decision(event)
+        return await super().compute_retry_decision(event)
 
 agent = Agent(retry_strategy=TimeoutRetryStrategy())
 ```

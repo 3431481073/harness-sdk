@@ -1,5 +1,6 @@
 """Unit tests for retry strategy implementations."""
 
+import math
 from unittest.mock import Mock, patch
 
 import pytest
@@ -410,6 +411,12 @@ def test_model_retry_strategy_uses_falsy_custom_backoff():
     assert ModelRetryStrategy(backoff=backoff)._backoff is backoff
 
 
+def test_model_retry_strategy_accepts_infinite_max_delay():
+    strategy = ModelRetryStrategy(max_delay=math.inf)
+    delays = [strategy._backoff.next_delay(BackoffContext(attempt=attempt, elapsed=0)) for attempt in (1, 2, 3)]
+    assert delays == [4, 8, 16]
+
+
 @pytest.mark.parametrize("delay_kwargs", [{"initial_delay": 2}, {"max_delay": 60}])
 def test_model_retry_strategy_rejects_backoff_with_delay_parameters(delay_kwargs):
     with pytest.raises(ValueError, match="cannot be combined with backoff"):
@@ -417,9 +424,9 @@ def test_model_retry_strategy_rejects_backoff_with_delay_parameters(delay_kwargs
 
 
 @pytest.mark.asyncio
-async def test_model_retry_strategy_sync_compute_retry_decision_override(mock_sleep):
+async def test_model_retry_strategy_compute_retry_decision_override(mock_sleep):
     class FixedDecision(ModelRetryStrategy):
-        def compute_retry_decision(self, event):
+        async def compute_retry_decision(self, event):
             return RetryDecision(retry=True, wait=0.5)
 
     strategy = FixedDecision()
@@ -432,7 +439,7 @@ async def test_model_retry_strategy_sync_compute_retry_decision_override(mock_sl
 
 
 @pytest.mark.asyncio
-async def test_model_retry_strategy_async_compute_retry_decision_override(mock_sleep):
+async def test_model_retry_strategy_compute_retry_decision_override_uses_attempt_count(mock_sleep):
     class AsyncDecision(ModelRetryStrategy):
         async def compute_retry_decision(self, event):
             return RetryDecision(retry=event.attempt_count < 2, wait=0.25)
@@ -452,7 +459,7 @@ async def test_model_retry_strategy_compute_retry_decision_not_called_when_alrea
     class Recording(ModelRetryStrategy):
         calls = 0
 
-        def compute_retry_decision(self, event):
+        async def compute_retry_decision(self, event):
             Recording.calls += 1
             return RetryDecision(retry=False)
 

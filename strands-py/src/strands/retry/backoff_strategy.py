@@ -32,7 +32,8 @@ class BackoffContext:
     be removed or repurposed.
 
     Attributes:
-        attempt: 1-based index of the attempt that just failed.
+        attempt: 1-based count of the failures the retry strategy has retried, including the one that just
+            failed. Retries requested by other hooks do not advance it.
         elapsed: Seconds elapsed since the first retryable failure in the current retry budget.
         last_delay: Previously computed delay in seconds. None before the first retry.
     """
@@ -68,6 +69,12 @@ def _validate_attempt(attempt: int, class_name: str) -> None:
 def _validate_non_negative(value: float, name: str, class_name: str) -> None:
     if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
         raise ValueError(f"{class_name}: {name} must be a non-negative finite number (got {value!r})")
+
+
+def _validate_max_delay(value: float, class_name: str) -> None:
+    # math.inf is a valid "no cap"; NaN fails the comparison and is rejected.
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not value >= 0:
+        raise ValueError(f"{class_name}: max_delay must be a non-negative number (got {value!r})")
 
 
 def _validate_jitter(jitter: str, class_name: str) -> None:
@@ -125,15 +132,16 @@ class LinearBackoff:
 
         Args:
             base_delay: Base delay in seconds. Defaults to 1.
-            max_delay: Upper bound in seconds applied before jitter. Defaults to 30.
+            max_delay: Upper bound in seconds applied before jitter; ``math.inf`` disables the cap. Defaults to 30.
             jitter: Jitter mode. Defaults to ``"full"``.
 
         Raises:
-            ValueError: If ``jitter`` is not a supported mode, or a delay is negative or not finite.
+            ValueError: If ``jitter`` is not a supported mode, ``base_delay`` is negative or not finite, or
+                ``max_delay`` is negative or NaN.
         """
         _validate_jitter(jitter, type(self).__name__)
         _validate_non_negative(base_delay, "base_delay", type(self).__name__)
-        _validate_non_negative(max_delay, "max_delay", type(self).__name__)
+        _validate_max_delay(max_delay, type(self).__name__)
         self._base_delay = base_delay
         self._max_delay = max_delay
         self._jitter: JitterKind = jitter
@@ -170,17 +178,17 @@ class ExponentialBackoff:
 
         Args:
             base_delay: Base delay in seconds. Defaults to 1.
-            max_delay: Upper bound in seconds applied before jitter. Defaults to 30.
+            max_delay: Upper bound in seconds applied before jitter; ``math.inf`` disables the cap. Defaults to 30.
             multiplier: Growth factor per attempt. Defaults to 2.
             jitter: Jitter mode. Defaults to ``"full"``.
 
         Raises:
-            ValueError: If ``jitter`` is not a supported mode, or a delay or ``multiplier`` is negative or not
-                finite.
+            ValueError: If ``jitter`` is not a supported mode, ``base_delay`` or ``multiplier`` is negative or not
+                finite, or ``max_delay`` is negative or NaN.
         """
         _validate_jitter(jitter, type(self).__name__)
         _validate_non_negative(base_delay, "base_delay", type(self).__name__)
-        _validate_non_negative(max_delay, "max_delay", type(self).__name__)
+        _validate_max_delay(max_delay, type(self).__name__)
         _validate_non_negative(multiplier, "multiplier", type(self).__name__)
         self._base_delay = base_delay
         self._max_delay = max_delay
@@ -197,5 +205,8 @@ class ExponentialBackoff:
             Delay in seconds.
         """
         _validate_attempt(context.attempt, type(self).__name__)
-        raw = min(self._max_delay, self._base_delay * self._multiplier ** (context.attempt - 1))
+        try:
+            raw = min(self._max_delay, self._base_delay * self._multiplier ** (context.attempt - 1))
+        except OverflowError:
+            raw = self._max_delay
         return _jitter(raw, self._jitter, self._base_delay, self._max_delay, context.last_delay)

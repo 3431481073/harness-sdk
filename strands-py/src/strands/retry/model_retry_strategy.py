@@ -5,10 +5,8 @@ when and how to retry failed model calls.
 """
 
 import asyncio
-import inspect
 import logging
 import time
-from collections.abc import Awaitable
 from typing import Any
 
 from ..hooks.events import AfterInvocationEvent, AfterModelCallEvent
@@ -107,11 +105,10 @@ class ModelRetryStrategy(HookProvider):
         """
         return isinstance(exception, ModelThrottledException)
 
-    def compute_retry_decision(self, event: AfterModelCallEvent) -> RetryDecision | Awaitable[RetryDecision]:
+    async def compute_retry_decision(self, event: AfterModelCallEvent) -> RetryDecision:
         """Decide whether to retry the failed model call, and how long to wait first.
 
-        Called only for failed model calls that no other hook has already marked for retry. Overrides may be
-        synchronous or ``async``; the base implementation is synchronous.
+        Called only for failed model calls that no other hook has already marked for retry.
 
         Each call for a retryable exception consumes one attempt from the ``max_attempts`` budget. An override that
         returns its own ``RetryDecision`` without calling ``super()`` neither consumes nor is bounded by that budget,
@@ -209,9 +206,7 @@ class ModelRetryStrategy(HookProvider):
             self._reset_retry_state()
             return
 
-        decision = self.compute_retry_decision(event)
-        if inspect.isawaitable(decision):
-            decision = await decision
+        decision = await self.compute_retry_decision(event)
         # RetryDecision guarantees wait is set when retry is True; the None check narrows the type.
         if not decision.retry or decision.wait is None:
             return
