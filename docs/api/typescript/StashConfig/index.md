@@ -1,4 +1,4 @@
-Defined in: [src/context-manager/types.ts:90](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L90)
+Defined in: [src/context-manager/types.ts:94](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L94)
 
 **`Experimental`**
 
@@ -31,7 +31,7 @@ new Agent({ storage: storage.namespace('team'), contextManager: new ContextManag
 optional storage?: Storage;
 ```
 
-Defined in: [src/context-manager/types.ts:92](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L92)
+Defined in: [src/context-manager/types.ts:96](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L96)
 
 **`Experimental`**
 
@@ -45,7 +45,7 @@ Storage backend. Defaults to the agent’s `storage`, then InMemoryStorage, when
 optional retrievalTool?: false;
 ```
 
-Defined in: [src/context-manager/types.ts:99](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L99)
+Defined in: [src/context-manager/types.ts:103](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L103)
 
 **`Experimental`**
 

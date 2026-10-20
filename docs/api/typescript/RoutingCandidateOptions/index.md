@@ -1,4 +1,4 @@
-Defined in: [src/models/routing/router.ts:37](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/router.ts#L37)
+Defined in: [src/models/routing/router.ts:38](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/router.ts#L38)
 
 Construction data for a [RoutingCandidate](/docs/api/typescript/RoutingCandidate/index.md).
 
@@ -12,7 +12,7 @@ readonly model:
   | ModelRouter;
 ```
 
-Defined in: [src/models/routing/router.ts:39](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/router.ts#L39)
+Defined in: [src/models/routing/router.ts:40](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/router.ts#L40)
 
 Concrete model or opaque nested router.
 
@@ -24,7 +24,7 @@ Concrete model or opaque nested router.
 readonly optional name?: string;
 ```
 
-Defined in: [src/models/routing/router.ts:41](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/router.ts#L41)
+Defined in: [src/models/routing/router.ts:42](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/router.ts#L42)
 
 Optional strategy-facing name.
 
@@ -36,7 +36,7 @@ Optional strategy-facing name.
 readonly optional description?: string;
 ```
 
-Defined in: [src/models/routing/router.ts:43](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/router.ts#L43)
+Defined in: [src/models/routing/router.ts:44](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/router.ts#L44)
 
 Optional strategy-facing description.
 
@@ -48,6 +48,6 @@ Optional strategy-facing description.
 readonly optional metadata?: Readonly<Record<string, JSONValue>>;
 ```
 
-Defined in: [src/models/routing/router.ts:45](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/router.ts#L45)
+Defined in: [src/models/routing/router.ts:46](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/router.ts#L46)
 
 Optional strategy-facing evidence; must be JSON-serializable and free of secrets.

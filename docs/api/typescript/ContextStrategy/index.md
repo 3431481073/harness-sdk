@@ -1,4 +1,4 @@
-Defined in: [src/context-manager/types.ts:20](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L20)
+Defined in: [src/context-manager/types.ts:21](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L21)
 
 **`Experimental`**
 
@@ -18,7 +18,7 @@ Strategies are applied in order during `apply()`. Each decides whether to act ba
 readonly name: string;
 ```
 
-Defined in: [src/context-manager/types.ts:22](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L22)
+Defined in: [src/context-manager/types.ts:23](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L23)
 
 **`Experimental`**
 
@@ -32,7 +32,7 @@ Stable identifier for logging and observability.
 optional init(agent, stash?): void;
 ```
 
-Defined in: [src/context-manager/types.ts:28](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L28)
+Defined in: [src/context-manager/types.ts:29](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L29)
 
 **`Experimental`**
 
@@ -57,7 +57,7 @@ Called once when the ContextManager is attached to an agent. Strategies can use 
 apply(context): Promise<boolean>;
 ```
 
-Defined in: [src/context-manager/types.ts:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L34)
+Defined in: [src/context-manager/types.ts:35](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L35)
 
 **`Experimental`**
 

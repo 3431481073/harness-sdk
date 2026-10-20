@@ -1,4 +1,4 @@
-Defined in: [src/types/agent.ts:94](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L94)
+Defined in: [src/types/agent.ts:95](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L95)
 
 Options for a single agent invocation.
 
@@ -10,7 +10,7 @@ Options for a single agent invocation.
 optional structuredOutputSchema?: ZodSchema;
 ```
 
-Defined in: [src/types/agent.ts:98](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L98)
+Defined in: [src/types/agent.ts:99](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L99)
 
 Zod schema for structured output validation, overriding the constructor-provided schema for this invocation only.
 
@@ -22,7 +22,7 @@ Zod schema for structured output validation, overriding the constructor-provided
 optional invocationState?: InvocationState;
 ```
 
-Defined in: [src/types/agent.ts:107](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L107)
+Defined in: [src/types/agent.ts:108](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L108)
 
 Per-invocation state. Passed to lifecycle hook events and tools, and returned on [AgentResult.invocationState](/docs/api/typescript/AgentResult/index.md#invocationstate). Mutable — hooks and tools may read and write. See [InvocationState](/docs/api/typescript/InvocationState/index.md) for details.
 
@@ -36,7 +36,7 @@ Defaults to an empty object when omitted.
 optional cancelSignal?: AbortSignal;
 ```
 
-Defined in: [src/types/agent.ts:137](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L137)
+Defined in: [src/types/agent.ts:138](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L138)
 
 External AbortSignal for cancelling the agent invocation.
 
@@ -63,52 +63,30 @@ app.post('/chat', async (req, res) => {
 
 ---
 
+### invocationContext?
+
+```ts
+optional invocationContext?: InvocationContext;
+```
+
+Defined in: [src/types/agent.ts:141](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L141)
+
+Runs this call as a nested call in the request a hook event’s or [ToolContext.invocationContext](/docs/api/typescript/ToolContext/index.md#invocationcontext) handle belongs to, sharing its limits and usage even after that request returned; `limits` set alongside it only add stricter limits.
+
+---
+
 ### limits?
 
 ```ts
-optional limits?: {
-  turns?: number;
-  outputTokens?: number;
-  totalTokens?: number;
-};
+optional limits?: InvokeLimits;
 ```
 
-Defined in: [src/types/agent.ts:155](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L155)
+Defined in: [src/types/agent.ts:171](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L171)
 
-Per-invocation budget caps. Each cap, when set, bounds the agent loop for this `invoke()` / `stream()` call only — counters are not cumulative across reuses of the same agent.
+Limits for the whole request this `invoke()` / `stream()` call starts. They apply to this agent’s loop and to every nested call: agents passed as tools, and any Graph or Swarm you pass the request’s `invocationContext` to (Graph and Swarm have no `limits` option of their own). An agent run by a hand-written tool joins only when the tool forwards [ToolContext.invocationContext](/docs/api/typescript/ToolContext/index.md#invocationcontext) as [InvokeOptions.invocationContext](#invocationcontext); otherwise it runs standalone under its own limits. A nested call can also set its own `limits`: it stops at whichever limit is reached first, its own or the request’s.
 
-Caps are checked at the top of each loop iteration. Tools requested by the previous turn always run to completion before a cap fires, so `agent.messages` remains in a reinvokable state.
+Auxiliary calls (summarization, routing, memory extraction, steering, HITL, goal judging, web-fetch) add their tokens to the request’s usage, but no limits apply to them. The same holds for an agent that an extension point (a conversation manager, context or routing strategy, or memory extractor) runs with the `invocationContext` it receives, unless the extension point also passes `limits`. Usage starts from zero on each top-level call; pass [AgentResult.invocationContext](/docs/api/typescript/AgentResult/index.md#invocationcontext) to a later call to continue on the same limits and usage.
 
-Each cap, when set, must be a positive finite number. Omit any field (or `limits` itself) for no limit on that dimension.
+Limits are checked before each turn, so tools requested by the previous turn finish first and `agent.messages` stays reinvokable. Each limit, when set, must be a positive finite number; omit a field (or `limits` itself) for no limit on that dimension.
 
-Priority on simultaneous trip (highest first): `turns`, `totalTokens`, `outputTokens`. The corresponding `stopReason` is `'limitTurns'`, `'limitTotalTokens'`, or `'limitOutputTokens'`.
-
-#### turns?
-
-```ts
-optional turns?: number;
-```
-
-Maximum number of agent loop iterations (turns). A turn is one model call plus any tool execution that follows. Counted against `metrics.latestAgentInvocation.cycles.length`.
-
-#### outputTokens?
-
-```ts
-optional outputTokens?: number;
-```
-
-Maximum cumulative model-generated tokens, summed across every model call in the agent loop (`metrics.latestAgentInvocation.usage.outputTokens`).
-
-Distinct from per-call provider-level `maxTokens` settings (e.g. `GoogleModelConfig.params.maxOutputTokens`), which bound a single model call’s output. This cap bounds the loop’s cumulative output across however many calls it makes.
-
-Soft cap: a single oversized model response can overshoot the budget. The agent stops at the first turn boundary on or after the budget is reached; it does not bound any individual model call.
-
-#### totalTokens?
-
-```ts
-optional totalTokens?: number;
-```
-
-Maximum cumulative input + output tokens (`metrics.latestAgentInvocation.usage.totalTokens`). Each model call’s input includes prior turns, so this counter compounds across the run — it approximates the total token spend you would be billed for.
-
-Soft cap: a single oversized model response can overshoot the budget. The agent stops at the first turn boundary on or after the budget is reached; it does not bound any individual model call.
+Priority when several are reached at once (highest first): `turns`, `totalTokens`, `outputTokens`, with `stopReason` `'limitTurns'`, `'limitTotalTokens'`, or `'limitOutputTokens'`.

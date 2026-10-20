@@ -1,4 +1,4 @@
-Defined in: [src/hooks/events.ts:539](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L539)
+Defined in: [src/hooks/events.ts:568](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L568)
 
 Event triggered for each streaming event from the model. Wraps a [ModelStreamEvent](/docs/api/typescript/ModelStreamEvent/index.md) (transient streaming delta) during model inference. Completed content blocks are handled separately by [ContentBlockEvent](/docs/api/typescript/ContentBlockEvent/index.md) because they represent different granularities: partial deltas vs fully assembled results.
 
@@ -14,16 +14,13 @@ Event triggered for each streaming event from the model. Wraps a [ModelStreamEve
 new ModelStreamUpdateEvent(data): ModelStreamUpdateEvent;
 ```
 
-Defined in: [src/hooks/events.ts:545](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L545)
+Defined in: [src/hooks/events.ts:574](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L574)
 
 #### Parameters
 
 | Parameter | Type |
 | --- | --- |
-| `data` | { `agent`: `LocalAgent`; `event`: [`ModelStreamEvent`](/docs/api/typescript/ModelStreamEvent/index.md); `invocationState`: [`InvocationState`](/docs/api/typescript/InvocationState/index.md); } |
-| `data.agent` | `LocalAgent` |
-| `data.event` | [`ModelStreamEvent`](/docs/api/typescript/ModelStreamEvent/index.md) |
-| `data.invocationState` | [`InvocationState`](/docs/api/typescript/InvocationState/index.md) |
+| `data` | { `agent`: `LocalAgent`; `event`: [`ModelStreamEvent`](/docs/api/typescript/ModelStreamEvent/index.md); `invocationState`: [`InvocationState`](/docs/api/typescript/InvocationState/index.md); } & `HookableEventData` |
 
 #### Returns
 
@@ -35,13 +32,29 @@ Defined in: [src/hooks/events.ts:545](https://github.com/strands-agents/harness-
 
 ## Properties
 
+### invocationContext?
+
+```ts
+readonly optional invocationContext?: InvocationContext;
+```
+
+Defined in: [src/hooks/events.ts:100](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L100)
+
+The request this event belongs to (`undefined` outside one); pass it to [InvokeOptions.invocationContext](/docs/api/typescript/InvokeOptions/index.md#invocationcontext) to join it.
+
+#### Inherited from
+
+[`HookableEvent`](/docs/api/typescript/HookableEvent/index.md).[`invocationContext`](/docs/api/typescript/HookableEvent/index.md#invocationcontext)
+
+---
+
 ### type
 
 ```ts
 readonly type: "modelStreamUpdateEvent";
 ```
 
-Defined in: [src/hooks/events.ts:540](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L540)
+Defined in: [src/hooks/events.ts:569](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L569)
 
 ---
 
@@ -51,7 +64,7 @@ Defined in: [src/hooks/events.ts:540](https://github.com/strands-agents/harness-
 readonly agent: LocalAgent;
 ```
 
-Defined in: [src/hooks/events.ts:541](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L541)
+Defined in: [src/hooks/events.ts:570](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L570)
 
 ---
 
@@ -61,7 +74,7 @@ Defined in: [src/hooks/events.ts:541](https://github.com/strands-agents/harness-
 readonly event: ModelStreamEvent;
 ```
 
-Defined in: [src/hooks/events.ts:542](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L542)
+Defined in: [src/hooks/events.ts:571](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L571)
 
 ---
 
@@ -71,7 +84,7 @@ Defined in: [src/hooks/events.ts:542](https://github.com/strands-agents/harness-
 readonly invocationState: InvocationState;
 ```
 
-Defined in: [src/hooks/events.ts:543](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L543)
+Defined in: [src/hooks/events.ts:572](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L572)
 
 ## Methods
 
@@ -81,7 +94,7 @@ Defined in: [src/hooks/events.ts:543](https://github.com/strands-agents/harness-
 toJSON(): Pick<ModelStreamUpdateEvent, "type" | "event">;
 ```
 
-Defined in: [src/hooks/events.ts:556](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L556)
+Defined in: [src/hooks/events.ts:587](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L587)
 
 Serializes for wire transport, excluding the agent reference and invocationState. Called automatically by JSON.stringify().
 

@@ -1,4 +1,4 @@
-Defined in: [src/hooks/events.ts:213](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L213)
+Defined in: [src/hooks/events.ts:234](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L234)
 
 Event triggered when the framework adds a message to the conversation history. Fired for user input, assistant responses, and tool-result messages added during agent execution. Does not fire for messages preloaded via `AgentConfig.messages` or messages manually pushed to `agent.messages`.
 
@@ -14,16 +14,13 @@ Event triggered when the framework adds a message to the conversation history. F
 new MessageAddedEvent(data): MessageAddedEvent;
 ```
 
-Defined in: [src/hooks/events.ts:219](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L219)
+Defined in: [src/hooks/events.ts:240](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L240)
 
 #### Parameters
 
 | Parameter | Type |
 | --- | --- |
-| `data` | { `agent`: `LocalAgent`; `message`: [`Message`](/docs/api/typescript/Message/index.md); `invocationState`: [`InvocationState`](/docs/api/typescript/InvocationState/index.md); } |
-| `data.agent` | `LocalAgent` |
-| `data.message` | [`Message`](/docs/api/typescript/Message/index.md) |
-| `data.invocationState` | [`InvocationState`](/docs/api/typescript/InvocationState/index.md) |
+| `data` | { `agent`: `LocalAgent`; `message`: [`Message`](/docs/api/typescript/Message/index.md); `invocationState`: [`InvocationState`](/docs/api/typescript/InvocationState/index.md); } & `HookableEventData` |
 
 #### Returns
 
@@ -35,13 +32,29 @@ Defined in: [src/hooks/events.ts:219](https://github.com/strands-agents/harness-
 
 ## Properties
 
+### invocationContext?
+
+```ts
+readonly optional invocationContext?: InvocationContext;
+```
+
+Defined in: [src/hooks/events.ts:100](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L100)
+
+The request this event belongs to (`undefined` outside one); pass it to [InvokeOptions.invocationContext](/docs/api/typescript/InvokeOptions/index.md#invocationcontext) to join it.
+
+#### Inherited from
+
+[`HookableEvent`](/docs/api/typescript/HookableEvent/index.md).[`invocationContext`](/docs/api/typescript/HookableEvent/index.md#invocationcontext)
+
+---
+
 ### type
 
 ```ts
 readonly type: "messageAddedEvent";
 ```
 
-Defined in: [src/hooks/events.ts:214](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L214)
+Defined in: [src/hooks/events.ts:235](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L235)
 
 ---
 
@@ -51,7 +64,7 @@ Defined in: [src/hooks/events.ts:214](https://github.com/strands-agents/harness-
 readonly agent: LocalAgent;
 ```
 
-Defined in: [src/hooks/events.ts:215](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L215)
+Defined in: [src/hooks/events.ts:236](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L236)
 
 ---
 
@@ -61,7 +74,7 @@ Defined in: [src/hooks/events.ts:215](https://github.com/strands-agents/harness-
 readonly message: Message;
 ```
 
-Defined in: [src/hooks/events.ts:216](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L216)
+Defined in: [src/hooks/events.ts:237](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L237)
 
 ---
 
@@ -71,7 +84,7 @@ Defined in: [src/hooks/events.ts:216](https://github.com/strands-agents/harness-
 readonly invocationState: InvocationState;
 ```
 
-Defined in: [src/hooks/events.ts:217](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L217)
+Defined in: [src/hooks/events.ts:238](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L238)
 
 ## Methods
 
@@ -81,7 +94,7 @@ Defined in: [src/hooks/events.ts:217](https://github.com/strands-agents/harness-
 toJSON(): Pick<MessageAddedEvent, "type" | "message">;
 ```
 
-Defined in: [src/hooks/events.ts:230](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L230)
+Defined in: [src/hooks/events.ts:251](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L251)
 
 Serializes for wire transport, excluding the agent reference and invocationState. Called automatically by JSON.stringify().
 

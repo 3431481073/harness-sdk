@@ -6,7 +6,7 @@ type ContextManagerStrategy =
   | false;
 ```
 
-Defined in: [src/context-manager/context-manager.ts:43](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/context-manager.ts#L43)
+Defined in: [src/context-manager/context-manager.ts:44](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/context-manager.ts#L44)
 
 Supported values for the `contextManager` parameter.
 

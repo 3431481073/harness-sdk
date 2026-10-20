@@ -50,7 +50,7 @@ executeBackground(
 ): Promise<ToolResultBlock>;
 ```
 
-Defined in: [src/tools/executors/executor.ts:81](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/executors/executor.ts#L81)
+Defined in: [src/tools/executors/executor.ts:84](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/executors/executor.ts#L84)
 
 #### Parameters
 
@@ -84,7 +84,7 @@ protected executeTool(
 ): AsyncGenerator<AgentStreamEvent, ToolResultBlock, undefined>;
 ```
 
-Defined in: [src/tools/executors/executor.ts:107](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/executors/executor.ts#L107)
+Defined in: [src/tools/executors/executor.ts:110](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/executors/executor.ts#L110)
 
 #### Parameters
 
@@ -116,7 +116,7 @@ protected _storePendingToolExecution(
 ): void;
 ```
 
-Defined in: [src/tools/executors/executor.ts:238](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/executors/executor.ts#L238)
+Defined in: [src/tools/executors/executor.ts:245](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/executors/executor.ts#L245)
 
 #### Parameters
 

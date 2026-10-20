@@ -1,4 +1,4 @@
-Defined in: [src/models/routing/strategy.ts:8](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/strategy.ts#L8)
+Defined in: [src/models/routing/strategy.ts:9](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/strategy.ts#L9)
 
 A candidate used during an invocation and the outcome of that attempt.
 
@@ -10,7 +10,7 @@ A candidate used during an invocation and the outcome of that attempt.
 readonly candidate: RoutingCandidate;
 ```
 
-Defined in: [src/models/routing/strategy.ts:10](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/strategy.ts#L10)
+Defined in: [src/models/routing/strategy.ts:11](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/strategy.ts#L11)
 
 The configured candidate instance.
 
@@ -22,6 +22,6 @@ The configured candidate instance.
 readonly optional exception?: Error;
 ```
 
-Defined in: [src/models/routing/strategy.ts:12](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/strategy.ts#L12)
+Defined in: [src/models/routing/strategy.ts:13](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/strategy.ts#L13)
 
 The model or candidate-resolution error, absent when the call succeeded.

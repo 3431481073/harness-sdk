@@ -9,7 +9,7 @@ Anthropic Claude model provider.
 class AnthropicModel(Model)
 ```
 
-Defined in: [src/strands/models/anthropic.py:83](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L83)
+Defined in: [src/strands/models/anthropic.py:119](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L119)
 
 Anthropic model provider implementation.
 
@@ -19,7 +19,7 @@ Anthropic model provider implementation.
 class AnthropicConfig(BaseModelConfig)
 ```
 
-Defined in: [src/strands/models/anthropic.py:101](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L101)
+Defined in: [src/strands/models/anthropic.py:139](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L139)
 
 Configuration options for Anthropic models.
 
@@ -41,7 +41,7 @@ def __init__(*,
              **model_config: Unpack[AnthropicConfig])
 ```
 
-Defined in: [src/strands/models/anthropic.py:133](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L133)
+Defined in: [src/strands/models/anthropic.py:171](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L171)
 
 Initialize provider instance.
 
@@ -57,7 +57,7 @@ Initialize provider instance.
 def update_config(**model_config: Unpack[AnthropicConfig]) -> None
 ```
 
-Defined in: [src/strands/models/anthropic.py:155](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L155)
+Defined in: [src/strands/models/anthropic.py:193](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L193)
 
 Update the Anthropic model configuration with the provided arguments.
 
@@ -72,7 +72,7 @@ Update the Anthropic model configuration with the provided arguments.
 def get_config() -> AnthropicConfig
 ```
 
-Defined in: [src/strands/models/anthropic.py:170](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L170)
+Defined in: [src/strands/models/anthropic.py:208](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L208)
 
 Get the Anthropic model configuration.
 
@@ -94,7 +94,7 @@ def format_request(
 ) -> dict[str, Any]
 ```
 
-Defined in: [src/strands/models/anthropic.py:473](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L473)
+Defined in: [src/strands/models/anthropic.py:531](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L531)
 
 Format an Anthropic streaming request.
 
@@ -121,7 +121,7 @@ An Anthropic streaming request.
 def format_chunk(event: dict[str, Any]) -> StreamEvent
 ```
 
-Defined in: [src/strands/models/anthropic.py:724](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L724)
+Defined in: [src/strands/models/anthropic.py:782](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L782)
 
 Format the Anthropic response events into standardized message chunks.
 
@@ -148,7 +148,7 @@ async def count_tokens(
         system_prompt_content: list[SystemContentBlock] | None = None) -> int
 ```
 
-Defined in: [src/strands/models/anthropic.py:863](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L863)
+Defined in: [src/strands/models/anthropic.py:921](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L921)
 
 Count tokens using Anthropic’s native count\_tokens API.
 
@@ -175,10 +175,11 @@ async def stream(messages: Messages,
                  *,
                  tool_choice: ToolChoice | None = None,
                  system_prompt_content: list[SystemContentBlock] | None = None,
+                 structured_output_model: type[BaseModel] | None = None,
                  **kwargs: Any) -> AsyncGenerator[StreamEvent, None]
 ```
 
-Defined in: [src/strands/models/anthropic.py:913](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L913)
+Defined in: [src/strands/models/anthropic.py:971](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L971)
 
 Stream conversation with the Anthropic model.
 
@@ -189,6 +190,7 @@ Stream conversation with the Anthropic model.
 -   `system_prompt` - Plain string system prompt. Ignored when system\_prompt\_content is provided.
 -   `tool_choice` - Selection strategy for tool invocation.
 -   `system_prompt_content` - Structured system prompt content blocks, which can carry a cache point.
+-   `structured_output_model` - Output model the call must produce; the request is then sent with the strongest structured output mechanism the model supports.
 -   `**kwargs` - Additional keyword arguments for future extensibility.
 
 **Yields**:
@@ -214,7 +216,7 @@ async def structured_output(
         **kwargs: Any) -> AsyncGenerator[dict[str, T | Any], None]
 ```
 
-Defined in: [src/strands/models/anthropic.py:1073](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L1073)
+Defined in: [src/strands/models/anthropic.py:1182](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/anthropic.py#L1182)
 
 Get structured output from the model.
 

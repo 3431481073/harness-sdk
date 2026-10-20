@@ -2,6 +2,10 @@ Defined in: [src/models/streaming.ts:493](https://github.com/strands-agents/harn
 
 Token usage statistics for a model invocation. Tracks input, output, and total tokens, plus cache-related metrics.
 
+## Extended by
+
+-   [`InvocationContextUsage`](/docs/api/typescript/InvocationContextUsage/index.md)
+
 ## Properties
 
 ### inputTokens

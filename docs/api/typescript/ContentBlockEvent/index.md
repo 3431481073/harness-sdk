@@ -1,4 +1,4 @@
-Defined in: [src/hooks/events.ts:571](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L571)
+Defined in: [src/hooks/events.ts:602](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L602)
 
 Event triggered when a content block completes during model inference. Wraps completed content blocks (TextBlock, ToolUseBlock, ReasoningBlock) from model streaming. This is intentionally separate from [ModelStreamUpdateEvent](/docs/api/typescript/ModelStreamUpdateEvent/index.md). The model’s `streamAggregated()` yields two kinds of output: [ModelStreamEvent](/docs/api/typescript/ModelStreamEvent/index.md) (transient streaming deltas — partial data arriving while the model generates) and [ContentBlock](/docs/api/typescript/ContentBlock/index.md) (fully assembled results after all deltas accumulate). These represent different granularities with different semantics, so they are wrapped in distinct event classes rather than combined into a single event.
 
@@ -14,16 +14,13 @@ Event triggered when a content block completes during model inference. Wraps com
 new ContentBlockEvent(data): ContentBlockEvent;
 ```
 
-Defined in: [src/hooks/events.ts:577](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L577)
+Defined in: [src/hooks/events.ts:608](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L608)
 
 #### Parameters
 
 | Parameter | Type |
 | --- | --- |
-| `data` | { `agent`: `LocalAgent`; `contentBlock`: [`ContentBlock`](/docs/api/typescript/ContentBlock/index.md); `invocationState`: [`InvocationState`](/docs/api/typescript/InvocationState/index.md); } |
-| `data.agent` | `LocalAgent` |
-| `data.contentBlock` | [`ContentBlock`](/docs/api/typescript/ContentBlock/index.md) |
-| `data.invocationState` | [`InvocationState`](/docs/api/typescript/InvocationState/index.md) |
+| `data` | { `agent`: `LocalAgent`; `contentBlock`: [`ContentBlock`](/docs/api/typescript/ContentBlock/index.md); `invocationState`: [`InvocationState`](/docs/api/typescript/InvocationState/index.md); } & `HookableEventData` |
 
 #### Returns
 
@@ -35,13 +32,29 @@ Defined in: [src/hooks/events.ts:577](https://github.com/strands-agents/harness-
 
 ## Properties
 
+### invocationContext?
+
+```ts
+readonly optional invocationContext?: InvocationContext;
+```
+
+Defined in: [src/hooks/events.ts:100](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L100)
+
+The request this event belongs to (`undefined` outside one); pass it to [InvokeOptions.invocationContext](/docs/api/typescript/InvokeOptions/index.md#invocationcontext) to join it.
+
+#### Inherited from
+
+[`HookableEvent`](/docs/api/typescript/HookableEvent/index.md).[`invocationContext`](/docs/api/typescript/HookableEvent/index.md#invocationcontext)
+
+---
+
 ### type
 
 ```ts
 readonly type: "contentBlockEvent";
 ```
 
-Defined in: [src/hooks/events.ts:572](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L572)
+Defined in: [src/hooks/events.ts:603](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L603)
 
 ---
 
@@ -51,7 +64,7 @@ Defined in: [src/hooks/events.ts:572](https://github.com/strands-agents/harness-
 readonly agent: LocalAgent;
 ```
 
-Defined in: [src/hooks/events.ts:573](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L573)
+Defined in: [src/hooks/events.ts:604](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L604)
 
 ---
 
@@ -61,7 +74,7 @@ Defined in: [src/hooks/events.ts:573](https://github.com/strands-agents/harness-
 readonly contentBlock: ContentBlock;
 ```
 
-Defined in: [src/hooks/events.ts:574](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L574)
+Defined in: [src/hooks/events.ts:605](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L605)
 
 ---
 
@@ -71,7 +84,7 @@ Defined in: [src/hooks/events.ts:574](https://github.com/strands-agents/harness-
 readonly invocationState: InvocationState;
 ```
 
-Defined in: [src/hooks/events.ts:575](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L575)
+Defined in: [src/hooks/events.ts:606](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L606)
 
 ## Methods
 
@@ -81,7 +94,7 @@ Defined in: [src/hooks/events.ts:575](https://github.com/strands-agents/harness-
 toJSON(): Pick<ContentBlockEvent, "type" | "contentBlock">;
 ```
 
-Defined in: [src/hooks/events.ts:588](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L588)
+Defined in: [src/hooks/events.ts:621](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L621)
 
 Serializes for wire transport, excluding the agent reference and invocationState. Called automatically by JSON.stringify().
 

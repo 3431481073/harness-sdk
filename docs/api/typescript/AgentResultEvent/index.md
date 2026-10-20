@@ -1,4 +1,4 @@
-Defined in: [src/hooks/events.ts:682](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L682)
+Defined in: [src/hooks/events.ts:726](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L726)
 
 Event triggered as the final event in the agent stream. Wraps the agent result containing the stop reason and last message.
 
@@ -14,16 +14,13 @@ Event triggered as the final event in the agent stream. Wraps the agent result c
 new AgentResultEvent(data): AgentResultEvent;
 ```
 
-Defined in: [src/hooks/events.ts:688](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L688)
+Defined in: [src/hooks/events.ts:732](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L732)
 
 #### Parameters
 
 | Parameter | Type |
 | --- | --- |
-| `data` | { `agent`: `LocalAgent`; `result`: [`AgentResult`](/docs/api/typescript/AgentResult/index.md); `invocationState`: [`InvocationState`](/docs/api/typescript/InvocationState/index.md); } |
-| `data.agent` | `LocalAgent` |
-| `data.result` | [`AgentResult`](/docs/api/typescript/AgentResult/index.md) |
-| `data.invocationState` | [`InvocationState`](/docs/api/typescript/InvocationState/index.md) |
+| `data` | { `agent`: `LocalAgent`; `result`: [`AgentResult`](/docs/api/typescript/AgentResult/index.md); `invocationState`: [`InvocationState`](/docs/api/typescript/InvocationState/index.md); } & `HookableEventData` |
 
 #### Returns
 
@@ -35,13 +32,29 @@ Defined in: [src/hooks/events.ts:688](https://github.com/strands-agents/harness-
 
 ## Properties
 
+### invocationContext?
+
+```ts
+readonly optional invocationContext?: InvocationContext;
+```
+
+Defined in: [src/hooks/events.ts:100](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L100)
+
+The request this event belongs to (`undefined` outside one); pass it to [InvokeOptions.invocationContext](/docs/api/typescript/InvokeOptions/index.md#invocationcontext) to join it.
+
+#### Inherited from
+
+[`HookableEvent`](/docs/api/typescript/HookableEvent/index.md).[`invocationContext`](/docs/api/typescript/HookableEvent/index.md#invocationcontext)
+
+---
+
 ### type
 
 ```ts
 readonly type: "agentResultEvent";
 ```
 
-Defined in: [src/hooks/events.ts:683](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L683)
+Defined in: [src/hooks/events.ts:727](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L727)
 
 ---
 
@@ -51,7 +64,7 @@ Defined in: [src/hooks/events.ts:683](https://github.com/strands-agents/harness-
 readonly agent: LocalAgent;
 ```
 
-Defined in: [src/hooks/events.ts:684](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L684)
+Defined in: [src/hooks/events.ts:728](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L728)
 
 ---
 
@@ -61,7 +74,7 @@ Defined in: [src/hooks/events.ts:684](https://github.com/strands-agents/harness-
 readonly result: AgentResult;
 ```
 
-Defined in: [src/hooks/events.ts:685](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L685)
+Defined in: [src/hooks/events.ts:729](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L729)
 
 ---
 
@@ -71,7 +84,7 @@ Defined in: [src/hooks/events.ts:685](https://github.com/strands-agents/harness-
 readonly invocationState: InvocationState;
 ```
 
-Defined in: [src/hooks/events.ts:686](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L686)
+Defined in: [src/hooks/events.ts:730](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L730)
 
 ## Methods
 
@@ -81,7 +94,7 @@ Defined in: [src/hooks/events.ts:686](https://github.com/strands-agents/harness-
 toJSON(): Pick<AgentResultEvent, "type" | "result">;
 ```
 
-Defined in: [src/hooks/events.ts:699](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L699)
+Defined in: [src/hooks/events.ts:743](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L743)
 
 Serializes for wire transport, excluding the agent reference and invocationState. Called automatically by JSON.stringify().
 

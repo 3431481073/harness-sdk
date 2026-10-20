@@ -72,7 +72,7 @@ This class defines the interface for all model implementations in the Strands Ag
 def stateful() -> bool
 ```
 
-Defined in: [src/strands/models/model.py:195](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L195)
+Defined in: [src/strands/models/model.py:199](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L199)
 
 Whether the model manages conversation state server-side.
 
@@ -87,7 +87,7 @@ False by default. Model providers that support server-side state should override
 def context_window_limit() -> int | None
 ```
 
-Defined in: [src/strands/models/model.py:204](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L204)
+Defined in: [src/strands/models/model.py:208](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L208)
 
 Maximum context window size in tokens, or None if not configured.
 
@@ -98,7 +98,7 @@ Maximum context window size in tokens, or None if not configured.
 def update_config(**model_config: Any) -> None
 ```
 
-Defined in: [src/strands/models/model.py:215](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L215)
+Defined in: [src/strands/models/model.py:219](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L219)
 
 Update the model configuration with the provided arguments.
 
@@ -113,7 +113,7 @@ Update the model configuration with the provided arguments.
 def get_config() -> Any
 ```
 
-Defined in: [src/strands/models/model.py:225](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L225)
+Defined in: [src/strands/models/model.py:229](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L229)
 
 Return the model configuration.
 
@@ -132,7 +132,7 @@ def structured_output(
         **kwargs: Any) -> AsyncGenerator[dict[str, T | Any], None]
 ```
 
-Defined in: [src/strands/models/model.py:235](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L235)
+Defined in: [src/strands/models/model.py:239](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L239)
 
 Get structured output from the model.
 
@@ -164,10 +164,11 @@ def stream(messages: Messages,
            invocation_state: dict[str, Any] | None = None,
            cancel_signal: threading.Event | None = None,
            agent_metadata: "AgentMetadata | None" = None,
+           structured_output_model: type[BaseModel] | None = None,
            **kwargs: Any) -> AsyncIterable[StreamEvent]
 ```
 
-Defined in: [src/strands/models/model.py:256](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L256)
+Defined in: [src/strands/models/model.py:260](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L260)
 
 Stream conversation with the model.
 
@@ -187,6 +188,7 @@ This method handles the full lifecycle of conversing with the model:
 -   `invocation_state` - Caller-provided state/context that was passed to the agent when it was invoked.
 -   `cancel_signal` - Event a provider can observe to abort an in-flight request. Support is provider-dependent; a provider that ignores it still cancels at the SDK’s between-chunk checkpoint.
 -   `agent_metadata` - Stable identity of the invoking agent (e.g. its session id), supplied per request. A provider may consult it to derive a prompt-cache routing key; None when the model is streamed directly without an agent.
+-   `structured_output_model` - Output model this call must produce, passed by the agent on its structured output retry to providers that enforce structured output themselves. The response must then be either a call to the tool named in `tool_choice` or a final text response whose text is exactly one JSON object that validates against this model.
 -   `**kwargs` - Additional keyword arguments for future extensibility.
 
 **Yields**:
@@ -207,7 +209,7 @@ async def count_tokens(
         system_prompt_content: list[SystemContentBlock] | None = None) -> int
 ```
 
-Defined in: [src/strands/models/model.py:300](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L300)
+Defined in: [src/strands/models/model.py:309](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L309)
 
 Estimate token count for the given input before sending to the model.
 
@@ -232,7 +234,7 @@ Estimated total input tokens.
 def estimate_utilization(input_tokens: int) -> float
 ```
 
-Defined in: [src/strands/models/model.py:328](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L328)
+Defined in: [src/strands/models/model.py:337](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L337)
 
 Estimate the fraction of the model’s context window consumed by the given input token count.
 
@@ -252,7 +254,7 @@ Token usage ratio (0–1+; above 1.0 means overflow).
 class _ModelPlugin(Plugin)
 ```
 
-Defined in: [src/strands/models/model.py:354](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L354)
+Defined in: [src/strands/models/model.py:363](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L363)
 
 Plugin that manages model-related lifecycle hooks.
 
@@ -263,7 +265,7 @@ Plugin that manages model-related lifecycle hooks.
 def name() -> str
 ```
 
-Defined in: [src/strands/models/model.py:358](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L358)
+Defined in: [src/strands/models/model.py:367](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L367)
 
 A stable string identifier for this plugin.
 
@@ -273,7 +275,7 @@ A stable string identifier for this plugin.
 def init_agent(agent: "Agent") -> None
 ```
 
-Defined in: [src/strands/models/model.py:376](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L376)
+Defined in: [src/strands/models/model.py:385](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/model.py#L385)
 
 Register model lifecycle hooks with the agent.
 

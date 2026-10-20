@@ -7,7 +7,7 @@ Built-in middleware stages and their context/result types.
 class InvokeModelContext()
 ```
 
-Defined in: [src/strands/middleware/stages.py:36](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L36)
+Defined in: [src/strands/middleware/stages.py:38](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L38)
 
 Context passed to InvokeModelStage middleware.
 
@@ -27,7 +27,7 @@ def replace(*,
             dynamic_trailing_blocks: int = _UNSET) -> InvokeModelContext
 ```
 
-Defined in: [src/strands/middleware/stages.py:56](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L56)
+Defined in: [src/strands/middleware/stages.py:59](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L59)
 
 Return a copy with the given fields replaced; omitted fields keep their current value.
 
@@ -59,7 +59,7 @@ A new `InvokeModelContext`.
 class InvokeModelResult()
 ```
 
-Defined in: [src/strands/middleware/stages.py:102](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L102)
+Defined in: [src/strands/middleware/stages.py:105](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L105)
 
 Result passed to and returned from `InvokeModelStage.Output` handlers.
 
@@ -80,7 +80,7 @@ Middleware registered for this stage can rate-limit, cache, or transform model i
 class MiddlewareInterruptResult()
 ```
 
-Defined in: [src/strands/middleware/stages.py:122](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L122)
+Defined in: [src/strands/middleware/stages.py:125](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L125)
 
 Value returned by a middleware `interrupt()` when the agent resumes.
 
@@ -97,7 +97,7 @@ Wrapping the response (rather than returning it bare) mirrors the TypeScript SDK
 class ExecuteToolContext()
 ```
 
-Defined in: [src/strands/middleware/stages.py:175](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L175)
+Defined in: [src/strands/middleware/stages.py:178](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L178)
 
 Context passed to ExecuteToolStage middleware.
 
@@ -116,7 +116,7 @@ def interrupt(name: str,
               response: Any = None) -> MiddlewareInterruptResult
 ```
 
-Defined in: [src/strands/middleware/stages.py:199](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L199)
+Defined in: [src/strands/middleware/stages.py:202](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L202)
 
 Request a human-in-the-loop interrupt.
 
@@ -147,7 +147,7 @@ def replace(*,
             invocation_state: dict[str, Any] = _UNSET) -> ExecuteToolContext
 ```
 
-Defined in: [src/strands/middleware/stages.py:239](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L239)
+Defined in: [src/strands/middleware/stages.py:242](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L242)
 
 Return a copy with the given fields replaced; omitted fields keep their current value.
 
@@ -176,7 +176,7 @@ A new `ExecuteToolContext`.
 class ExecuteToolResult()
 ```
 
-Defined in: [src/strands/middleware/stages.py:267](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L267)
+Defined in: [src/strands/middleware/stages.py:270](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/middleware/stages.py#L270)
 
 Result passed to and returned from `ExecuteToolStage.Output` handlers.
 

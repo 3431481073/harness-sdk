@@ -10,7 +10,7 @@ Mirroring the TypeScript oracle, this extends :class:`~strands.sandbox.base.Sand
 class NotASandboxLocalEnvironment(Sandbox)
 ```
 
-Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:31](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L31)
+Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:65](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L65)
 
 Run commands, code, and file operations on the host with no isolation.
 
@@ -30,16 +30,16 @@ async def execute_streaming(
         **kwargs: Any) -> AsyncGenerator[StreamChunk | ExecutionResult, None]
 ```
 
-Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:49](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L49)
+Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:83](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L83)
 
-Execute a command on the host via `sh -c`, streaming output.
+Execute a command on the host in its shell (`sh -c`; PowerShell on Windows), streaming output.
 
 **Arguments**:
 
 -   `command` - The shell command to execute.
 -   `timeout` - Maximum execution time in seconds. `None` means no timeout.
 -   `cwd` - Working directory for this command. Defaults to the process’s current working directory.
--   `env` - Environment variables to set, applied via a shell `export` prefix.
+-   `env` - Environment variables to set on top of the host environment.
 -   `**kwargs` - Additional keyword arguments for forward compatibility.
 
 **Yields**:
@@ -64,11 +64,11 @@ async def execute_code_streaming(
         **kwargs: Any) -> AsyncGenerator[StreamChunk | ExecutionResult, None]
 ```
 
-Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:82](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L82)
+Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:131](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L131)
 
-Execute code on the host by piping it to a language interpreter via `sh`.
+Execute code on the host by feeding it to a language interpreter on stdin.
 
-The code is base64-encoded and decoded inside a quoted heredoc, then piped to the interpreter (`base64 -d << 'EOF' | <lang>`), so arbitrary source — including shell metacharacters, quotes, and newlines — reaches the interpreter without injection risk. `language` is validated against :data:`~strands.sandbox.constants.LANGUAGE_PATTERN` first.
+On POSIX the code is base64-encoded and decoded inside a quoted heredoc, then piped to the interpreter (`base64 -d << 'EOF' | <lang>`), so arbitrary source — including shell metacharacters, quotes, and newlines — reaches the interpreter without injection risk. On Windows the interpreter is spawned directly with the code on stdin. `language` is validated against :data:`~strands.sandbox.constants.LANGUAGE_PATTERN` first.
 
 **Arguments**:
 
@@ -76,7 +76,7 @@ The code is base64-encoded and decoded inside a quoted heredoc, then piped to th
 -   `language` - The interpreter to use (e.g., `"python3"`, `"node"`).
 -   `timeout` - Maximum execution time in seconds. `None` means no timeout.
 -   `cwd` - Working directory for execution. Defaults to the process’s current working directory.
--   `env` - Environment variables to set, applied via a shell `export` prefix.
+-   `env` - Environment variables to set on top of the host environment.
 -   `**kwargs` - Additional keyword arguments for forward compatibility.
 
 **Yields**:
@@ -94,7 +94,7 @@ The code is base64-encoded and decoded inside a quoted heredoc, then piped to th
 async def read_file(path: str, **kwargs: Any) -> bytes
 ```
 
-Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:126](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L126)
+Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:190](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L190)
 
 Read a file from the host filesystem as raw bytes.
 
@@ -118,7 +118,7 @@ The file contents as raw bytes.
 async def write_file(path: str, content: bytes, **kwargs: Any) -> None
 ```
 
-Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:143](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L143)
+Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:207](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L207)
 
 Write raw bytes to a file on the host, creating parent directories.
 
@@ -138,7 +138,7 @@ Write raw bytes to a file on the host, creating parent directories.
 async def remove_file(path: str, **kwargs: Any) -> None
 ```
 
-Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:159](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L159)
+Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:223](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L223)
 
 Remove a file from the host filesystem.
 
@@ -157,7 +157,7 @@ Remove a file from the host filesystem.
 async def list_files(path: str, **kwargs: Any) -> list[FileInfo]
 ```
 
-Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:172](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L172)
+Defined in: [src/strands/sandbox/not\_a\_sandbox\_local\_environment.py:236](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/sandbox/not_a_sandbox_local_environment.py#L236)
 
 List directory contents from the host filesystem, sorted by name.
 

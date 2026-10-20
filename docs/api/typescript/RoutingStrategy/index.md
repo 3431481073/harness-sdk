@@ -1,4 +1,4 @@
-Defined in: [src/models/routing/strategy.ts:32](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/strategy.ts#L32)
+Defined in: [src/models/routing/strategy.ts:35](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/strategy.ts#L35)
 
 Chooses a configured routing candidate.
 
@@ -10,7 +10,7 @@ Chooses a configured routing candidate.
 select(context): Promise<RoutingCandidate>;
 ```
 
-Defined in: [src/models/routing/strategy.ts:52](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/strategy.ts#L52)
+Defined in: [src/models/routing/strategy.ts:55](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/strategy.ts#L55)
 
 Select a candidate from `context.candidates`, or decline with `undefined`.
 

@@ -1,4 +1,4 @@
-Defined in: [src/context-manager/strategies/offload/base.ts:70](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/strategies/offload/base.ts#L70)
+Defined in: [src/context-manager/strategies/offload/base.ts:71](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/strategies/offload/base.ts#L71)
 
 Intermediate builder result that allows chaining `.when()` conditions. Also implements `ContextStrategy` directly so it can be used without `.when()`.
 
@@ -14,7 +14,7 @@ Intermediate builder result that allows chaining `.when()` conditions. Also impl
 readonly name: string;
 ```
 
-Defined in: [src/context-manager/types.ts:22](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L22)
+Defined in: [src/context-manager/types.ts:23](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L23)
 
 Stable identifier for logging and observability.
 
@@ -30,7 +30,7 @@ Stable identifier for logging and observability.
 when(conditions): ContextStrategy;
 ```
 
-Defined in: [src/context-manager/strategies/offload/base.ts:72](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/strategies/offload/base.ts#L72)
+Defined in: [src/context-manager/strategies/offload/base.ts:73](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/strategies/offload/base.ts#L73)
 
 Add conditions that determine when this strategy fires.
 
@@ -52,7 +52,7 @@ Add conditions that determine when this strategy fires.
 optional init(agent, stash?): void;
 ```
 
-Defined in: [src/context-manager/types.ts:28](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L28)
+Defined in: [src/context-manager/types.ts:29](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L29)
 
 Called once when the ContextManager is attached to an agent. Strategies can use this to register hooks (e.g., eager offloading on message arrival).
 
@@ -79,7 +79,7 @@ Called once when the ContextManager is attached to an agent. Strategies can use 
 apply(context): Promise<boolean>;
 ```
 
-Defined in: [src/context-manager/types.ts:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L34)
+Defined in: [src/context-manager/types.ts:35](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L35)
 
 Attempt to reduce context. Returns true if it made changes, false if it decided not to act (e.g., conditions not met, nothing to offload).
 
