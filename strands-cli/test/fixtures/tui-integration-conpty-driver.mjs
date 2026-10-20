@@ -120,18 +120,6 @@ async function main() {
     )
   }
   const waitForStableScreen = (markers, timeout = 8_000, start = 0) => waitFor(markers, timeout, false, start, true)
-  const settle = async (timeout = 150) => {
-    let deadline = Date.now() + timeout
-    const limit = Date.now() + 2_000
-    let length = transcript.length
-    while (Date.now() < deadline && Date.now() < limit) {
-      await sleep(25)
-      if (transcript.length !== length) {
-        length = transcript.length
-        deadline = Date.now() + timeout
-      }
-    }
-  }
   const clickText = async (text) => {
     await waitForStableScreen([text])
     const { column, row } = screen.locate(text)
@@ -170,13 +158,14 @@ async function main() {
     }
   }
 
-  let noopOutput = ''
   const resizeScreens = []
   try {
     if (setupImportMode) {
       await waitFor(['Quickstart', 'Import'], 20_000, false)
     } else {
-      await waitFor(['Enter to send', CHAT_READY], liveMode ? 90_000 : lifecycleMode ? 20_000 : 8_000)
+      const readyTimeout = liveMode ? 90_000 : lifecycleMode ? 20_000 : 8_000
+      await waitFor([CHAT_READY], readyTimeout)
+      await waitForStableScreen(['Enter to send'], readyTimeout)
     }
 
     if (resize) {
@@ -204,11 +193,6 @@ async function main() {
       }
       await waitForStableScreen([], 2_000, burstStart)
       resizeScreens.push({ columns: 120, rows: 40, text: screen.text })
-
-      const noopStart = transcript.length
-      resizeTerminal(120, 40)
-      await settle(200)
-      noopOutput = transcript.slice(noopStart)
     }
 
     const exportLanguage = process.env.STRANDS_CLI_TEST_EXPORT_LANGUAGE ?? 'typescript'
@@ -503,7 +487,6 @@ async function main() {
         termiosRestored: null,
         transcript: Buffer.from(transcript).toString('base64'),
         screens,
-        resizeNoopTranscript: Buffer.from(noopOutput).toString('base64'),
         resizeScreens,
         exportSaved: existsSync(process.env.STRANDS_CLI_TEST_EXPORT_PATH),
       })

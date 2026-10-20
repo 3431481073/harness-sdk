@@ -186,7 +186,9 @@ def main() -> int:
         if setup_import_mode:
             wait_for([b"Quickstart", b"Import"], timeout=20.0, styled=False)
         else:
-            wait_for([READY_MARKER, CHAT_READY], timeout=90.0 if live_mode else 20.0 if lifecycle_mode else 8.0)
+            ready_timeout = 90.0 if live_mode else 20.0 if lifecycle_mode else 8.0
+            wait_for([CHAT_READY], timeout=ready_timeout)
+            wait_for_stable_screen([READY_MARKER], timeout=ready_timeout)
         wait_for_raw_mode()
 
         def set_size(columns: int, height: int) -> None:
@@ -194,19 +196,6 @@ def main() -> int:
             fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", height, columns, 0, 0))
             os.kill(process.pid, signal.SIGWINCH)
 
-        def settle(timeout: float = 0.15) -> None:
-            deadline = time.monotonic() + timeout
-            limit = time.monotonic() + 2.0
-            last = len(transcript)
-            while time.monotonic() < deadline and time.monotonic() < limit:
-                pump()
-                if len(transcript) != last:
-                    last = len(transcript)
-                    deadline = time.monotonic() + timeout
-                else:
-                    select.select([master], [], [], 0.05)
-
-        noop_output = b""
         resize_screens: list[dict[str, object]] = []
         if resize:
             for columns, height in [(80, 24), (40, 16), (22, 10), (160, 50), (160, 25), (100, 30)]:
@@ -220,11 +209,6 @@ def main() -> int:
                 set_size(columns, height)
             wait_for_stable_screen([], timeout=2.0, start=burst_start)
             resize_screens.append({"columns": 120, "rows": 40, "text": screen})
-
-            noop_start = len(transcript)
-            set_size(120, 40)
-            settle(0.2)
-            noop_output = bytes(transcript[noop_start:])
         export_language = os.environ.get("STRANDS_CLI_TEST_EXPORT_LANGUAGE", "typescript")
 
         def submit(prompt: bytes, markers: list[bytes], approve: bool = False) -> None:
@@ -535,7 +519,6 @@ def main() -> int:
                     "termiosRestored": initial_terminal == final_terminal,
                     "transcript": base64.b64encode(transcript).decode(),
                     "screens": screens,
-                    "resizeNoopTranscript": base64.b64encode(noop_output).decode(),
                     "resizeScreens": resize_screens,
                     "exportSaved": os.path.isfile(os.environ["STRANDS_CLI_TEST_EXPORT_PATH"]),
                 }

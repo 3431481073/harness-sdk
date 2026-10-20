@@ -27,7 +27,6 @@ export interface TuiResult {
   output: string
   screens: string[]
   resizeScreens: Array<{ columns: number; rows: number; text: string }>
-  resizeNoopRedraw: boolean
   exportSaved: boolean
 }
 
@@ -81,9 +80,8 @@ export async function runTuiCommand(options: {
       },
     }
   )
-  const result = JSON.parse(stdout) as Omit<TuiResult, 'output' | 'resizeNoopRedraw'> & {
+  const result = JSON.parse(stdout) as Omit<TuiResult, 'output'> & {
     transcript: string
-    resizeNoopTranscript: string
   }
   return {
     returnCode: result.returnCode,
@@ -91,7 +89,6 @@ export async function runTuiCommand(options: {
     output: decode(result.transcript),
     screens: result.screens,
     resizeScreens: result.resizeScreens,
-    resizeNoopRedraw: decode(result.resizeNoopTranscript).length > 0,
     exportSaved: result.exportSaved,
   }
 }

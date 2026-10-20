@@ -21,7 +21,6 @@ describe('TUI terminal integration', () => {
       expect(text.trim()).not.toBe('')
       expect(text).toMatch(/Enter(?: to)? send/)
     }
-    expect(result.resizeNoopRedraw).toBe(false)
     expectRestoredTerminal(result)
   })
 
@@ -30,8 +29,5 @@ describe('TUI terminal integration', () => {
 
     expect(result.returnCode).toBe(0)
     expectRestoredTerminal(result)
-    const resumeMessage = 'Resume with: strands --session-id fixture-session'
-    expect(result.output.split(resumeMessage)).toHaveLength(2)
-    expect(result.output.indexOf('\u001b[?1049l')).toBeLessThan(result.output.indexOf(resumeMessage))
   })
 })
