@@ -106,7 +106,7 @@ describe('interactiveBackgroundTasks', () => {
   })
 })
 
-describe('interactive runtime lifecycle', { timeout: 15_000 }, () => {
+describe('interactive runtime lifecycle', () => {
   it('loads the saved name when starting with an explicit session ID', async () => {
     const sessionDirectory = join(dirname(testSessionRoot), 'named-sessions')
     await mkdir(join(sessionDirectory, 'saved-one'), { recursive: true })

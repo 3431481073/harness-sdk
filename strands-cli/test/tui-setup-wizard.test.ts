@@ -56,7 +56,7 @@ function setupSwitch(frame: string, label: string): { row: number; column: numbe
   return { row, column: state.index, state: state[0] }
 }
 
-describe('setup presentation', { timeout: 15_000 }, () => {
+describe('setup presentation', () => {
   it('reports progress through the quickstart flow', () => {
     expect(setupStepProgress('quickstart', 1)).toEqual({
       current: 1,
