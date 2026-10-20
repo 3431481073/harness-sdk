@@ -31,10 +31,12 @@ import type { ToolChoice, ToolSpec } from '../tools/types.js'
 import { cloneSystemPrompt, systemPromptFromData } from '../types/messages.js'
 import { normalizeError, ConcurrentInvocationError, StructuredOutputError } from '../errors.js'
 import { Model } from '../models/model.js'
+import { ModelProxy } from '../models/model-proxy.js'
 import { ModelRouter } from '../models/routing/router.js'
 import type { BaseModelConfig, StreamAggregatedResult, StreamOptions } from '../models/model.js'
 import { ModelPlugin } from '../plugins/model-plugin.js'
 import { totalPromptTokens, isModelStreamEvent } from '../models/streaming.js'
+import { InvocationContextImpl, reachedLimit, unwrapInvocationContext } from './invocation-context.js'
 import { ToolRegistry } from '../registry/tool-registry.js'
 import { StateStore } from '../state-store.js'
 import { serializeStateSerializable, loadStateSerializable } from '../types/serializable.js'
@@ -649,8 +651,8 @@ export class Agent implements LocalAgent, InvokableAgent {
     this._backgroundTasks = config?.backgroundTasks
       ? new BackgroundTasks(
           config.backgroundTasks === true ? {} : config.backgroundTasks,
-          (tool, context, middlewareInterrupt) =>
-            this._toolExecutor.executeBackground(
+          (tool, context, middlewareInterrupt) => {
+            return this._toolExecutor.executeBackground(
               {
                 agent: this,
                 middlewareRegistry: this._middlewareRegistry,
@@ -661,6 +663,7 @@ export class Agent implements LocalAgent, InvokableAgent {
                 cancelSignal: context.cancelSignal,
                 toolInterrupt: context.interrupt,
                 middlewareInterrupt,
+                invocationContext: context.invocationContext,
                 toolGuard: (selectedTool) => this._backgroundTasks!.assertToolCanRun(selectedTool),
               },
               context.toolUse,
@@ -668,6 +671,7 @@ export class Agent implements LocalAgent, InvokableAgent {
               context.invocationState,
               (event) => this._invokeCallbacks(event)
             )
+          }
         )
       : undefined
 
@@ -922,15 +926,11 @@ export class Agent implements LocalAgent, InvokableAgent {
   }
 
   /**
-   * Validates the per-invocation budget caps in {@link InvokeOptions.limits}.
-   * Called once at the top of `_stream` so bad inputs fail fast with a clear
-   * error instead of silently no-op'ing (`NaN`, `Infinity`) or tripping
-   * pathologically (zero swallows the user input; negative trips immediately).
-   *
-   * Each cap, when set, must be a positive finite number. Fractional values
-   * are accepted — harmless, and useful for token budgets derived from
-   * arithmetic. Unrecognized keys are rejected for the same reason: a
-   * mistyped cap name would otherwise silently apply no limit at all.
+   * Validates {@link InvokeOptions.limits} so bad input fails fast instead of
+   * being silently ignored (`NaN`, `Infinity`) or stopping the call at once
+   * (zero, negative). Each limit, when set, must be a positive finite number;
+   * fractional values are allowed. An unrecognized key throws, since a mistyped
+   * limit name would otherwise apply no limit at all.
    */
   private _validateLimits(options: InvokeOptions | undefined): void {
     if (!options?.limits) return
@@ -941,7 +941,7 @@ export class Agent implements LocalAgent, InvokableAgent {
       .sort()
     if (unrecognizedKeys.length > 0) {
       throw new TypeError(
-        `limits keys [${unrecognizedKeys.join(', ')}] are not recognized caps, ` +
+        `limits keys [${unrecognizedKeys.join(', ')}] are not recognized limits, ` +
           `expected one of ${LIMITS_KEYS.map((key) => `'${key}'`).join(', ')}`
       )
     }
@@ -954,39 +954,63 @@ export class Agent implements LocalAgent, InvokableAgent {
   }
 
   /**
-   * Evaluates the per-invocation budget caps in {@link InvokeOptions.limits}
-   * against the current invocation's metrics. Called at the top of each
-   * agent-loop iteration, after `_throwIfCancelled` and before `startCycle`.
+   * Builds the {@link AgentResult} for a call that stopped because a limit was
+   * reached. When the request had already reached a limit before this call
+   * appended anything, `lastMessage` is an empty assistant message rather than
+   * one left over from an earlier call.
    *
-   * Reads from {@link AgentMetrics.latestAgentInvocation} (scoped to the
-   * current invocation) — not `cycleCount` / `accumulatedUsage`, which are
-   * lifetime accumulators that would cause caps to fire prematurely on the
-   * second `invoke()` call against a reused agent.
-   *
-   * Priority on simultaneous trip: turns → totalTokens → outputTokens.
-   *
-   * Returns the {@link StopReason} the loop should terminate with, or
-   * `undefined` if every configured cap is still within budget.
+   * @param limitStopReason - The stop reason for the limit that was reached
+   * @param invocationState - The shared per-invocation state bag
+   * @param invocationContext - The state of the request the call ran in
+   * @param messageCountAtStart - Length of `messages` when this call started
+   * @returns A well-formed result carrying the limit stop reason
    */
-  private _checkLimits(options: InvokeOptions | undefined): StopReason | undefined {
-    const limits = options?.limits
-    if (!limits) return undefined
-    const invocation = this._meter.metrics.latestAgentInvocation
-    if (!invocation) return undefined
+  private _buildLimitStopResult(
+    limitStopReason: StopReason,
+    invocationState: InvocationState,
+    invocationContext: InvocationContextImpl,
+    messageCountAtStart: number
+  ): AgentResult {
+    const appendedMessage = this.messages.length > messageCountAtStart ? this.messages.at(-1) : undefined
+    return new AgentResult({
+      invocationContext,
+      stopReason: limitStopReason,
+      lastMessage: appendedMessage ?? new Message({ role: 'assistant', content: [] }),
+      traces: this._tracer.localTraces,
+      metrics: this._meter.metrics,
+      invocationState,
+    })
+  }
 
-    const cycleCount = invocation.cycles.length
-    const { outputTokens, totalTokens } = invocation.usage
+  /**
+   * Whether a hook's `resume` starts another pass. Never once one of the
+   * request's limits is reached: it stays reached for the rest of the request,
+   * so that pass would stop at once.
+   *
+   * @param event - The event whose callbacks may have set `resume`
+   * @param invocationContext - The state of the request the pass ran in
+   * @returns `true` to run another pass with `event.resume` as input
+   */
+  private _shouldResume(event: AfterInvocationEvent, invocationContext: InvocationContextImpl): boolean {
+    if (event.resume === undefined) return false
+    const limitStopReason = reachedLimit(invocationContext)
+    if (limitStopReason === undefined) return true
+    logger.debug(`limit=<${limitStopReason}> | ignoring resume because the request reached its limit`)
+    return false
+  }
 
-    if (limits.turns !== undefined && cycleCount >= limits.turns) {
-      return 'limitTurns'
-    }
-    if (limits.totalTokens !== undefined && totalTokens >= limits.totalTokens) {
-      return 'limitTotalTokens'
-    }
-    if (limits.outputTokens !== undefined && outputTokens >= limits.outputTokens) {
-      return 'limitOutputTokens'
-    }
-    return undefined
+  /**
+   * Joins the request given in `options.invocationContext`, or starts a new request
+   * with this call's limits. A nested call that sets its own `limits` gets child
+   * state, bound by both its own limits and the request's.
+   *
+   * @param options - The per-invocation options, if any
+   * @returns The state of the request to run this call in
+   */
+  private _resolveInvocationContext(options: InvokeOptions | undefined): InvocationContextImpl {
+    const inherited = unwrapInvocationContext(options?.invocationContext)
+    if (!inherited) return new InvocationContextImpl(options?.limits)
+    return options?.limits === undefined ? inherited : new InvocationContextImpl(options.limits, inherited)
   }
 
   /**
@@ -1231,8 +1255,11 @@ export class Agent implements LocalAgent, InvokableAgent {
       await this.initialize()
 
       // Thread the resolved invocationState so all layers share the same reference.
-      const invocationState = options?.invocationState ?? {}
+      const invocationState: InvocationState = options?.invocationState ?? {}
       const resolvedOptions: InvokeOptions = options?.invocationState ? options : { ...options, invocationState }
+
+      this._validateLimits(options)
+      const invocationContext = this._resolveInvocationContext(options)
 
       let currentArgs: InvokeArgs = args
 
@@ -1254,6 +1281,7 @@ export class Agent implements LocalAgent, InvokableAgent {
         // Hooks fire outside middleware — always, even on short-circuit.
         const beforeInvocationEvent = new BeforeInvocationEvent({
           agent: this,
+          invocationContext,
           invocationState,
           messages: inputMessages,
         })
@@ -1265,8 +1293,8 @@ export class Agent implements LocalAgent, InvokableAgent {
               ? beforeInvocationEvent.cancel
               : 'invocation denied by hook'
           const message = new Message({ role: 'assistant', content: [new TextBlock(cancelText)] })
-          yield this._appendMessage(message, invocationState)
-          const afterEvent = new AfterInvocationEvent({ agent: this, invocationState })
+          yield this._appendMessage(message, invocationState, invocationContext)
+          const afterEvent = new AfterInvocationEvent({ agent: this, invocationContext, invocationState })
           await continuations.abandon(
             continuationEvent,
             new Error('Continuation was not incorporated into agent history')
@@ -1275,6 +1303,7 @@ export class Agent implements LocalAgent, InvokableAgent {
           await this._invokeCallbacks(afterEvent)
           yield afterEvent
           return new AgentResult({
+            invocationContext,
             stopReason: 'endTurn',
             lastMessage: message,
             traces: this._tracer.localTraces,
@@ -1285,12 +1314,13 @@ export class Agent implements LocalAgent, InvokableAgent {
 
         let result: AgentResult | undefined
         let caughtError: Error | undefined
-        const afterInvocationEvent = new AfterInvocationEvent({ agent: this, invocationState })
+        const afterInvocationEvent = new AfterInvocationEvent({ agent: this, invocationContext, invocationState })
         try {
           result = yield* this._streamWithMiddleware(
             currentArgs,
             resolvedOptions,
             invocationState,
+            invocationContext,
             beforeInvocationEvent.messages,
             continuationEvent
           )
@@ -1332,7 +1362,7 @@ export class Agent implements LocalAgent, InvokableAgent {
           )) !== undefined
         continuationEvent = hasContinuation ? afterInvocationEvent : undefined
 
-        if (hasContinuation || afterInvocationEvent.resume !== undefined) {
+        if (hasContinuation || this._shouldResume(afterInvocationEvent, invocationContext)) {
           currentArgs = afterInvocationEvent.resume ?? []
           continue
         }
@@ -1340,6 +1370,7 @@ export class Agent implements LocalAgent, InvokableAgent {
         // Only emit AgentResultEvent on the final iteration (not on resumed ones).
         yield await this._invokeCallbacks(
           new AgentResultEvent({
+            invocationContext,
             agent: this,
             result: result!,
             invocationState,
@@ -1364,6 +1395,7 @@ export class Agent implements LocalAgent, InvokableAgent {
     args: InvokeArgs,
     options: InvokeOptions,
     invocationState: InvocationState,
+    invocationContext: InvocationContextImpl,
     inputMessages: Message[],
     continuationEvent?: AfterInvocationEvent
   ): AsyncGenerator<AgentStreamEvent, AgentResult, undefined> {
@@ -1397,6 +1429,7 @@ export class Agent implements LocalAgent, InvokableAgent {
           const result = yield* self._streamCore(
             streamArgs,
             ctx.options,
+            invocationContext,
             continuationApplied ? continuationEvent : undefined,
             historyMessages
           )
@@ -1418,9 +1451,10 @@ export class Agent implements LocalAgent, InvokableAgent {
         }
         this._interruptState.activate()
         for (const interrupt of error.interrupts) {
-          yield new InterruptEvent({ agent: this, interrupt, invocationState })
+          yield new InterruptEvent({ agent: this, invocationContext, interrupt, invocationState })
         }
         return new AgentResult({
+          invocationContext,
           stopReason: 'interrupt',
           lastMessage:
             this.messages.length > 0
@@ -1442,11 +1476,12 @@ export class Agent implements LocalAgent, InvokableAgent {
    */
   private async *_streamCore(
     args: InvokeArgs,
-    options?: InvokeOptions,
+    options: InvokeOptions | undefined,
+    invocationContext: InvocationContextImpl,
     continuationEvent?: AfterInvocationEvent,
     inputMessages?: Message[]
   ): AsyncGenerator<AgentStreamEvent, AgentResult, undefined> {
-    const streamGenerator = this._stream(args, options, continuationEvent, inputMessages)
+    const streamGenerator = this._stream(args, options, invocationContext, continuationEvent, inputMessages)
     let caughtError: Error | undefined
     let iterationResult: IteratorResult<AgentStreamEvent, AgentResult>
     try {
@@ -1616,15 +1651,15 @@ export class Agent implements LocalAgent, InvokableAgent {
    */
   private async *_stream(
     args: InvokeArgs,
-    options?: InvokeOptions,
+    options: InvokeOptions | undefined,
+    invocationContext: InvocationContextImpl,
     continuationEvent?: AfterInvocationEvent,
     inputMessages?: Message[]
   ): AsyncGenerator<AgentStreamEvent, AgentResult, undefined> {
     let currentArgs: InvokeArgs | undefined = args
     let pendingInputMessages = inputMessages
     let result: AgentResult | undefined
-
-    this._validateLimits(options)
+    const messageCountAtStart = this.messages.length
 
     // Checkpoint resume: consume a { checkpointResume: { checkpoint } } arg.
     // On resume we append no new input and re-derive the cycle position from the
@@ -1690,17 +1725,14 @@ export class Agent implements LocalAgent, InvokableAgent {
       while (true) {
         this._throwIfCancelled()
 
-        const limitStopReason = this._checkLimits(options)
+        const limitStopReason = reachedLimit(invocationContext)
         if (limitStopReason) {
-          result = new AgentResult({
-            stopReason: limitStopReason,
-            lastMessage: this.messages.at(-1)!,
-            traces: this._tracer.localTraces,
-            metrics: this._meter.metrics,
-            invocationState,
-          })
+          result = this._buildLimitStopResult(limitStopReason, invocationState, invocationContext, messageCountAtStart)
           return result
         }
+
+        // Count this turn before it runs, so nested calls started by its tools see it already counted.
+        invocationContext.recordTurn()
 
         // Start metrics cycle tracking
         const { cycleId, startTime: cycleStartTime } = this._meter.startCycle()
@@ -1734,10 +1766,15 @@ export class Agent implements LocalAgent, InvokableAgent {
           if (currentArgs !== undefined || pendingInputMessages !== undefined) {
             const messagesToAppend = pendingInputMessages ?? this._normalizeInput(currentArgs)
             if (continuationEvent) {
-              yield* await this._appendContinuationMessages(messagesToAppend, continuationEvent, invocationState)
+              yield* await this._appendContinuationMessages(
+                messagesToAppend,
+                continuationEvent,
+                invocationState,
+                invocationContext
+              )
             } else {
               for (const message of messagesToAppend) {
-                yield this._appendMessage(message, invocationState)
+                yield this._appendMessage(message, invocationState, invocationContext)
               }
             }
             currentArgs = undefined
@@ -1754,7 +1791,7 @@ export class Agent implements LocalAgent, InvokableAgent {
             assistantMessage = pendingExecution.assistantMessage
             completedToolResults = pendingExecution.completedToolResults
           } else {
-            const modelResult = yield* this._invokeModel(invocationState, structuredOutputChoice)
+            const modelResult = yield* this._invokeModel(invocationState, invocationContext, structuredOutputChoice)
 
             if (modelResult.stopReason !== 'toolUse') {
               // Schema set, we already forced, and the model still refused.
@@ -1779,8 +1816,9 @@ export class Agent implements LocalAgent, InvokableAgent {
               }
 
               // Normal end of turn.
-              yield this._appendMessage(modelResult.message, invocationState)
+              yield this._appendMessage(modelResult.message, invocationState, invocationContext)
               result = new AgentResult({
+                invocationContext,
                 stopReason: modelResult.stopReason,
                 lastMessage: modelResult.message,
                 traces: this._tracer.localTraces,
@@ -1805,12 +1843,13 @@ export class Agent implements LocalAgent, InvokableAgent {
               )
               const toolResultMessage = new Message({ role: 'user', content: cancelBlocks })
 
-              yield this._appendMessage(modelResult.message, invocationState)
-              yield this._appendMessage(toolResultMessage, invocationState)
+              yield this._appendMessage(modelResult.message, invocationState, invocationContext)
+              yield this._appendMessage(toolResultMessage, invocationState, invocationContext)
 
               closeCycle()
 
               result = new AgentResult({
+                invocationContext,
                 stopReason: 'cancelled',
                 lastMessage: modelResult.message,
                 traces: this._tracer.localTraces,
@@ -1832,6 +1871,7 @@ export class Agent implements LocalAgent, InvokableAgent {
               if (priorResumePosition !== 'afterModel') {
                 closeCycle()
                 result = new AgentResult({
+                  invocationContext,
                   stopReason: 'checkpoint',
                   lastMessage: modelResult.message,
                   traces: this._tracer.localTraces,
@@ -1847,7 +1887,12 @@ export class Agent implements LocalAgent, InvokableAgent {
           }
 
           // Execute tools
-          const toolsResult = yield* this.executeTools(assistantMessage, invocationState, completedToolResults)
+          const toolsResult = yield* this.executeTools(
+            assistantMessage,
+            invocationState,
+            invocationContext,
+            completedToolResults
+          )
 
           // Reached when the consumer breaks the stream during tool execution.
           // _streamCore's drain loop calls .return(), which runs the finally in
@@ -1871,8 +1916,8 @@ export class Agent implements LocalAgent, InvokableAgent {
            * If interrupted during tool execution, messages has no dangling toolUse
            * without a matching toolResult, so the agent can be reinvoked cleanly.
            */
-          yield this._appendMessage(assistantMessage, invocationState)
-          yield this._appendMessage(toolResultMessage, invocationState)
+          yield this._appendMessage(assistantMessage, invocationState, invocationContext)
+          yield this._appendMessage(toolResultMessage, invocationState, invocationContext)
 
           // Both messages are in history, so any stored pending execution is now stale.
           this._interruptState.clearPendingToolExecution()
@@ -1897,9 +1942,10 @@ export class Agent implements LocalAgent, InvokableAgent {
                   ),
                 ]
             const lastMessage = new Message({ role: 'assistant', content: endTurnContent })
-            yield this._appendMessage(lastMessage, invocationState)
+            yield this._appendMessage(lastMessage, invocationState, invocationContext)
 
             result = new AgentResult({
+              invocationContext,
               stopReason: 'endTurn',
               lastMessage,
               traces: this._tracer.localTraces,
@@ -1915,6 +1961,7 @@ export class Agent implements LocalAgent, InvokableAgent {
             : undefined
           if (structuredOutput !== undefined) {
             result = new AgentResult({
+              invocationContext,
               stopReason: 'toolUse',
               lastMessage: assistantMessage,
               traces: this._tracer.localTraces,
@@ -1931,6 +1978,7 @@ export class Agent implements LocalAgent, InvokableAgent {
           // iteration's cancellation check return `cancelled`.
           if (this._checkpointing && !this.isCancelled) {
             result = new AgentResult({
+              invocationContext,
               stopReason: 'checkpoint',
               lastMessage: assistantMessage,
               traces: this._tracer.localTraces,
@@ -1956,10 +2004,11 @@ export class Agent implements LocalAgent, InvokableAgent {
           content: [new TextBlock('Cancelled by user')],
         })
         if (this._hasOpenUserTurn()) {
-          yield this._appendMessage(cancelMessage, invocationState)
+          yield this._appendMessage(cancelMessage, invocationState, invocationContext)
         }
 
         result = new AgentResult({
+          invocationContext,
           stopReason: 'cancelled',
           lastMessage: cancelMessage,
           traces: this._tracer.localTraces,
@@ -1978,9 +2027,9 @@ export class Agent implements LocalAgent, InvokableAgent {
         // consumers can filter by origin (tool callback vs hook callback) without
         // subscribing to separate event types.
         for (const interrupt of error.interrupts) {
-          yield new InterruptEvent({ agent: this, interrupt, invocationState })
+          yield new InterruptEvent({ agent: this, invocationContext, interrupt, invocationState })
         }
-        result = this._createInterruptResult(invocationState)
+        result = this._createInterruptResult(invocationState, invocationContext)
         return result
       }
       caughtError = error as Error
@@ -1995,7 +2044,7 @@ export class Agent implements LocalAgent, InvokableAgent {
           content: [new TextBlock('Cancelled by user')],
         })
         if (this._hasOpenUserTurn()) {
-          yield this._appendMessage(cancelMessage, invocationState)
+          yield this._appendMessage(cancelMessage, invocationState, invocationContext)
         }
       }
 
@@ -2040,11 +2089,16 @@ export class Agent implements LocalAgent, InvokableAgent {
    * Creates an AgentResult for an interrupt stop.
    *
    * @param invocationState - The current invocation state
+   * @param invocationContext - The state of the request the call ran in
    * @returns AgentResult with stopReason 'interrupt'
    */
-  private _createInterruptResult(invocationState: InvocationState): AgentResult {
+  private _createInterruptResult(
+    invocationState: InvocationState,
+    invocationContext: InvocationContextImpl
+  ): AgentResult {
     this._interruptState.activate()
     return new AgentResult({
+      invocationContext,
       stopReason: 'interrupt',
       lastMessage:
         this.messages.length > 0
@@ -2185,6 +2239,7 @@ export class Agent implements LocalAgent, InvokableAgent {
    */
   private async *_invokeModel(
     invocationState: InvocationState,
+    invocationContext: InvocationContextImpl,
     toolChoice?: ToolChoice
   ): AsyncGenerator<AgentStreamEvent, StreamAggregatedResult, undefined> {
     const toolSpecs = this._toolRegistry.list().map((tool) => tool.toolSpec)
@@ -2210,6 +2265,7 @@ export class Agent implements LocalAgent, InvokableAgent {
       }
 
       const beforeModelCallEvent = new BeforeModelCallEvent({
+        invocationContext,
         agent: this,
         model: selectedModel,
         invocationState,
@@ -2237,6 +2293,7 @@ export class Agent implements LocalAgent, InvokableAgent {
         const message = new Message({ role: 'assistant', content: [new TextBlock(cancelText)] })
         const stopData: ModelStopData = { message, stopReason: 'endTurn' }
         const afterModelCallEvent = new AfterModelCallEvent({
+          invocationContext,
           agent: this,
           model: selectedModel,
           attemptCount,
@@ -2253,7 +2310,12 @@ export class Agent implements LocalAgent, InvokableAgent {
         return { message, stopReason: 'endTurn' }
       }
 
-      yield* await this._appendContinuationMessages(modelContinuation ?? [], beforeModelCallEvent, invocationState)
+      yield* await this._appendContinuationMessages(
+        modelContinuation ?? [],
+        beforeModelCallEvent,
+        invocationState,
+        invocationContext
+      )
 
       if (modelContinuation !== undefined) {
         try {
@@ -2270,6 +2332,7 @@ export class Agent implements LocalAgent, InvokableAgent {
       try {
         const result = yield* this._invokeModelWithMiddleware(
           invocationState,
+          invocationContext,
           selectedModel,
           invokedModelRef,
           toolChoice,
@@ -2281,6 +2344,7 @@ export class Agent implements LocalAgent, InvokableAgent {
         this._meter.updateCycle(result.metadata)
 
         yield new ModelMessageEvent({
+          invocationContext,
           agent: this,
           message: result.message,
           stopReason: result.stopReason,
@@ -2298,6 +2362,7 @@ export class Agent implements LocalAgent, InvokableAgent {
         }
 
         const afterModelCallEvent = new AfterModelCallEvent({
+          invocationContext,
           agent: this,
           model,
           attemptCount,
@@ -2318,6 +2383,7 @@ export class Agent implements LocalAgent, InvokableAgent {
         const failedModel = invokedModelRef.model ?? routedModel
         const modelError = normalizeError(error)
         const errorEvent = new AfterModelCallEvent({
+          invocationContext,
           agent: this,
           model: failedModel,
           attemptCount,
@@ -2364,6 +2430,7 @@ export class Agent implements LocalAgent, InvokableAgent {
    */
   private async *_invokeModelWithMiddleware(
     invocationState: InvocationState,
+    invocationContext: InvocationContextImpl,
     selectedModel: Model,
     invokedModelRef: InvokedModelRef,
     toolChoice?: ToolChoice,
@@ -2378,6 +2445,7 @@ export class Agent implements LocalAgent, InvokableAgent {
       ...(toolChoice !== undefined && { toolChoice: deepCopy(toolChoice) as unknown as ToolChoice }),
       invocationState,
       ...(projectedInputTokens !== undefined && { projectedInputTokens }),
+      invocationContext,
     }
 
     // Snapshot model state before middleware runs so concurrent mutations don't leak in.
@@ -2416,7 +2484,13 @@ export class Agent implements LocalAgent, InvokableAgent {
             ...(ctx.dynamicTrailingBlocks ? { dynamicTrailingBlocks: ctx.dynamicTrailingBlocks } : {}),
             ...(self.sessionManager ? { agentMetadata: { sessionId: self.sessionId } } : {}),
           }
-          const gen = self._streamFromModel(ctx.model, ctx.messages as Message[], streamOptions, ctx.invocationState)
+          const gen = self._streamFromModel(
+            ctx.model,
+            ctx.messages as Message[],
+            streamOptions,
+            ctx.invocationState,
+            invocationContext
+          )
           let iterResult = await gen.next()
           while (!iterResult.done) {
             yield iterResult.value
@@ -2479,10 +2553,12 @@ export class Agent implements LocalAgent, InvokableAgent {
     model: Model,
     messages: Message[],
     streamOptions: StreamOptions,
-    invocationState: InvocationState
+    invocationState: InvocationState,
+    invocationContext: InvocationContextImpl
   ): AsyncGenerator<AgentStreamEvent, StreamAggregatedResult, undefined> {
     messages = normalizeToolUseNames(messages)
-    const streamGenerator = model.streamAggregated(messages, streamOptions)
+    const proxy = new ModelProxy(model)
+    const streamGenerator = proxy.streamAggregated(messages, streamOptions, invocationContext)
     try {
       let result = await streamGenerator.next()
 
@@ -2493,10 +2569,10 @@ export class Agent implements LocalAgent, InvokableAgent {
 
         if (isModelStreamEvent(event)) {
           // ModelStreamEvent: wrap in ModelStreamUpdateEvent
-          yield new ModelStreamUpdateEvent({ agent: this, event, invocationState })
+          yield new ModelStreamUpdateEvent({ agent: this, invocationContext, event, invocationState })
         } else {
           // ContentBlock: wrap in ContentBlockEvent
-          yield new ContentBlockEvent({ agent: this, contentBlock: event, invocationState })
+          yield new ContentBlockEvent({ agent: this, invocationContext, contentBlock: event, invocationState })
         }
         result = await streamGenerator.next()
       }
@@ -2523,9 +2599,15 @@ export class Agent implements LocalAgent, InvokableAgent {
   private async *executeTools(
     assistantMessage: Message,
     invocationState: InvocationState,
+    invocationContext: InvocationContextImpl,
     completedToolResults?: Map<string, ToolResultBlock>
   ): AsyncGenerator<AgentStreamEvent, ToolsExecutionResult, undefined> {
-    const beforeToolsEvent = new BeforeToolsEvent({ agent: this, message: assistantMessage, invocationState })
+    const beforeToolsEvent = new BeforeToolsEvent({
+      agent: this,
+      invocationContext,
+      message: assistantMessage,
+      invocationState,
+    })
     try {
       yield beforeToolsEvent
     } catch (error) {
@@ -2566,7 +2648,7 @@ export class Agent implements LocalAgent, InvokableAgent {
         toolsSkipped = true
         toolResultBlocks.push(...this._cancelAllAsResults(toolUseBlocks, cancelMessage))
         for (const result of toolResultBlocks) {
-          yield new ToolResultEvent({ agent: this, result, invocationState })
+          yield new ToolResultEvent({ agent: this, invocationContext, result, invocationState })
         }
       } else {
         yield* this._toolExecutor.execute(
@@ -2576,6 +2658,7 @@ export class Agent implements LocalAgent, InvokableAgent {
             tracer: this._tracer,
             meter: this._meter,
             cancelSignal: this._abortSignal,
+            invocationContext,
             ...(this._backgroundTasks && {
               backgroundTasks: this._backgroundTasks,
               backgroundTaskPassId: assistantMessage.trackingId,
@@ -2592,7 +2675,12 @@ export class Agent implements LocalAgent, InvokableAgent {
       }
     } finally {
       toolResultMessage = new Message({ role: 'user', content: toolResultBlocks })
-      afterToolsEvent = new AfterToolsEvent({ agent: this, message: toolResultMessage, invocationState })
+      afterToolsEvent = new AfterToolsEvent({
+        agent: this,
+        invocationContext,
+        message: toolResultMessage,
+        invocationState,
+      })
       yield afterToolsEvent
     }
 
@@ -2727,21 +2815,26 @@ export class Agent implements LocalAgent, InvokableAgent {
    * @param message - The message to append
    * @returns MessageAddedEvent to be yielded
    */
-  private _appendMessage(message: Message, invocationState: InvocationState): MessageAddedEvent {
+  private _appendMessage(
+    message: Message,
+    invocationState: InvocationState,
+    invocationContext: InvocationContextImpl
+  ): MessageAddedEvent {
     this.messages.push(message)
-    return new MessageAddedEvent({ agent: this, message, invocationState })
+    return new MessageAddedEvent({ agent: this, invocationContext, message, invocationState })
   }
 
   private async _appendContinuationMessages(
     messages: readonly Message[],
     continuationEvent: AfterInvocationEvent | BeforeModelCallEvent,
-    invocationState: InvocationState
+    invocationState: InvocationState,
+    invocationContext: InvocationContextImpl
   ): Promise<MessageAddedEvent[]> {
     const events: MessageAddedEvent[] = []
     for (const message of messages) {
       const lastMessage = this.messages.at(-1)
       if (lastMessage?.role !== message.role) {
-        events.push(this._appendMessage(message, invocationState))
+        events.push(this._appendMessage(message, invocationState, invocationContext))
         continue
       }
 
@@ -2753,7 +2846,12 @@ export class Agent implements LocalAgent, InvokableAgent {
       })
       this.messages[this.messages.length - 1] = appendedMessage
 
-      const messageEvent = new MessageAddedEvent({ agent: this, message: appendedMessage, invocationState })
+      const messageEvent = new MessageAddedEvent({
+        agent: this,
+        invocationContext,
+        message: appendedMessage,
+        invocationState,
+      })
       if (events.at(-1)?.message === lastMessage) {
         events[events.length - 1] = messageEvent
       } else {

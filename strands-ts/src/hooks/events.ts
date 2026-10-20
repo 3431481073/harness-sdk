@@ -6,6 +6,7 @@ import type { ModelStreamEvent } from '../models/streaming.js'
 import type { Model } from '../models/model.js'
 import { interruptFromAgent, type Interrupt, type Interruptible } from '../interrupt.js'
 import type { InterruptParams } from '../types/interrupt.js'
+import type { InvocationContext } from '../agent/invocation-context.js'
 
 /**
  * Agent hook events.
@@ -81,12 +82,31 @@ import type { InterruptParams } from '../types/interrupt.js'
 export abstract class StreamEvent {}
 
 /**
+ * Data accepted by every {@link HookableEvent} constructor.
+ */
+export interface HookableEventData {
+  /** The request the event belongs to, if any. */
+  invocationContext?: InvocationContext | undefined
+}
+
+/**
  * Base class for events that can be subscribed to via the hook system.
  * Only events extending this class are dispatched to {@link HookRegistry} callbacks.
  * All current events extend this class. {@link StreamEvent} exists as the base for
  * potential future stream-only events that should not be hookable.
  */
 export abstract class HookableEvent extends StreamEvent {
+  /** The request this event belongs to (`undefined` outside one); pass it to {@link InvokeOptions.invocationContext} to join it. */
+  declare readonly invocationContext?: InvocationContext
+
+  constructor(data?: HookableEventData) {
+    super()
+    // Non-enumerable, so it stays out of equality checks, spreads, and enumeration of the event.
+    if (data?.invocationContext !== undefined) {
+      Object.defineProperty(this, 'invocationContext', { value: data.invocationContext, enumerable: false })
+    }
+  }
+
   /**
    * @internal
    * Check if callbacks should be reversed for this event.
@@ -154,8 +174,8 @@ export class BeforeInvocationEvent extends HookableEvent {
    */
   cancel: boolean | string = false
 
-  constructor(data: { agent: LocalAgent; invocationState: InvocationState; messages?: Message[] }) {
-    super()
+  constructor(data: { agent: LocalAgent; invocationState: InvocationState; messages?: Message[] } & HookableEventData) {
+    super(data)
     this.agent = data.agent
     this.invocationState = data.invocationState
     this.messages = data.messages ?? []
@@ -185,14 +205,15 @@ export class AfterInvocationEvent extends HookableEvent {
    * When set, after this event's callbacks complete the agent re-enters its loop
    * with these args as new input, under the same invocation lock. A fresh
    * {@link BeforeInvocationEvent}/{@link AfterInvocationEvent} pair fires for the
-   * resumed run. Ignored if the invocation ended with an error.
+   * resumed run. Ignored if the invocation ended with an error or one of the
+   * request's limits is reached, since a resumed run would stop again at once.
    *
    * If multiple callbacks set `resume`, the last callback to run wins.
    */
   resume: InvokeArgs | undefined = undefined
 
-  constructor(data: { agent: LocalAgent; invocationState: InvocationState }) {
-    super()
+  constructor(data: { agent: LocalAgent; invocationState: InvocationState } & HookableEventData) {
+    super(data)
     this.agent = data.agent
     this.invocationState = data.invocationState
   }
@@ -223,8 +244,8 @@ export class MessageAddedEvent extends HookableEvent {
   readonly message: Message
   readonly invocationState: InvocationState
 
-  constructor(data: { agent: LocalAgent; message: Message; invocationState: InvocationState }) {
-    super()
+  constructor(data: { agent: LocalAgent; message: Message; invocationState: InvocationState } & HookableEventData) {
+    super(data)
     this.agent = data.agent
     this.message = data.message
     this.invocationState = data.invocationState
@@ -275,13 +296,15 @@ export class BeforeToolCallEvent extends HookableEvent implements Interruptible 
    */
   selectedTool: Tool | undefined = undefined
 
-  constructor(data: {
-    agent: LocalAgent
-    toolUse: ToolUseData
-    tool: Tool | undefined
-    invocationState: InvocationState
-  }) {
-    super()
+  constructor(
+    data: {
+      agent: LocalAgent
+      toolUse: ToolUseData
+      tool: Tool | undefined
+      invocationState: InvocationState
+    } & HookableEventData
+  ) {
+    super(data)
     this.agent = data.agent
     this.toolUse = data.toolUse
     this.tool = data.tool
@@ -344,15 +367,17 @@ export class AfterToolCallEvent extends HookableEvent {
    */
   retry?: boolean
 
-  constructor(data: {
-    agent: LocalAgent
-    toolUse: ToolUseData
-    tool: Tool | undefined
-    result: ToolResultBlock
-    invocationState: InvocationState
-    error?: Error
-  }) {
-    super()
+  constructor(
+    data: {
+      agent: LocalAgent
+      toolUse: ToolUseData
+      tool: Tool | undefined
+      result: ToolResultBlock
+      invocationState: InvocationState
+      error?: Error
+    } & HookableEventData
+  ) {
+    super(data)
     this.agent = data.agent
     this.toolUse = data.toolUse
     this.tool = data.tool
@@ -407,13 +432,15 @@ export class BeforeModelCallEvent extends HookableEvent {
    */
   readonly projectedInputTokens?: number
 
-  constructor(data: {
-    agent: LocalAgent
-    model: Model
-    invocationState: InvocationState
-    projectedInputTokens?: number
-  }) {
-    super()
+  constructor(
+    data: {
+      agent: LocalAgent
+      model: Model
+      invocationState: InvocationState
+      projectedInputTokens?: number
+    } & HookableEventData
+  ) {
+    super(data)
     this.agent = data.agent
     this.model = data.model
     this.invocationState = data.invocationState
@@ -497,15 +524,17 @@ export class AfterModelCallEvent extends HookableEvent {
    */
   retry?: boolean
 
-  constructor(data: {
-    agent: LocalAgent
-    model: Model
-    invocationState: InvocationState
-    attemptCount: number
-    stopData?: ModelStopData
-    error?: Error
-  }) {
-    super()
+  constructor(
+    data: {
+      agent: LocalAgent
+      model: Model
+      invocationState: InvocationState
+      attemptCount: number
+      stopData?: ModelStopData
+      error?: Error
+    } & HookableEventData
+  ) {
+    super(data)
     this.agent = data.agent
     this.model = data.model
     this.invocationState = data.invocationState
@@ -549,8 +578,10 @@ export class ModelStreamUpdateEvent extends HookableEvent {
   readonly event: ModelStreamEvent
   readonly invocationState: InvocationState
 
-  constructor(data: { agent: LocalAgent; event: ModelStreamEvent; invocationState: InvocationState }) {
-    super()
+  constructor(
+    data: { agent: LocalAgent; event: ModelStreamEvent; invocationState: InvocationState } & HookableEventData
+  ) {
+    super(data)
     this.agent = data.agent
     this.event = data.event
     this.invocationState = data.invocationState
@@ -581,8 +612,10 @@ export class ContentBlockEvent extends HookableEvent {
   readonly contentBlock: ContentBlock
   readonly invocationState: InvocationState
 
-  constructor(data: { agent: LocalAgent; contentBlock: ContentBlock; invocationState: InvocationState }) {
-    super()
+  constructor(
+    data: { agent: LocalAgent; contentBlock: ContentBlock; invocationState: InvocationState } & HookableEventData
+  ) {
+    super(data)
     this.agent = data.agent
     this.contentBlock = data.contentBlock
     this.invocationState = data.invocationState
@@ -608,8 +641,15 @@ export class ModelMessageEvent extends HookableEvent {
   readonly stopReason: StopReason
   readonly invocationState: InvocationState
 
-  constructor(data: { agent: LocalAgent; message: Message; stopReason: StopReason; invocationState: InvocationState }) {
-    super()
+  constructor(
+    data: {
+      agent: LocalAgent
+      message: Message
+      stopReason: StopReason
+      invocationState: InvocationState
+    } & HookableEventData
+  ) {
+    super(data)
     this.agent = data.agent
     this.message = data.message
     this.stopReason = data.stopReason
@@ -635,8 +675,10 @@ export class ToolResultEvent extends HookableEvent {
   readonly result: ToolResultBlock
   readonly invocationState: InvocationState
 
-  constructor(data: { agent: LocalAgent; result: ToolResultBlock; invocationState: InvocationState }) {
-    super()
+  constructor(
+    data: { agent: LocalAgent; result: ToolResultBlock; invocationState: InvocationState } & HookableEventData
+  ) {
+    super(data)
     this.agent = data.agent
     this.result = data.result
     this.invocationState = data.invocationState
@@ -653,7 +695,7 @@ export class ToolResultEvent extends HookableEvent {
 
 /**
  * Event triggered for each streaming progress event from a tool during execution.
- * Wraps a {@link ToolStreamEvent} with agent context, keeping the tool authoring
+ * Wraps a {@link ToolStreamEvent} with invocation context, keeping the tool authoring
  * interface unchanged — tools construct `ToolStreamEvent` without knowledge of agents
  * or hooks, and the agent layer wraps them at the boundary.
  *
@@ -666,8 +708,10 @@ export class ToolStreamUpdateEvent extends HookableEvent {
   readonly event: ToolStreamEvent
   readonly invocationState: InvocationState
 
-  constructor(data: { agent: LocalAgent; event: ToolStreamEvent; invocationState: InvocationState }) {
-    super()
+  constructor(
+    data: { agent: LocalAgent; event: ToolStreamEvent; invocationState: InvocationState } & HookableEventData
+  ) {
+    super(data)
     this.agent = data.agent
     this.event = data.event
     this.invocationState = data.invocationState
@@ -692,8 +736,8 @@ export class AgentResultEvent extends HookableEvent {
   readonly result: AgentResult
   readonly invocationState: InvocationState
 
-  constructor(data: { agent: LocalAgent; result: AgentResult; invocationState: InvocationState }) {
-    super()
+  constructor(data: { agent: LocalAgent; result: AgentResult; invocationState: InvocationState } & HookableEventData) {
+    super(data)
     this.agent = data.agent
     this.result = data.result
     this.invocationState = data.invocationState
@@ -719,8 +763,8 @@ export class InterruptEvent extends HookableEvent {
   readonly interrupt: Interrupt
   readonly invocationState: InvocationState
 
-  constructor(data: { agent: LocalAgent; interrupt: Interrupt; invocationState: InvocationState }) {
-    super()
+  constructor(data: { agent: LocalAgent; interrupt: Interrupt; invocationState: InvocationState } & HookableEventData) {
+    super(data)
     this.agent = data.agent
     this.interrupt = data.interrupt
     this.invocationState = data.invocationState
@@ -750,8 +794,8 @@ export class BeforeToolsEvent extends HookableEvent implements Interruptible {
    */
   cancel: boolean | string = false
 
-  constructor(data: { agent: LocalAgent; message: Message; invocationState: InvocationState }) {
-    super()
+  constructor(data: { agent: LocalAgent; message: Message; invocationState: InvocationState } & HookableEventData) {
+    super(data)
     this.agent = data.agent
     this.message = data.message
     this.invocationState = data.invocationState
@@ -804,8 +848,8 @@ export class AfterToolsEvent extends HookableEvent {
    */
   endTurn: boolean | string | ContentBlock[] = false
 
-  constructor(data: { agent: LocalAgent; message: Message; invocationState: InvocationState }) {
-    super()
+  constructor(data: { agent: LocalAgent; message: Message; invocationState: InvocationState } & HookableEventData) {
+    super(data)
     this.agent = data.agent
     this.message = data.message
     this.invocationState = data.invocationState
