@@ -15,6 +15,13 @@ sourceLinks:
 
 Keep an agent's state and conversation history across restarts and requests. A session persists what the agent knows, so it can pick up where it left off even when your application restarts or runs across several machines.
 
+:::caution[Python repository-based session managers are deprecated]
+`RepositorySessionManager`, `FileSessionManager`, and `S3SessionManager` remain supported
+in v1 but will be removed in v2.0.0. Use `SnapshotSessionManager` for new sessions.
+`SnapshotSessionManager` cannot read repository-format records, so follow the
+[migration guide](./migrate-repository-sessions.mdx) to preserve existing data.
+:::
+
 ## What a session contains
 
 A session holds the stateful information agents and multi-agent systems need to function, including:
@@ -80,9 +87,8 @@ agent("Hello!")  # This conversation is persisted
 
 Strands persists the conversation and its state to the underlying storage backend.
 
-In Python, use `SnapshotSessionManager` for new sessions. The repository-based managers
-are deprecated and will be removed in v2.0.0. TypeScript uses a single `SessionManager`
-for both single-agent and multi-agent sessions.
+In Python, use `SnapshotSessionManager` for new sessions. TypeScript uses a single
+`SessionManager` for both single-agent and multi-agent sessions.
 
 ### Multi-agent sessions
 
@@ -209,8 +215,9 @@ console.log(new Agent().sessionId) // e.g. "a1b2c3d4"
   storage. If neither provides storage, Python falls back to
   `LocalFileStorage("./.strands/")`, while TypeScript fails during initialization.
 - **Repository-based managers (Python, deprecated)** configure a storage directory or
-  Amazon S3 bucket directly. They do not accept a `Storage` backend and will be removed
-  in v2.0.0.
+  Amazon S3 bucket directly. They do not accept a `Storage` backend. See
+  [Repository-based session managers](#repository-based-session-managers) for v1
+  configuration examples.
 
 Configure snapshot storage for each SDK:
 
@@ -317,13 +324,6 @@ See [Basic Usage](#basic-usage) for configuration examples.
 
 ### Repository-based session managers
 
-:::note[Python only]
-Repository-based session managers are deprecated and will be removed in v2.0.0.
-Switching to `SnapshotSessionManager` does not carry existing data over: the new session
-starts empty, and the source records remain unchanged. Follow the
-[migration guide](./migrate-repository-sessions.mdx) to preserve existing sessions.
-:::
-
 Repository-based session managers persist session metadata, agent state, and individual
 messages as separate records through the `SessionRepository` interface.
 
@@ -331,6 +331,49 @@ messages as separate records through the `SessionRepository` interface.
   `SessionRepository` implementation.
 - **`FileSessionManager`** stores session records as local files.
 - **`S3SessionManager`** stores session records as Amazon S3 objects.
+
+Continue an existing repository-format session with its original manager, session ID,
+agent ID, and storage configuration. The manager restores those records when it
+initializes the agent and persists subsequent messages and state.
+
+#### Continue a session from local files
+
+To continue a session stored on local disk, configure `FileSessionManager` with its
+existing storage directory:
+
+```python
+from strands import Agent
+from strands.session import FileSessionManager
+
+session_manager = FileSessionManager(
+    session_id="user-123",
+    storage_dir="./repository-sessions",
+)
+agent = Agent(session_manager=session_manager)
+
+agent("Continue our previous conversation.")
+```
+
+#### Continue a session from Amazon S3
+
+To continue a session stored in Amazon S3, configure `S3SessionManager` with its existing
+bucket and prefix. Configure the standard Boto3 credential chain and grant the
+[required S3 permissions](../storage.mdx#required-s3-permissions).
+
+```python
+from strands import Agent
+from strands.session import S3SessionManager
+
+session_manager = S3SessionManager(
+    session_id="user-123",
+    bucket="my-agent-sessions",
+    prefix="production/",
+    region_name="us-west-2",
+)
+agent = Agent(session_manager=session_manager)
+
+agent("Continue our previous conversation.")
+```
 
 ## Immutable snapshots
 
@@ -535,9 +578,14 @@ Implement a custom storage backend when the built-in backends do not meet your n
 <Tabs>
 <Tab label="Python">
 
-Implement the [`Storage` interface](../storage.mdx#custom-backends) and pass it to
-`SnapshotSessionManager`. Existing custom `SessionRepository` implementations must migrate
-before v2.0.0.
+For new custom backends, implement the
+[`Storage` interface](../storage.mdx#custom-backends) and pass it to
+`SnapshotSessionManager`.
+
+Existing custom `SessionRepository` implementations remain supported in v1. Pass the
+repository instance to `RepositorySessionManager` as `session_repository`, then attach the
+manager to an agent as you would a built-in manager. Migrate the implementation to a
+custom `Storage` backend before v2.0.0.
 
 </Tab>
 <Tab label="TypeScript">
