@@ -691,7 +691,9 @@ class Graph(MultiAgentBase):
                     yield event.as_dict()
 
                 # Set final status based on execution results
-                if self.state.failed_nodes:
+                if self.state.status == Status.INTERRUPTED:
+                    pass
+                elif self.state.failed_nodes:
                     self.state.status = Status.FAILED
                 elif self.state.status == Status.EXECUTING:
                     self.state.status = Status.COMPLETED
@@ -804,8 +806,6 @@ class Graph(MultiAgentBase):
             self._interrupt_state.deactivate()
 
             # Find newly ready nodes after batch execution
-            # We add all nodes in current batch as completed batch,
-            # because a failure would throw exception and code would not make it here
             newly_ready = self._find_newly_ready_nodes(current_batch)
 
             # Emit handoff event for batch transition if there are nodes to transition to
@@ -835,6 +835,10 @@ class Graph(MultiAgentBase):
             nodes = [node for node in nodes if node.execution_status == Status.INTERRUPTED]
 
         event_queue: asyncio.Queue[Any | None | Exception] = asyncio.Queue()
+
+        # Mark nodes DISPATCHED before scheduling so a serialize in the pre-EXECUTING window sees them as in-flight.
+        for node in nodes:
+            node.execution_status = Status.DISPATCHED
 
         # Start all node streams as independent tasks
         tasks = [asyncio.create_task(self._stream_node_to_queue(node, event_queue, invocation_state)) for node in nodes]
@@ -950,8 +954,15 @@ class Graph(MultiAgentBase):
         """Find nodes that became ready after the last execution.
 
         Only evaluates destination nodes of outbound edges from the completed batch,
-        instead of iterating over all nodes in the graph.
+        instead of iterating over all nodes in the graph.  Failed nodes (e.g. a
+        cancelled agent) are excluded so they cannot nominate successors — their
+        downstream branch is pruned while sibling branches continue.
         """
+        # Strip failed/cancelled nodes so their outgoing edges are never walked.
+        completed_batch = [node for node in completed_batch if node.execution_status != Status.FAILED]
+        if not completed_batch:
+            return []
+
         # Collect unique candidate nodes reachable from the completed batch
         candidates = {edge.to_node for edge in self.edges if edge.from_node in completed_batch}
 
@@ -1046,6 +1057,8 @@ class Graph(MultiAgentBase):
             elif isinstance(node.executor, AgentBase):
                 # For AgentBase implementations (Agent, A2AAgent, etc.), stream events and collect result
                 agent_response = None
+                # Captured before stream_async's finally clears it.
+                node_cancel_signal_set = False
                 async for event in node.executor.stream_async(node_input, invocation_state=invocation_state):
                     # Forward agent events with node context
                     wrapped_event = MultiAgentNodeStreamEvent(node.node_id, event)
@@ -1053,6 +1066,8 @@ class Graph(MultiAgentBase):
                     # Capture the final result event
                     if "result" in event:
                         agent_response = event["result"]
+                        signal = getattr(node.executor, "cancel_signal", None)
+                        node_cancel_signal_set = signal is not None and signal.is_set()
 
                 # Use the captured result from streaming (no double execution)
                 if agent_response is None:
@@ -1068,11 +1083,19 @@ class Graph(MultiAgentBase):
                 # Handle stop_reason and interrupts (use getattr for AgentBase compatibility)
                 stop_reason = getattr(agent_response, "stop_reason", "end_turn")
                 interrupts = getattr(agent_response, "interrupts", None) or []
+                # Immediate cancel (signal set) is an abort → FAILED; the stop tool's deferred
+                # cancel never sets the signal and resolves as a normal completion.
+                if stop_reason == "cancelled":
+                    agent_status = Status.FAILED if node_cancel_signal_set else Status.COMPLETED
+                elif stop_reason == "interrupt":
+                    agent_status = Status.INTERRUPTED
+                else:
+                    agent_status = Status.COMPLETED
 
                 node_result = NodeResult(
                     result=agent_response,
                     execution_time=round((time.time() - start_time) * 1000),
-                    status=Status.INTERRUPTED if stop_reason == "interrupt" else Status.COMPLETED,
+                    status=agent_status,
                     accumulated_usage=usage,
                     accumulated_metrics=metrics,
                     execution_count=1,
@@ -1357,11 +1380,12 @@ class Graph(MultiAgentBase):
         branch*, so a fan-in node stays not-ready while any parent that will still produce a result
         is outstanding. It has two seeds:
 
-        - In-flight nodes (``execution_status == EXECUTING``): serialize runs from the per-node
-          ``AfterNodeCallEvent`` while sibling nodes in the same parallel batch are still executing.
-          Their partial progress is not persisted, so they re-run on resume. This is the
-          authoritative in-flight signal, and it catches siblings with no completed ancestor (e.g.
-          two concurrent entry points feeding one join) that forward reachability alone would miss.
+        - In-flight nodes (``execution_status in (EXECUTING, DISPATCHED)``): serialize runs from the per-node
+          ``AfterNodeCallEvent`` while sibling nodes in the same parallel batch are still executing
+          or dispatched but not yet started. Their partial progress is not persisted, so they re-run
+          on resume. This is the authoritative in-flight signal, and it catches siblings with no
+          completed ancestor (e.g. two concurrent entry points feeding one join) that forward
+          reachability alone would miss.
         - Completed nodes: their traversable outgoing edges lead to nodes that will be scheduled
           next on resume.
 
@@ -1381,9 +1405,11 @@ class Graph(MultiAgentBase):
             The set of not-yet-completed nodes that will execute on resume — in-flight nodes plus
             everything reachable from the completed or in-flight frontier via traversable edges.
         """
-        executing_nodes = {node for node in self.nodes.values() if node.execution_status == Status.EXECUTING}
-        pending: set[GraphNode] = set(executing_nodes)
-        visited = completed_nodes | executing_nodes
+        in_flight_nodes = {
+            node for node in self.nodes.values() if node.execution_status in (Status.EXECUTING, Status.DISPATCHED)
+        }
+        pending: set[GraphNode] = set(in_flight_nodes)
+        visited = completed_nodes | in_flight_nodes
         frontier = list(visited)
         while frontier:
             source = frontier.pop()

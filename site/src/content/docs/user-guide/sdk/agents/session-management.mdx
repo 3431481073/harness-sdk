@@ -160,9 +160,9 @@ Multi-agent session managers only track the current state of the Graph/Swarm exe
 
 An agent exposes its session identifier through a readable <Syntax py="agent.session_id" ts="agent.sessionId" /> property. When a session manager is attached, the property returns the manager's <Syntax py="session_id" ts="sessionId" /> (also readable directly on the session manager). Without a session manager, it returns a random 8-character hex string generated at construction, unique per agent instance but not persisted across restarts.
 
-Snapshot-based session managers accept any [Storage](../storage.mdx) backend, including
+Snapshot-based session managers accept any [Storage](../storage/index.mdx) backend, including
 `InMemoryStorage`, `LocalFileStorage`, `S3Storage`, and custom implementations. See
-[Storage](../storage.mdx) for backend configuration, tradeoffs, custom backends, and
+[Storage](../storage/index.mdx) for backend configuration, tradeoffs, custom backends, and
 required S3 permissions.
 
 <Tabs>
@@ -208,7 +208,7 @@ console.log(new Agent().sessionId) // e.g. "a1b2c3d4"
 
 ## Storage backends
 
-[Storage](../storage.mdx) is the single place persistence backends are documented. How session management reaches a backend depends on the manager:
+[Storage](../storage/index.mdx) is the single place persistence backends are documented. How session management reaches a backend depends on the manager:
 
 - **`SnapshotSessionManager` (Python) and `SessionManager` (TypeScript)** use the
   shared `Storage` abstraction. Manager-level storage takes precedence over agent-level
@@ -224,7 +224,7 @@ Configure snapshot storage for each SDK:
 <Tabs>
 <Tab label="Python">
 
-The recommended `SnapshotSessionManager` accepts any [Storage](../storage.mdx) backend, so you choose durability the same way the offloader and memory subsystems do:
+The recommended `SnapshotSessionManager` accepts any [Storage](../storage/index.mdx) backend, so you choose durability the same way the offloader and memory subsystems do:
 
 ```python
 from strands import Agent
@@ -358,7 +358,7 @@ agent("Continue our previous conversation.")
 
 To continue a session stored in Amazon S3, configure `S3SessionManager` with its existing
 bucket and prefix. Configure the standard Boto3 credential chain and grant the
-[required S3 permissions](../storage.mdx#required-s3-permissions).
+[required S3 permissions](../storage/index.mdx#required-s3-permissions).
 
 ```python
 from strands import Agent
@@ -579,7 +579,7 @@ Implement a custom storage backend when the built-in backends do not meet your n
 <Tab label="Python">
 
 For new custom backends, implement the
-[`Storage` interface](../storage.mdx#custom-backends) and pass it to
+[`Storage` interface](../storage/index.mdx#custom-backends) and pass it to
 `SnapshotSessionManager`.
 
 Existing custom `SessionRepository` implementations remain supported in v1. Pass the
@@ -590,7 +590,7 @@ custom `Storage` backend before v2.0.0.
 </Tab>
 <Tab label="TypeScript">
 
-Pass any [Storage](../storage.mdx) backend directly to `SessionManager`. For full control,
+Pass any [Storage](../storage/index.mdx) backend directly to `SessionManager`. For full control,
 implement the `SnapshotStorage` interface:
 
 ```typescript

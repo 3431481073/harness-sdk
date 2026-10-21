@@ -1,7 +1,10 @@
 import { describe, it, expect, vi } from 'vitest'
 import { Offload } from '../offload/index.js'
-import { Message, TextBlock, ToolResultBlock } from '../../../types/messages.js'
+import { summarizeContent } from '../../methods/summarize.js'
+import { InvocationContextImpl } from '../../../agent/invocation-context.js'
+import { Message, TextBlock, ToolResultBlock, ToolUseBlock } from '../../../types/messages.js'
 import { createMockAgent } from '../../../__fixtures__/agent-helpers.js'
+import { MockMessageModel } from '../../../__fixtures__/mock-message-model.js'
 import type { Agent } from '../../../agent/agent.js'
 import type { ContextState } from '../../types.js'
 
@@ -174,7 +177,8 @@ describe('Offload.summarize', () => {
       const largeText = 'x'.repeat(2500 * 4 + 100)
       const firstMessage = new Message({ role: 'user', content: [new TextBlock('initial question')] })
       const toolResultMessage = makeToolResultMessage(largeText)
-      const messages = [firstMessage, toolResultMessage]
+      const latest = new Message({ role: 'assistant', content: [new TextBlock('latest')] })
+      const messages = [firstMessage, toolResultMessage, latest]
       const mockModel = { stream: vi.fn(), countTokens: vi.fn(async () => 5000) }
       const strategy = Offload.summarize('toolResults').when({ utilization: 0.85 })
       const context = makeContext(messages, 0.9, mockModel)
@@ -193,5 +197,60 @@ describe('Offload.summarize', () => {
 
       expect(result).toBe(false)
     })
+  })
+
+  describe('request limits', () => {
+    it('adds the summarizer usage to the request total even when the request limit is used up', async () => {
+      const actualSummarize =
+        await vi.importActual<typeof import('../../methods/summarize.js')>('../../methods/summarize.js')
+      vi.mocked(summarizeContent).mockImplementationOnce(actualSummarize.summarizeContent)
+      const summarizer = new MockMessageModel().addTurn(
+        { type: 'textBlock', text: 'Summary of tool output' },
+        { usage: { inputTokens: 4, outputTokens: 5, totalTokens: 9 } }
+      )
+      const messages = [makeToolResultMessage('x'.repeat(2500 * 4 + 100))]
+      const strategy = Offload.summarize('toolResults', { model: summarizer })
+      const invocationContext = new InvocationContextImpl({ turns: 1 })
+      invocationContext.usage.turnsTaken = 5
+
+      const result = await strategy.apply({ ...makeContext(messages, 0.9, { stream: vi.fn() }), invocationContext })
+
+      expect(result).toBe(true)
+      expect(messages[0]!.content).toEqual([
+        new ToolResultBlock({
+          toolUseId: 'tool-123',
+          status: 'success',
+          content: [new TextBlock('[Summarized: tool result, ~2,525 tokens]\n\nSummary of tool output')],
+        }),
+      ])
+      expect(invocationContext.usage).toEqual({ turnsTaken: 5, inputTokens: 4, outputTokens: 5, totalTokens: 9 })
+    })
+  })
+})
+
+describe('repeated summarization', () => {
+  // Regression test for https://github.com/strands-agents/harness-sdk/issues/4685
+  it('keeps summaries out of a pinned message 0', async () => {
+    const strategy = Offload.summarize('*').when({ utilization: 0.7, preserveRecent: 4 })
+    const mockModel = { stream: vi.fn() }
+    const task = () =>
+      new Message({ role: 'user', content: [new TextBlock('task')], metadata: { custom: { pinned: true } } })
+    const messages = [task()]
+    for (let index = 0; index < 30; index++) {
+      messages.push(
+        new Message({
+          role: 'assistant',
+          content: [new ToolUseBlock({ toolUseId: `t${index}`, name: 'read', input: {} })],
+        }),
+        makeToolResultMessage('x', `t${index}`)
+      )
+      await strategy.apply(makeContext(messages, 0.9, mockModel))
+    }
+    expect(messages[0]!.content).toEqual(task().content)
+    expect(messages[0]!.metadata).toEqual(task().metadata)
+    const summaries = messages
+      .flatMap((message) => message.content)
+      .filter((block) => block instanceof TextBlock && block.text.startsWith('[Summarized:'))
+    expect(summaries).toHaveLength(1)
   })
 })
