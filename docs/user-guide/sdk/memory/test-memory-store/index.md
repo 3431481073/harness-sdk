@@ -162,11 +162,13 @@ Concurrent `add` calls on one store instance are serialized, so they can’t clo
 ## Related
 
 -   [Memory](/docs/user-guide/sdk/memory/overview/index.md) - the `MemoryManager` concept this store plugs into, including the tools, extraction, and injection it enables.
+-   [File memory store](/docs/user-guide/sdk/memory/file-memory-store/index.md) - the vended `MemoryStore` backed by the `Storage` interface, persisting knowledge as markdown files with topic-aware extraction.
 -   [Bedrock Knowledge Base store](/docs/user-guide/sdk/memory/bedrock-knowledge-base/index.md) - the managed `MemoryStore` with semantic search, for production workloads.
 
 ## Related pages
 
 - [Control what your agent remembers](/docs/user-guide/sdk/memory/managing-memory/index.md) (1 shared tag)
+- [File Memory Store](/docs/user-guide/sdk/memory/file-memory-store/index.md) (1 shared tag)
 - [Give your agent long-term memory](/docs/user-guide/sdk/memory/overview/index.md) (1 shared tag)
 - [Bedrock Knowledge Base Store](/docs/user-guide/sdk/memory/bedrock-knowledge-base/index.md) (1 shared tag)
 

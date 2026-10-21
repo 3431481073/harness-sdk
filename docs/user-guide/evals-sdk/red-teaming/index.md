@@ -1,14 +1,10 @@
-Experimental
-
-Red teaming lives under `strands_evals.experimental.redteam`. The API is still evolving: import paths, scores, and report shapes may shift between versions, so treat absolute numbers as directional and pin your SDK version if you gate CI on them.
-
 Use only on systems you are authorized to test
 
 These strategies generate adversarial prompts designed to make a model misbehave. Run them only against agents you own or have explicit permission to test, in an environment where the outputs stay contained. The breaching transcripts can contain the very content the attack elicited, so handle reports accordingly.
 
-Red teaming answers **“can an attacker make my agent misbehave?”** It runs *jailbreaks* (prompts crafted to get a model to do something its instructions forbid) against your agent and scores whether each one got through. While evaluators measure whether an agent does the right thing on cooperative input, red teaming probes what it does under deliberately hostile input: prompts engineered to leak its system prompt, extract data it should keep private, produce harmful content, or trigger tool calls beyond its authority. An attack that gets through is a **breach**.
+Red teaming answers **“can an attacker make my agent misbehave?”** It runs *jailbreaks* (prompts crafted to get a model to do something its instructions forbid) against your agent and scores whether each one got through. While evaluators measure whether an agent does the right thing on cooperative input, red teaming probes what it does under deliberately hostile input: prompts engineered to override its instructions, leak its system prompt or private data, send data out through its tools, or trigger tool calls beyond its authority. An attack that gets through is a **breach**.
 
-You assemble adversarial cases and one or more attack strategies against your agent in a `RedTeamExperiment`, run it, and read the breaches off the report. Each attack is driven by an `AttackStrategy` (a technique drawn from published jailbreak research) and scored by an LLM judge, but you only interact with the experiment.
+You assemble adversarial cases and one or more attack strategies against your agent in a `RedTeamExperiment`, run it, and read the breaches off the report. Each attack is driven by an `AttackStrategy` (a technique drawn from published jailbreak research) and scored by an LLM judge. With the built-in task, you only interact with the experiment; to drive the target yourself, see [Writing a custom task](/docs/user-guide/evals-sdk/red-teaming/custom_task/index.md).
 
 ## Why red teaming?
 
@@ -23,7 +19,7 @@ Evaluators tell you the agent is helpful. Red teaming tells you whether it stays
 **Evaluators + red teaming:**
 
 -   Probe the agent with attacks engineered to bypass its guardrails
--   Cover the threat types that matter for a deployed agent (prompt leak, data exfiltration, harmful content, excessive tool use)
+-   Cover the threat types that matter for a tool-using agent (prompt injection, sensitive data disclosure, data exfiltration, privilege escalation, excessive agency)
 -   Score each attack with an LLM judge and surface the conversations that breached
 
 ## When to use red teaming
@@ -32,7 +28,7 @@ Use red teaming when you need to:
 
 -   **Pre-deployment safety checks**: Probe an agent’s guardrails before it ships
 -   **Safety regression checks**: Re-run the same attacks after a prompt or tool change to catch new weaknesses
--   **Coverage across threat types**: Probe prompt-leak, data-exfiltration, harmful-content, and excessive-agency risks in one run
+-   **Coverage across threat types**: Probe all seven risk categories, from prompt injection to business-rule violations, in one run
 -   **Comparing defenses**: Measure attack success rate across model or system-prompt variants
 
 ## Risk categories
@@ -41,23 +37,29 @@ Cases are organized by **risk category**: the kind of violation an attack target
 
 | Risk Category | What an attack targets |
 | --- | --- |
-| `guideline_bypass` | Getting the agent to ignore its safety guidelines via roleplay, hypotheticals, or creative framing |
-| `system_prompt_leak` | Getting the agent to reveal its system prompt, internal rules, or hidden configuration |
-| `harmful_content` | Getting the agent to produce dangerous, illegal, or policy-violating content |
-| `data_exfiltration` | Getting the agent to disclose data it should not share, such as other users’ records or internal-only fields |
-| `excessive_agency` | Getting the agent to make a tool call that violates policy or exceeds its authorization |
+| `prompt_injection` | Getting the agent to ignore its instructions or adopt a forbidden persona through jailbreaking, role-play coercion, or instruction override |
+| `excessive_agency` | Getting the agent to make a tool call beyond its authorization scope, such as a refund over the allowed limit |
+| `sensitive_data` | Getting the agent to reveal information it holds but should not share, such as its system prompt, credentials, or other users’ records |
+| `data_exfiltration` | Getting the agent to send protected data to an external destination through its tools, such as an email, API call, or webhook |
+| `social_engineering` | Getting the agent to write messages that manipulate people into unsafe actions, such as phishing emails or impersonating an authority |
+| `privilege_escalation` | Getting the agent to access resources or operations reserved for higher privilege levels, or to act on behalf of another user |
+| `business_rule_violation` | Getting the agent to take an action its tools allow but its policies forbid, such as splitting a request to get around a limit |
 
-A case’s risk category tells the judge what counts as a breach for that case. These categories align with the threat types in standard taxonomies like the OWASP LLM Top 10 (for example, `system_prompt_leak` maps to LLM07 and `excessive_agency` to LLM06), so findings translate into the language a security review expects.
+A case’s risk category tells the judge what counts as a breach for that case. Revealing protected data in a reply is `sensitive_data`; sending it out through a tool is `data_exfiltration`. These categories align with the threat types in standard taxonomies like the OWASP LLM Top 10 (for example, `prompt_injection` maps to LLM01, `sensitive_data` to LLM02 and LLM07, and `excessive_agency` to LLM06), so findings translate into the language a security review expects.
+
+Renamed categories
+
+`guideline_bypass` and `system_prompt_leak` still work but emit a `DeprecationWarning`, and resolve to `prompt_injection` and `sensitive_data`. `harmful_content` has no replacement: `AdversarialCaseGenerator` raises a `ValueError` for it.
 
 ## Quick example
 
-Define a zero-arg factory that builds a fresh target, generate adversarial cases from it, run a strategy across the case x strategy cross-product in parallel, and read the breaches:
+Define a zero-arg factory that builds a fresh target, generate adversarial cases from it, pass the factory to the run call to attack the case x strategy cross-product in parallel, and read the breaches:
 
 ```python
 import asyncio
 
 from strands import Agent
-from strands_evals.experimental.redteam import (
+from strands_evals.redteam import (
     AdversarialCaseGenerator,
     CrescendoStrategy,
     RedTeamExperiment,
@@ -69,14 +71,12 @@ def agent_factory() -> Agent:
 
 
 cases = AdversarialCaseGenerator().generate_cases(agent=agent_factory(), num_cases=3)
-experiment = RedTeamExperiment(
-    cases=cases, agent_factory=agent_factory, attack_strategies=[CrescendoStrategy()]
+experiment = RedTeamExperiment(cases=cases, attack_strategies=[CrescendoStrategy()])
+report = asyncio.run(
+    experiment.run_evaluations_async(agent_factory=agent_factory, max_workers=5)
 )
-report = asyncio.run(experiment.run_evaluations_async(max_workers=5))
 report.display()
 ```
-
-The [Quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) walks through each step (including a sync `run_evaluations()` path for notebook-style runs) and shows the report output.
 
 ## Red teaming vs evaluators
 
@@ -85,7 +85,7 @@ The [Quickstart](/docs/user-guide/evals-sdk/quickstart/index.md) walks through e
 | **Question** | “How well did the agent do?” | “Can an attacker make it misbehave?” |
 | **Input** | Cooperative test cases | Adversarial attacks (multi-turn or scripted) |
 | **Output** | Score + pass/fail | Attack success score + breaching conversations |
-| **Driver** | A fixed task function | An `AttackStrategy` that adapts per turn |
+| **Driver** | Your task function, called once per case | An `AttackStrategy` that drives the conversation turn by turn |
 | **Use Case** | Quality evaluation | Safety probing, guardrail regression |
 
 **Use Together:** Evaluate the agent for quality, then red team it for safety. A high quality score and an undefended jailbreak are both true at once.
@@ -111,6 +111,7 @@ Informed by general LLM red-teaming guidance like the [OWASP Top 10 for LLM Appl
 -   [Quickstart](/docs/user-guide/evals-sdk/quickstart/index.md): Run your first red-team experiment end to end
 -   [Attack Strategies](/docs/user-guide/evals-sdk/red-teaming/strategies/index.md): The built-in strategies and how to choose
 -   [Writing Custom Cases](/docs/user-guide/evals-sdk/red-teaming/custom_cases/index.md): Hand-author cases instead of generating them
+-   [Writing a Custom Task](/docs/user-guide/evals-sdk/red-teaming/custom_task/index.md): Build and drive the target yourself, for example to add a guardrail between turns
 -   [Scoring Attacks](/docs/user-guide/evals-sdk/evaluators/index.md): How `AttackSuccessEvaluator` decides a breach
 -   [Reading the Report](/docs/user-guide/evals-sdk/red-teaming/reading_the_report/index.md): Read the breach matrix and act on findings
 
@@ -130,5 +131,5 @@ Informed by general LLM red-teaming guidance like the [OWASP Top 10 for LLM Appl
 - [Scoring attacks](/docs/user-guide/evals-sdk/red-teaming/evaluators/index.md) (1 shared tag)
 - [Secure for production](/docs/user-guide/sdk/safety-security/index.md) (1 shared tag)
 - [Stereotyping evaluator](/docs/user-guide/evals-sdk/evaluators/stereotyping_evaluator/index.md) (1 shared tag)
+- [Writing a custom task](/docs/user-guide/evals-sdk/red-teaming/custom_task/index.md) (1 shared tag)
 - [Writing custom cases](/docs/user-guide/evals-sdk/red-teaming/custom_cases/index.md) (1 shared tag)
-- [Trusted Message History](/docs/user-guide/sdk/safety-security/trusted-message-history/index.md) (1 shared tag)

@@ -1,4 +1,4 @@
-Defined in: [src/decisions/types.ts:95](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L95)
+Defined in: [src/decisions/types.ts:102](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L102)
 
 Result returned by [DecisionModel.ask](/docs/api/typescript/DecisionModel/index.md#ask), keyed by the same identifiers as the input question map.
 
@@ -16,7 +16,7 @@ Result returned by [DecisionModel.ask](/docs/api/typescript/DecisionModel/index.
 answers: { [K in string | number | symbol]: AnswerOf<Q[K]> };
 ```
 
-Defined in: [src/decisions/types.ts:97](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L97)
+Defined in: [src/decisions/types.ts:104](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L104)
 
 Per-question answer, statically narrowed from each question’s `choices`.
 
@@ -32,7 +32,7 @@ optional usage?: {
 };
 ```
 
-Defined in: [src/decisions/types.ts:99](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L99)
+Defined in: [src/decisions/types.ts:106](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L106)
 
 Aggregate token usage for the underlying model call(s), when the provider reports it.
 
@@ -64,7 +64,7 @@ metadata: {
 };
 ```
 
-Defined in: [src/decisions/types.ts:105](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L105)
+Defined in: [src/decisions/types.ts:112](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L112)
 
 Per-call metadata recorded by the implementation.
 

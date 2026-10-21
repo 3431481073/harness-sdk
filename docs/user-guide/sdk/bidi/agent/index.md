@@ -14,7 +14,7 @@ agent = BidiAgent(
 )
 ```
 
-By default, `BidiAgent` uses [Amazon Nova Sonic](/docs/user-guide/sdk/bidi/models/bedrock/index.md). Pass a model instance through `model` to customize its configuration or choose [Google Gemini Live](/docs/user-guide/sdk/bidi/models/google/index.md) or [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/index.md). See the [`BidiAgent` API reference](/docs/api/python/strands.bidi.agent#strands.bidi.agent.BidiAgent.__init__) for constructor options.
+By default, `BidiAgent` uses [Amazon Nova Sonic](/docs/user-guide/sdk/bidi/models/bedrock/index.md). Pass a model instance through `model` to customize its configuration or choose [Google Gemini Live](/docs/user-guide/sdk/bidi/models/google/index.md), [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/realtime/index.md), or experimental [OpenAI Live](/docs/user-guide/sdk/bidi/models/openai/live/index.md). See the [`BidiAgent` API reference](/docs/api/python/strands.bidi.agent#strands.bidi.agent.BidiAgent.__init__) for constructor options.
 
 `BidiAgent` and `Agent` share the [`LocalAgent`](/docs/api/python/strands.types.agent#strands.types.agent.LocalAgent) interface for common capabilities such as `messages` and registered tools. Tools and hooks can use this interface to work with either agent type. See [Hooks](/docs/user-guide/sdk/bidi/hooks/index.md) for callback annotations.
 
@@ -22,7 +22,7 @@ By default, `BidiAgent` uses [Amazon Nova Sonic](/docs/user-guide/sdk/bidi/model
 
 Creating the agent configures it; entering `async with` opens the model connection. Inside the block, `send()` submits input without waiting for a model response, and `receive()` yields output events as they arrive.
 
-This example sends a text prompt and prints the completed response, then ends the conversation. Follow the [OpenAI Realtime setup](/docs/user-guide/sdk/bidi/models/openai/index.md) before running it:
+This example sends a text prompt and prints the completed response, then ends the conversation. Follow the [OpenAI Realtime setup](/docs/user-guide/sdk/bidi/models/openai/realtime/index.md) before running it:
 
 ```python
 import asyncio
@@ -127,10 +127,10 @@ To track the transition, handle [`BidiConnectionRestartEvent`](/docs/user-guide/
 - [I/O Streams](/docs/user-guide/sdk/bidi/io/index.md) (1 shared tag)
 - [Input Content](/docs/user-guide/sdk/bidi/content/index.md) (1 shared tag)
 - [Interrupts](/docs/user-guide/sdk/bidi/interrupts/index.md) (1 shared tag)
-- [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/index.md) (1 shared tag)
+- [OpenAI Live](/docs/user-guide/sdk/bidi/models/openai/live/index.md) (1 shared tag)
+- [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/realtime/index.md) (1 shared tag)
 - [Stream Events](/docs/user-guide/sdk/bidi/events/index.md) (1 shared tag)
 - [Tools](/docs/user-guide/sdk/bidi/tools/index.md) (1 shared tag)
-- [Bidirectional Streaming Observability](/docs/user-guide/sdk/bidi/observability/index.md) (1 shared tag)
 
 
 ## Implementation

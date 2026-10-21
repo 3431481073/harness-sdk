@@ -409,8 +409,8 @@ If the data source has ACL awareness enabled and no `access_control_list``access
 - [TypeScript Deployment to Amazon Bedrock AgentCore Runtime](/docs/user-guide/sdk/deploy/deploy_to_bedrock_agentcore/typescript/index.md) (2 shared tags)
 - [AgentCore evaluations](/docs/user-guide/evals-sdk/how-to/agentcore_evaluation_dashboard/index.md) (2 shared tags)
 - [Control what your agent remembers](/docs/user-guide/sdk/memory/managing-memory/index.md) (1 shared tag)
+- [File Memory Store](/docs/user-guide/sdk/memory/file-memory-store/index.md) (1 shared tag)
 - [Give your agent long-term memory](/docs/user-guide/sdk/memory/overview/index.md) (1 shared tag)
-- [Test Memory Store](/docs/user-guide/sdk/memory/test-memory-store/index.md) (1 shared tag)
 
 
 ## Implementation

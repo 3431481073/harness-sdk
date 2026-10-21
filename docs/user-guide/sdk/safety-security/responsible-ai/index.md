@@ -76,5 +76,5 @@ def profanity_scanner(query: str) -> str:
 - [Scoring attacks](/docs/user-guide/evals-sdk/red-teaming/evaluators/index.md) (1 shared tag)
 - [Secure for production](/docs/user-guide/sdk/safety-security/index.md) (1 shared tag)
 - [Stereotyping evaluator](/docs/user-guide/evals-sdk/evaluators/stereotyping_evaluator/index.md) (1 shared tag)
+- [Writing a custom task](/docs/user-guide/evals-sdk/red-teaming/custom_task/index.md) (1 shared tag)
 - [Writing custom cases](/docs/user-guide/evals-sdk/red-teaming/custom_cases/index.md) (1 shared tag)
-- [Trusted Message History](/docs/user-guide/sdk/safety-security/trusted-message-history/index.md) (1 shared tag)

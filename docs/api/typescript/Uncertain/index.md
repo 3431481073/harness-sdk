@@ -1,4 +1,4 @@
-Defined in: [src/decisions/types.ts:62](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L62)
+Defined in: [src/decisions/types.ts:69](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L69)
 
 Sentinel returned in place of an answer when the decision model declined to commit. Carries an optional free-form reason supplied by the implementation.
 
@@ -10,7 +10,7 @@ Sentinel returned in place of an answer when the decision model declined to comm
 new Uncertain(reason?): Uncertain;
 ```
 
-Defined in: [src/decisions/types.ts:63](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L63)
+Defined in: [src/decisions/types.ts:70](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L70)
 
 #### Parameters
 
@@ -30,7 +30,7 @@ Defined in: [src/decisions/types.ts:63](https://github.com/strands-agents/harnes
 readonly optional reason?: string;
 ```
 
-Defined in: [src/decisions/types.ts:63](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L63)
+Defined in: [src/decisions/types.ts:70](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L70)
 
 ## Methods
 
@@ -40,7 +40,7 @@ Defined in: [src/decisions/types.ts:63](https://github.com/strands-agents/harnes
 toString(): string;
 ```
 
-Defined in: [src/decisions/types.ts:65](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L65)
+Defined in: [src/decisions/types.ts:72](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L72)
 
 #### Returns
 
@@ -57,7 +57,7 @@ toJSON(): {
 };
 ```
 
-Defined in: [src/decisions/types.ts:69](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L69)
+Defined in: [src/decisions/types.ts:76](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L76)
 
 #### Returns
 
@@ -70,5 +70,5 @@ Defined in: [src/decisions/types.ts:69](https://github.com/strands-agents/harnes
 
 | Name | Type | Defined in |
 | --- | --- | --- |
-| `uncertain` | `true` | [src/decisions/types.ts:69](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L69) |
-| `reason?` | `string` | [src/decisions/types.ts:69](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L69) |
+| `uncertain` | `true` | [src/decisions/types.ts:76](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L76) |
+| `reason?` | `string` | [src/decisions/types.ts:76](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L76) |

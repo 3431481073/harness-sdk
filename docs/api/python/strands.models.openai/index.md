@@ -8,7 +8,7 @@ OpenAI model provider.
 class Client(Protocol)
 ```
 
-Defined in: [src/strands/models/openai.py:37](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L37)
+Defined in: [src/strands/models/openai.py:38](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L38)
 
 Protocol defining the OpenAI-compatible interface for the underlying provider client.
 
@@ -19,7 +19,7 @@ Protocol defining the OpenAI-compatible interface for the underlying provider cl
 def chat() -> Any
 ```
 
-Defined in: [src/strands/models/openai.py:42](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L42)
+Defined in: [src/strands/models/openai.py:43](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L43)
 
 Chat completions interface.
 
@@ -29,7 +29,7 @@ Chat completions interface.
 class OpenAIModel(Model)
 ```
 
-Defined in: [src/strands/models/openai.py:47](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L47)
+Defined in: [src/strands/models/openai.py:48](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L48)
 
 OpenAI model provider implementation.
 
@@ -39,7 +39,7 @@ OpenAI model provider implementation.
 class OpenAIConfig(BaseModelConfig)
 ```
 
-Defined in: [src/strands/models/openai.py:52](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L52)
+Defined in: [src/strands/models/openai.py:53](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L53)
 
 Configuration options for OpenAI models.
 
@@ -59,7 +59,7 @@ def __init__(client: Client | None = None,
              **model_config: Unpack[OpenAIConfig]) -> None
 ```
 
-Defined in: [src/strands/models/openai.py:73](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L73)
+Defined in: [src/strands/models/openai.py:74](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L74)
 
 Initialize provider instance.
 
@@ -86,7 +86,7 @@ Initialize provider instance.
 def update_config(**model_config: Unpack[OpenAIConfig]) -> None
 ```
 
-Defined in: [src/strands/models/openai.py:143](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L143)
+Defined in: [src/strands/models/openai.py:144](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L144)
 
 Update the OpenAI model configuration with the provided arguments.
 
@@ -101,7 +101,7 @@ Update the OpenAI model configuration with the provided arguments.
 def get_config() -> OpenAIConfig
 ```
 
-Defined in: [src/strands/models/openai.py:153](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L153)
+Defined in: [src/strands/models/openai.py:154](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L154)
 
 Get the OpenAI model configuration.
 
@@ -117,7 +117,7 @@ def format_request_message_content(cls, content: ContentBlock,
                                    **kwargs: Any) -> dict[str, Any]
 ```
 
-Defined in: [src/strands/models/openai.py:164](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L164)
+Defined in: [src/strands/models/openai.py:165](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L165)
 
 Format an OpenAI compatible content block.
 
@@ -142,7 +142,7 @@ def format_request_message_tool_call(cls, tool_use: ToolUse,
                                      **kwargs: Any) -> dict[str, Any]
 ```
 
-Defined in: [src/strands/models/openai.py:207](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L207)
+Defined in: [src/strands/models/openai.py:208](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L208)
 
 Format an OpenAI compatible tool call.
 
@@ -163,7 +163,7 @@ def format_request_tool_message(cls, tool_result: ToolResult,
                                 **kwargs: Any) -> dict[str, Any]
 ```
 
-Defined in: [src/strands/models/openai.py:227](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L227)
+Defined in: [src/strands/models/openai.py:228](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L228)
 
 Format an OpenAI compatible tool message.
 
@@ -189,7 +189,7 @@ def format_request_messages(cls,
                             **kwargs: Any) -> list[dict[str, Any]]
 ```
 
-Defined in: [src/strands/models/openai.py:460](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L460)
+Defined in: [src/strands/models/openai.py:463](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L463)
 
 Format an OpenAI compatible messages array.
 
@@ -218,7 +218,7 @@ def format_request(messages: Messages,
                    **kwargs: Any) -> dict[str, Any]
 ```
 
-Defined in: [src/strands/models/openai.py:484](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L484)
+Defined in: [src/strands/models/openai.py:487](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L487)
 
 Format an OpenAI compatible chat streaming request.
 
@@ -246,7 +246,7 @@ An OpenAI compatible chat streaming request.
 def format_chunk(event: dict[str, Any], **kwargs: Any) -> StreamEvent
 ```
 
-Defined in: [src/strands/models/openai.py:545](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L545)
+Defined in: [src/strands/models/openai.py:548](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L548)
 
 Format an OpenAI response event into a standardized message chunk.
 
@@ -276,7 +276,7 @@ async def stream(messages: Messages,
                  **kwargs: Any) -> AsyncGenerator[StreamEvent, None]
 ```
 
-Defined in: [src/strands/models/openai.py:700](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L700)
+Defined in: [src/strands/models/openai.py:703](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L703)
 
 Stream conversation with the OpenAI model.
 
@@ -309,7 +309,7 @@ async def structured_output(
         **kwargs: Any) -> AsyncGenerator[dict[str, T | Any], None]
 ```
 
-Defined in: [src/strands/models/openai.py:843](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L843)
+Defined in: [src/strands/models/openai.py:846](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/openai.py#L846)
 
 Get structured output from the model.
 

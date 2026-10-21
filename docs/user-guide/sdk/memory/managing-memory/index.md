@@ -600,11 +600,13 @@ Three SDK features manage different kinds of state; memory is the one that cross
 
 -   [Give your agent long-term memory](/docs/user-guide/sdk/memory/overview/index.md) - the memory hub: what the manager does and the stores it works with.
 -   [Test memory store](/docs/user-guide/sdk/memory/test-memory-store/index.md) - the zero-setup vended `MemoryStore` backed by a local JSON file, for prototyping and testing.
+-   [File memory store](/docs/user-guide/sdk/memory/file-memory-store/index.md) - the vended `MemoryStore` backed by the `Storage` interface, persisting knowledge as markdown files with topic-aware extraction.
 -   [Bedrock Knowledge Base store](/docs/user-guide/sdk/memory/bedrock-knowledge-base/index.md) - the vended `MemoryStore` backed by Amazon Bedrock Knowledge Bases.
 -   [Context Injector](/docs/user-guide/sdk/plugins/context-injector/index.md) - the generic injection plugin that memory injection builds on.
 
 ## Related pages
 
+- [File Memory Store](/docs/user-guide/sdk/memory/file-memory-store/index.md) (1 shared tag)
 - [Give your agent long-term memory](/docs/user-guide/sdk/memory/overview/index.md) (1 shared tag)
 - [Test Memory Store](/docs/user-guide/sdk/memory/test-memory-store/index.md) (1 shared tag)
 - [Bedrock Knowledge Base Store](/docs/user-guide/sdk/memory/bedrock-knowledge-base/index.md) (1 shared tag)

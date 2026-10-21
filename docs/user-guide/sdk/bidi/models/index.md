@@ -1,4 +1,4 @@
-A `BidiAgent` talks to a realtime model: a hosted speech-to-speech service, such as Nova Sonic, Gemini Live, or OpenAI Realtime, that holds one connection open for the whole conversation and listens while it responds. In your code, a model provider class stands in for that service. It opens the connection and translates the service’s streaming protocol into Strands events, so tools, hooks, I/O streams, and event handling work the same whichever service you choose.
+A `BidiAgent` talks to a realtime model: a hosted speech-to-speech service, such as Nova Sonic, Gemini Live, or OpenAI, that holds one connection open for the whole conversation and listens while it responds. In your code, a model provider class stands in for that service. It opens the connection and translates the service’s streaming protocol into Strands events, so tools, hooks, I/O streams, and event handling share a common interface. Event support varies by provider.
 
 Realtime models are a separate family from the models a standard `Agent` uses, and each provider class works only with `BidiAgent`.
 
@@ -8,7 +8,8 @@ Realtime models are a separate family from the models a standard `Agent` uses, a
 | --- | --- | --- | --- |
 | [Amazon Nova Sonic](/docs/user-guide/sdk/bidi/models/bedrock/index.md) | `BedrockNovaSonicModel` | [Audio, text](https://docs.aws.amazon.com/nova/latest/nova2-userguide/using-conversational-speech.html) | [8 minutes](https://docs.aws.amazon.com/nova/latest/nova2-userguide/using-conversational-speech.html) |
 | [Google Gemini Live](/docs/user-guide/sdk/bidi/models/google/index.md) | `GoogleGeminiLiveModel` | [Audio, text, images](https://ai.google.dev/gemini-api/docs/live) | [About 10 minutes](https://ai.google.dev/gemini-api/docs/live-session) |
-| [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/index.md) | `OpenAIRealtimeModel` | [Audio, text, images](https://developers.openai.com/api/docs/guides/realtime-conversations) | [60 minutes](https://developers.openai.com/api/docs/guides/realtime-conversations) |
+| [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/realtime/index.md) | `OpenAIRealtimeModel` | [Audio, text, images](https://developers.openai.com/api/docs/guides/realtime-conversations) | [60 minutes](https://developers.openai.com/api/docs/guides/realtime-conversations) |
+| [OpenAI Live](/docs/user-guide/sdk/bidi/models/openai/live/index.md) | `OpenAILiveModel` | Audio, text, images | [See notes](/docs/user-guide/sdk/bidi/models/openai/live/index.md#connection-restarts) |
 
 Each provider page covers credentials, client options, and behavior specific to that model.
 
@@ -23,7 +24,7 @@ Every provider accepts the same core options, so moving between providers keeps 
 | `params` | Provider-native session settings, such as temperature or turn detection. |
 | `connection` | Connection restart timing. See [Connection limits](#connection-limits). |
 
-`params` is the pass-through to the provider’s own API. Field names and casing follow that provider’s documentation, which each provider page links to.
+Where supported, `params` passes settings through to the provider’s own API. Field names and casing follow that provider’s documentation, which each provider page links to.
 
 ```python
 from strands.bidi.models import BedrockNovaSonicModel
@@ -45,7 +46,7 @@ Use the model’s audio configuration to set up capture and playback. The built-
 
 ## Connection limits
 
-Every realtime provider limits how long a single connection stays open (see [Supported providers](#supported-providers)). The agent restarts the connection shortly before that limit, at a break between turns when it can, and the conversation continues on the new connection. Providers carry context across the restart in one of two ways:
+Realtime services limit how long a single connection stays open (see [Supported providers](#supported-providers)). With automatic restart enabled, the agent restarts the connection on its configured schedule, at a break between turns when it can, and the conversation continues on the new connection. Providers carry context across the restart. For example:
 
 -   **History replay**: Nova Sonic and OpenAI Realtime open a fresh connection and receive the conversation history.
 -   **Session resumption**: Gemini Live reconnects to the same server-side session through [session resumption](/docs/user-guide/sdk/bidi/models/google/index.md#connection-restarts), falling back to history replay if resumption is unavailable.
@@ -64,10 +65,10 @@ To connect a realtime model Strands doesn’t support yet, subclass `BidiModel`.
 - [I/O Streams](/docs/user-guide/sdk/bidi/io/index.md) (1 shared tag)
 - [Input Content](/docs/user-guide/sdk/bidi/content/index.md) (1 shared tag)
 - [Interrupts](/docs/user-guide/sdk/bidi/interrupts/index.md) (1 shared tag)
-- [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/index.md) (1 shared tag)
+- [OpenAI Live](/docs/user-guide/sdk/bidi/models/openai/live/index.md) (1 shared tag)
+- [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/realtime/index.md) (1 shared tag)
 - [Stream Events](/docs/user-guide/sdk/bidi/events/index.md) (1 shared tag)
 - [Tools](/docs/user-guide/sdk/bidi/tools/index.md) (1 shared tag)
-- [Bidirectional Streaming Observability](/docs/user-guide/sdk/bidi/observability/index.md) (1 shared tag)
 
 
 ## Implementation

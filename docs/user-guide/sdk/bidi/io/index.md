@@ -94,7 +94,7 @@ To customize processing, such as disabling echo cancellation when using a headse
 
 Use `ConsoleIO` to type messages and display text, reasoning, speech transcripts, and tool call names.
 
-This example uses [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/index.md) with text output. Install the terminal and model dependencies:
+This example uses [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/realtime/index.md) with text output. Install the terminal and model dependencies:
 
 ```bash
 pip install "strands-agents[bidi-openai,bidi-io]"
@@ -175,7 +175,7 @@ Connect your own input sources and output destinations to `run()` with asynchron
 -   An input callable takes no arguments and returns one [`BidiAgentInput`](/docs/user-guide/sdk/bidi/content/index.md#send-input) per call.
 -   An output callable receives one [`BidiOutputEvent`](/docs/user-guide/sdk/bidi/events/index.md) and chooses which events to handle.
 
-The following FastAPI example exchanges text messages with a WebSocket client, using [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/index.md) configured for text output.
+The following FastAPI example exchanges text messages with a WebSocket client, using [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/realtime/index.md) configured for text output.
 
 Install the server and model dependencies:
 
@@ -234,10 +234,10 @@ If startup or processing fails, `run()` cancels the remaining tasks, stops the s
 - [Google Gemini Live](/docs/user-guide/sdk/bidi/models/google/index.md) (1 shared tag)
 - [Input Content](/docs/user-guide/sdk/bidi/content/index.md) (1 shared tag)
 - [Interrupts](/docs/user-guide/sdk/bidi/interrupts/index.md) (1 shared tag)
-- [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/index.md) (1 shared tag)
+- [OpenAI Live](/docs/user-guide/sdk/bidi/models/openai/live/index.md) (1 shared tag)
+- [OpenAI Realtime](/docs/user-guide/sdk/bidi/models/openai/realtime/index.md) (1 shared tag)
 - [Stream Events](/docs/user-guide/sdk/bidi/events/index.md) (1 shared tag)
 - [Tools](/docs/user-guide/sdk/bidi/tools/index.md) (1 shared tag)
-- [Bidirectional Streaming Observability](/docs/user-guide/sdk/bidi/observability/index.md) (1 shared tag)
 
 
 ## Implementation

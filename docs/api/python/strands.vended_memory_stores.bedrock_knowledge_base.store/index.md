@@ -8,7 +8,7 @@ Supports semantic search via `Retrieve` and document ingestion via `IngestKnowle
 class BedrockKnowledgeBaseStore(MemoryStore)
 ```
 
-Defined in: [src/strands/vended\_memory\_stores/bedrock\_knowledge\_base/store.py:85](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/bedrock_knowledge_base/store.py#L85)
+Defined in: [src/strands/vended\_memory\_stores/bedrock\_knowledge\_base/store.py:86](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/bedrock_knowledge_base/store.py#L86)
 
 A :class:`~strands.memory.types.MemoryStore` backed by Amazon Bedrock Knowledge Bases.
 
@@ -40,7 +40,7 @@ result = await store.add("User prefers dark mode")
 def __init__(**store_config: Unpack[BedrockKnowledgeBaseStoreConfig]) -> None
 ```
 
-Defined in: [src/strands/vended\_memory\_stores/bedrock\_knowledge\_base/store.py:116](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/bedrock_knowledge_base/store.py#L116)
+Defined in: [src/strands/vended\_memory\_stores/bedrock\_knowledge\_base/store.py:117](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/bedrock_knowledge_base/store.py#L117)
 
 Initialize the store.
 
@@ -58,7 +58,7 @@ Initialize the store.
 async def initialize() -> None
 ```
 
-Defined in: [src/strands/vended\_memory\_stores/bedrock\_knowledge\_base/store.py:190](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/bedrock_knowledge_base/store.py#L190)
+Defined in: [src/strands/vended\_memory\_stores/bedrock\_knowledge\_base/store.py:191](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/bedrock_knowledge_base/store.py#L191)
 
 Resolve the knowledge base type via `GetKnowledgeBase` and cache the result.
 
@@ -71,7 +71,7 @@ async def search(query: str,
                  options: SearchOptions | None = None) -> list[MemoryEntry]
 ```
 
-Defined in: [src/strands/vended\_memory\_stores/bedrock\_knowledge\_base/store.py:213](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/bedrock_knowledge_base/store.py#L213)
+Defined in: [src/strands/vended\_memory\_stores/bedrock\_knowledge\_base/store.py:215](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/bedrock_knowledge_base/store.py#L215)
 
 Search the knowledge base for entries matching the query.
 
@@ -98,7 +98,7 @@ async def add(
         metadata: Metadata | None = None) -> BedrockKnowledgeBaseAddResult
 ```
 
-Defined in: [src/strands/vended\_memory\_stores/bedrock\_knowledge\_base/store.py:296](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/bedrock_knowledge_base/store.py#L296)
+Defined in: [src/strands/vended\_memory\_stores/bedrock\_knowledge\_base/store.py:299](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_memory_stores/bedrock_knowledge_base/store.py#L299)
 
 Ingest `content` (with optional `metadata`) into the knowledge base.
 

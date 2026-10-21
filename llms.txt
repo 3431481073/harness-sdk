@@ -90,7 +90,7 @@
     - [pii-redaction](https://strandsagents.com/docs/user-guide/sdk/safety-security/pii-redaction/index.md): Protect personal data in agent telemetry: integrate PII redaction with third-party libraries or OpenTelemetry Collector masking in Strands.
 - Components
   - [Agent loop](https://strandsagents.com/docs/user-guide/sdk/agents/agent-loop/index.md): How Strands agents reason, plan, and act. Understand the model-driven loop that orchestrates tool use, reflection, and goal completion.
-  - [Production lifecycle controls](https://strandsagents.com/docs/user-guide/sdk/agents/lifecycle-controls/index.md): Turn limits, token budgets, timeouts, cancellation, and stop reasons that keep a production Strands agent bounded, recoverable, and safe to run at scale.
+  - [Production lifecycle controls](https://strandsagents.com/docs/user-guide/sdk/agents/lifecycle-controls/index.md): Set turn and token limits, cancel running Strands agents, interpret stop reasons, and recover from tool or model failures in production workloads.
   - [State](https://strandsagents.com/docs/user-guide/sdk/agents/state/index.md): Maintain state in Strands agents across turns and sessions: conversation history, key-value agent state, and per-request invocation state.
   - Storage
     - [Overview](https://strandsagents.com/docs/user-guide/sdk/storage/index.md): Choose a storage backend and pass it to the Agent for automatic subsystem resolution, or to individual plugins for fine-grained control.
@@ -138,6 +138,7 @@
     - [vended-tools](https://strandsagents.com/docs/user-guide/sdk/tools/vended-tools/index.md): Pre-built tools included in the SDK for common agent tasks like file operations, shell commands, HTTP requests, and persistent notes.
   - Memory
     - [test-memory-store](https://strandsagents.com/docs/user-guide/sdk/memory/test-memory-store/index.md): A zero-infrastructure memory store backed by a local JSON file: no cloud account, lexical recall, and memories that survive across sessions.
+    - [file-memory-store](https://strandsagents.com/docs/user-guide/sdk/memory/file-memory-store/index.md): Persist agent memories as markdown files on any Storage backend (local, S3, or custom): one file per topic, pluggable search, and topic-aware extraction.
     - [bedrock-knowledge-base](https://strandsagents.com/docs/user-guide/sdk/memory/bedrock-knowledge-base/index.md): Back agent memory with Amazon Bedrock Knowledge Bases: semantic search over a managed vector store and document ingestion for CUSTOM and S3 data sources.
   - Plugins
     - [Overview](https://strandsagents.com/docs/user-guide/sdk/plugins/index.md): Extend agent behavior with plugins. Add steering, guardrails, and custom capabilities that hook into the agent lifecycle.
@@ -175,7 +176,8 @@
       - [Overview](https://strandsagents.com/docs/user-guide/sdk/bidi/models/index.md): Realtime models for BidiAgent: the providers Strands supports, and the configuration, audio, and connection behavior they share.
       - [bedrock](https://strandsagents.com/docs/user-guide/sdk/bidi/models/bedrock/index.md): Configure Amazon Nova Sonic for BidiAgent: set AWS credentials, choose a voice, tune turn detection, and preserve context across connection restarts.
       - [google](https://strandsagents.com/docs/user-guide/sdk/bidi/models/google/index.md): Configure Google Gemini Live for BidiAgent: set credentials, choose a voice and audio settings, tune turn detection, and manage connection restarts.
-      - [openai](https://strandsagents.com/docs/user-guide/sdk/bidi/models/openai/index.md): Configure OpenAI Realtime for BidiAgent: set credentials, choose a voice and transcription model, tune turn detection, and manage connection restarts.
+      - [realtime](https://strandsagents.com/docs/user-guide/sdk/bidi/models/openai/realtime/index.md): Configure OpenAI Realtime for BidiAgent: set credentials, choose a voice and transcription model, tune turn detection, and manage connection restarts.
+      - [live](https://strandsagents.com/docs/user-guide/sdk/bidi/models/openai/live/index.md): Configure OpenAI Live for BidiAgent: set credentials, choose voice and backend models, configure audio and tools, and understand experimental event boundaries.
     - [tools](https://strandsagents.com/docs/user-guide/sdk/bidi/tools/index.md): Give BidiAgent tools that run while the conversation continues. Register tools, understand concurrent execution, and let users end a conversation.
     - [io](https://strandsagents.com/docs/user-guide/sdk/bidi/io/index.md): Connect microphones, speakers, terminals, and WebSockets to BidiAgent. Combine input and output streams, configure audio, and build custom adapters.
     - [content](https://strandsagents.com/docs/user-guide/sdk/bidi/content/index.md): Send text, images, and streaming audio to BidiAgent. Combine ordered content blocks, use dictionary forms, and understand how inputs become model messages.
@@ -307,6 +309,7 @@
     - [quickstart](https://strandsagents.com/docs/user-guide/evals-sdk/red-teaming/quickstart/index.md): Run an adversarial red-team experiment against a Strands agent end to end, generating attack cases, running a strategy, and reading which attacks breached.
     - [strategies](https://strandsagents.com/docs/user-guide/evals-sdk/red-teaming/strategies/index.md): The built-in red-team attack strategies (Crescendo, GOAT, PAIR, Bad Likert Judge, SequentialBreak), their parameters, and when to use each.
     - [custom_cases](https://strandsagents.com/docs/user-guide/evals-sdk/red-teaming/custom_cases/index.md): Hand-author RedTeamCase objects for domain-specific red-team risks, and write success_criteria the LLM judge can apply reliably.
+    - [custom_task](https://strandsagents.com/docs/user-guide/evals-sdk/red-teaming/custom_task/index.md): Replace the built-in red-team task with your own, to wrap the target in a guardrail, add a check between turns, or build the target yourself.
     - [evaluators](https://strandsagents.com/docs/user-guide/evals-sdk/red-teaming/evaluators/index.md): How AttackSuccessEvaluator scores a red-team attack from 0.0 to 1.0, what counts as a breach, and how to tune the threshold.
     - [reading_the_report](https://strandsagents.com/docs/user-guide/evals-sdk/red-teaming/reading_the_report/index.md): Understand what a RedTeamReport prints, how to read the breach matrix and per-attack table, and what to do when an attack breaches.
   - [chaos_testing](https://strandsagents.com/docs/user-guide/evals-sdk/chaos_testing/index.md): Test agent resilience by injecting controlled tool failures with ChaosPlugin: simulate timeouts, network errors, and corrupted responses safely.
@@ -530,6 +533,7 @@
 - [AgentStreamEvent](https://strandsagents.com/docs/api/typescript/AgentStreamEvent/index.md)
 - [AgentTrace](https://strandsagents.com/docs/api/typescript/AgentTrace/index.md)
 - [AnswerOf](https://strandsagents.com/docs/api/typescript/AnswerOf/index.md)
+- [AskOptions](https://strandsagents.com/docs/api/typescript/AskOptions/index.md)
 - [AudioBlock](https://strandsagents.com/docs/api/typescript/AudioBlock/index.md)
 - [AudioBlockData](https://strandsagents.com/docs/api/typescript/AudioBlockData/index.md)
 - [AudioFormat](https://strandsagents.com/docs/api/typescript/AudioFormat/index.md)

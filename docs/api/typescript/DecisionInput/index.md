@@ -5,7 +5,7 @@ type DecisionInput =
   | Message[];
 ```
 
-Defined in: [src/decisions/types.ts:15](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L15)
+Defined in: [src/decisions/types.ts:16](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L16)
 
 Input state passed to a [DecisionModel](/docs/api/typescript/DecisionModel/index.md) invocation.
 

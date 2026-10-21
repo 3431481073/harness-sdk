@@ -8,7 +8,7 @@ A :class:`ModelExtractor` calls a language model with a fact-extraction system p
 class ModelExtractor()
 ```
 
-Defined in: [src/strands/memory/extraction/model\_extractor.py:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/model_extractor.py#L34)
+Defined in: [src/strands/memory/extraction/model\_extractor.py:38](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/model_extractor.py#L38)
 
 An :class:`Extractor` that calls a language model to distill messages into discrete facts.
 
@@ -30,14 +30,14 @@ def __init__(model: Model | None = None,
              system_prompt: str | None = None) -> None
 ```
 
-Defined in: [src/strands/memory/extraction/model\_extractor.py:49](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/model_extractor.py#L49)
+Defined in: [src/strands/memory/extraction/model\_extractor.py:53](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/model_extractor.py#L53)
 
 Initialize the extractor.
 
 **Arguments**:
 
 -   `model` - Model used to extract facts. Resolution order: this `model` > :attr:`ExtractorContext.default_model` (`agent.aux_model` > `agent.model`).
--   `system_prompt` - System prompt steering what counts as a fact. Defaults to a general fact-extraction prompt.
+-   `system_prompt` - System prompt steering what counts as a fact. Defaults to a general fact-extraction prompt. The JSON output format the extractor parses is always appended after it.
 
 #### extract
 
@@ -47,7 +47,7 @@ async def extract(
         context: ExtractorContext | None = None) -> list[ExtractionResult]
 ```
 
-Defined in: [src/strands/memory/extraction/model\_extractor.py:61](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/model_extractor.py#L61)
+Defined in: [src/strands/memory/extraction/model\_extractor.py:66](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/model_extractor.py#L66)
 
 Extract entries from a batch of messages.
 

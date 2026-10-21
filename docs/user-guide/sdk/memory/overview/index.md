@@ -14,6 +14,8 @@ Recall and injection are enabled by default when you attach a store; writing mem
 
 [Test memory store](../test-memory-store/index.md)A zero-setup store backed by a local JSON file, for prototyping and tests.
 
+[File memory store](../file-memory-store/index.md)Knowledge as markdown files on any Storage backend, with topic-aware extraction.
+
 [Bedrock Knowledge Base store](../bedrock-knowledge-base/index.md)A managed store with semantic search over a vector store, for production.
 
 [Build a custom store](../managing-memory/index.md#custom-stores)Back memory with any database or service by implementing the MemoryStore interface.
@@ -61,6 +63,7 @@ Memory is one of three ways an agent carries state. [Session management](/docs/u
 ## Related pages
 
 - [Control what your agent remembers](/docs/user-guide/sdk/memory/managing-memory/index.md) (1 shared tag)
+- [File Memory Store](/docs/user-guide/sdk/memory/file-memory-store/index.md) (1 shared tag)
 - [Test Memory Store](/docs/user-guide/sdk/memory/test-memory-store/index.md) (1 shared tag)
 - [Bedrock Knowledge Base Store](/docs/user-guide/sdk/memory/bedrock-knowledge-base/index.md) (1 shared tag)
 

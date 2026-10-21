@@ -64,10 +64,14 @@ TypeError if `options.model` is not a [Model](/docs/api/typescript/Model/index.m
 ### ask()
 
 ```ts
-ask<Q>(state, questions): Promise<DecisionResult<Q>>;
+ask<Q>(
+   state,
+   questions,
+   options?
+): Promise<DecisionResult<Q>>;
 ```
 
-Defined in: [src/decisions/decision-model.ts:29](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/decision-model.ts#L29)
+Defined in: [src/decisions/decision-model.ts:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/decision-model.ts#L34)
 
 Ask one or more closed questions over the given state.
 
@@ -83,6 +87,7 @@ Ask one or more closed questions over the given state.
 | --- | --- | --- |
 | `state` | [`DecisionInput`](/docs/api/typescript/DecisionInput/index.md) | A plain string, a one-shot content list, or a message history. |
 | `questions` | `Q` | Map of identifier → question. The returned `answers` object is keyed off this same map and statically narrowed per question. |
+| `options?` | [`AskOptions`](/docs/api/typescript/AskOptions/index.md) | Per-call options, such as the request to add the decision’s usage to. |
 
 #### Returns
 
@@ -93,6 +98,10 @@ A [DecisionResult](/docs/api/typescript/DecisionResult/index.md) whose answers a
 #### Throws
 
 Error if `questions` is empty or contains an invalid `question`, `choices`, or `uncertainty`.
+
+#### Throws
+
+TypeError if `options.invocationContext` was not created by the SDK.
 
 #### Inherited from
 

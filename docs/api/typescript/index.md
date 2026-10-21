@@ -104,6 +104,7 @@
     -   [AddMessagesContext](/docs/api/typescript/AddMessagesContext/index.md)
     -   [AgentAsToolOptions](/docs/api/typescript/AgentAsToolOptions/index.md)
     -   [AgentMetadata](/docs/api/typescript/AgentMetadata/index.md)
+    -   [AskOptions](/docs/api/typescript/AskOptions/index.md)
     -   [AudioBlockData](/docs/api/typescript/AudioBlockData/index.md)
     -   [BackgroundTasksConfig](/docs/api/typescript/BackgroundTasksConfig/index.md)
     -   [BackoffContext](/docs/api/typescript/BackoffContext/index.md)

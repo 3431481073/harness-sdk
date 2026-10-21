@@ -8,7 +8,7 @@ Writer model provider.
 class WriterModel(Model)
 ```
 
-Defined in: [src/strands/models/writer.py:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L34)
+Defined in: [src/strands/models/writer.py:36](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L36)
 
 Writer API model provider implementation.
 
@@ -18,7 +18,7 @@ Writer API model provider implementation.
 class WriterConfig(BaseModelConfig)
 ```
 
-Defined in: [src/strands/models/writer.py:46](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L46)
+Defined in: [src/strands/models/writer.py:48](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L48)
 
 Configuration options for Writer API.
 
@@ -39,7 +39,7 @@ def __init__(client_args: dict[str, Any] | None = None,
              **model_config: Unpack[WriterConfig])
 ```
 
-Defined in: [src/strands/models/writer.py:67](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L67)
+Defined in: [src/strands/models/writer.py:69](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L69)
 
 Initialize provider instance.
 
@@ -55,7 +55,7 @@ Initialize provider instance.
 def update_config(**model_config: Unpack[WriterConfig]) -> None
 ```
 
-Defined in: [src/strands/models/writer.py:83](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L83)
+Defined in: [src/strands/models/writer.py:85](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L85)
 
 Update the Writer Model configuration with the provided arguments.
 
@@ -70,7 +70,7 @@ Update the Writer Model configuration with the provided arguments.
 def get_config() -> WriterConfig
 ```
 
-Defined in: [src/strands/models/writer.py:93](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L93)
+Defined in: [src/strands/models/writer.py:95](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L95)
 
 Get the Writer model configuration.
 
@@ -86,7 +86,7 @@ def format_request(messages: Messages,
                    system_prompt: str | None = None) -> Any
 ```
 
-Defined in: [src/strands/models/writer.py:277](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L277)
+Defined in: [src/strands/models/writer.py:281](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L281)
 
 Format a streaming request to the underlying model.
 
@@ -106,7 +106,7 @@ The formatted request.
 def format_chunk(event: Any) -> StreamEvent
 ```
 
-Defined in: [src/strands/models/writer.py:320](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L320)
+Defined in: [src/strands/models/writer.py:324](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L324)
 
 Format the model response events into standardized message chunks.
 
@@ -130,7 +130,7 @@ async def stream(messages: Messages,
                  **kwargs: Any) -> AsyncGenerator[StreamEvent, None]
 ```
 
-Defined in: [src/strands/models/writer.py:385](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L385)
+Defined in: [src/strands/models/writer.py:389](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L389)
 
 Stream conversation with the Writer model.
 
@@ -162,7 +162,7 @@ async def structured_output(
         **kwargs: Any) -> AsyncGenerator[dict[str, T | Any], None]
 ```
 
-Defined in: [src/strands/models/writer.py:470](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L470)
+Defined in: [src/strands/models/writer.py:474](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/writer.py#L474)
 
 Get structured output from the model.
 

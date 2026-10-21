@@ -13,7 +13,7 @@ Deprecated: The Llama API service has been deprecated by Meta. This provider wil
 class LlamaAPIModel(Model)
 ```
 
-Defined in: [src/strands/models/llamaapi.py:38](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L38)
+Defined in: [src/strands/models/llamaapi.py:44](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L44)
 
 Llama API model provider implementation.
 
@@ -25,7 +25,7 @@ Deprecated: The Llama API service has been deprecated by Meta. This class will b
 class LlamaConfig(BaseModelConfig)
 ```
 
-Defined in: [src/strands/models/llamaapi.py:54](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L54)
+Defined in: [src/strands/models/llamaapi.py:60](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L60)
 
 Configuration options for Llama API models.
 
@@ -46,7 +46,7 @@ def __init__(*,
              **model_config: Unpack[LlamaConfig]) -> None
 ```
 
-Defined in: [src/strands/models/llamaapi.py:73](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L73)
+Defined in: [src/strands/models/llamaapi.py:79](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L79)
 
 Initialize provider instance.
 
@@ -62,7 +62,7 @@ Initialize provider instance.
 def update_config(**model_config: Unpack[LlamaConfig]) -> None
 ```
 
-Defined in: [src/strands/models/llamaapi.py:95](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L95)
+Defined in: [src/strands/models/llamaapi.py:101](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L101)
 
 Update the Llama API Model configuration with the provided arguments.
 
@@ -77,7 +77,7 @@ Update the Llama API Model configuration with the provided arguments.
 def get_config() -> LlamaConfig
 ```
 
-Defined in: [src/strands/models/llamaapi.py:105](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L105)
+Defined in: [src/strands/models/llamaapi.py:111](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L111)
 
 Get the Llama API model configuration.
 
@@ -93,7 +93,7 @@ def format_request(messages: Messages,
                    system_prompt: str | None = None) -> dict[str, Any]
 ```
 
-Defined in: [src/strands/models/llamaapi.py:235](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L235)
+Defined in: [src/strands/models/llamaapi.py:243](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L243)
 
 Format a Llama API chat streaming request.
 
@@ -117,7 +117,7 @@ An Llama API chat streaming request.
 def format_chunk(event: dict[str, Any]) -> StreamEvent
 ```
 
-Defined in: [src/strands/models/llamaapi.py:281](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L281)
+Defined in: [src/strands/models/llamaapi.py:289](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L289)
 
 Format the Llama API model response events into standardized message chunks.
 
@@ -141,7 +141,7 @@ async def stream(messages: Messages,
                  **kwargs: Any) -> AsyncGenerator[StreamEvent, None]
 ```
 
-Defined in: [src/strands/models/llamaapi.py:355](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L355)
+Defined in: [src/strands/models/llamaapi.py:363](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L363)
 
 Stream conversation with the LlamaAPI model.
 
@@ -173,7 +173,7 @@ def structured_output(
         **kwargs: Any) -> AsyncGenerator[dict[str, T | Any], None]
 ```
 
-Defined in: [src/strands/models/llamaapi.py:450](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L450)
+Defined in: [src/strands/models/llamaapi.py:458](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/llamaapi.py#L458)
 
 Get structured output from the model.
 

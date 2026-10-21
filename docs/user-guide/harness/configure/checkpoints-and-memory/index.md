@@ -41,7 +41,7 @@ For the full option set see [persist sessions](/docs/user-guide/harness/configur
 
 ## Long-term memory: carry facts across conversations
 
-Memory is on by default. Strands harness distills durable facts into files under `./.agent/memory`, searches them before each turn, and folds the top matches into context — so knowledge survives across sessions and works with sessions off. The agent also gets a `search_memory` tool for on-demand recall, and extraction runs in the background every few turns on a small model, so keeping memory costs little.
+Memory is on by default. Strands harness distills durable facts into files under `./.agent/memory`, searches them before each user turn, and folds the top matches into context — so knowledge survives across sessions and works with sessions off. The agent also gets a `search_memory` tool for on-demand recall, and extraction runs in the background every few turns on a small model, so keeping memory costs little.
 
 Because memory persistence is plain files, independent of any session, it is the right tool for preferences, project facts, and decisions that should outlive a single task. Turn it off for a stateless run with `memory=False` (`memory: false`), point it at a different directory with `memory={"dir": ...}` / `memory: { dir }`, or swap the backing store with `memory={"stores": [...]}`. See [give long-term memory](/docs/user-guide/harness/configure/memory/index.md) and the Strands Harness SDK’s [memory overview](/docs/user-guide/sdk/memory/overview/index.md).
 
