@@ -62,30 +62,25 @@ class BackoffStrategy(Protocol):
         ...
 
 
-def _validate_attempt(attempt: int, class_name: str) -> None:
+def _validate_attempt(attempt: int) -> None:
     if isinstance(attempt, bool) or not isinstance(attempt, int) or attempt < 1:
-        raise ValueError(f"{class_name}: attempt must be an integer >= 1 (got {attempt!r})")
+        raise ValueError(f"attempt must be an integer >= 1 (got {attempt!r})")
 
 
-def _validate_non_negative(value: float, name: str, class_name: str) -> None:
+def _validate_non_negative(value: float, name: str) -> None:
     if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
-        raise ValueError(f"{class_name}: {name} must be a non-negative finite number (got {value!r})")
+        raise ValueError(f"{name} must be a non-negative finite number (got {value!r})")
 
 
-def _validate_max_delay(value: float, class_name: str) -> None:
+def _validate_max_delay(value: float) -> None:
     # math.inf is a valid "no cap"; NaN fails the comparison and is rejected.
     if isinstance(value, bool) or not isinstance(value, (int, float)) or not value >= 0:
-        raise ValueError(f"{class_name}: max_delay must be a non-negative number (got {value!r})")
+        raise ValueError(f"max_delay must be a non-negative number (got {value!r})")
 
 
-def _finite_cap(max_delay: float) -> float:
-    # An uncapped (math.inf) max_delay is clamped so raw and jittered delays stay finite.
-    return min(max_delay, sys.float_info.max)
-
-
-def _validate_jitter(jitter: str, class_name: str) -> None:
+def _validate_jitter(jitter: str) -> None:
     if jitter not in _JITTER_KINDS:
-        raise ValueError(f"{class_name}: jitter must be one of {_JITTER_KINDS} (got {jitter!r})")
+        raise ValueError(f"jitter must be one of {_JITTER_KINDS} (got {jitter!r})")
 
 
 def _jitter(raw: float, kind: JitterKind, base_delay: float, max_delay: float, last_delay: float | None) -> float:
@@ -114,7 +109,7 @@ class ConstantBackoff:
         Raises:
             ValueError: If ``delay`` is negative or not finite.
         """
-        _validate_non_negative(delay, "delay", type(self).__name__)
+        _validate_non_negative(delay, "delay")
         self._delay = delay
 
     def next_delay(self, context: BackoffContext) -> float:
@@ -126,7 +121,7 @@ class ConstantBackoff:
         Returns:
             Delay in seconds.
         """
-        _validate_attempt(context.attempt, type(self).__name__)
+        _validate_attempt(context.attempt)
         return self._delay
 
 
@@ -145,11 +140,12 @@ class LinearBackoff:
             ValueError: If ``jitter`` is not a supported mode, ``base_delay`` is negative or not finite, or
                 ``max_delay`` is negative or NaN.
         """
-        _validate_jitter(jitter, type(self).__name__)
-        _validate_non_negative(base_delay, "base_delay", type(self).__name__)
-        _validate_max_delay(max_delay, type(self).__name__)
+        _validate_jitter(jitter)
+        _validate_non_negative(base_delay, "base_delay")
+        _validate_max_delay(max_delay)
         self._base_delay = base_delay
-        self._max_delay = _finite_cap(max_delay)
+        # An uncapped (math.inf) max_delay is clamped so raw and jittered delays stay finite.
+        self._max_delay = min(max_delay, sys.float_info.max)
         self._jitter: JitterKind = jitter
 
     def next_delay(self, context: BackoffContext) -> float:
@@ -161,7 +157,7 @@ class LinearBackoff:
         Returns:
             Delay in seconds.
         """
-        _validate_attempt(context.attempt, type(self).__name__)
+        _validate_attempt(context.attempt)
         raw = min(self._max_delay, self._base_delay * context.attempt)
         return _jitter(raw, self._jitter, self._base_delay, self._max_delay, context.last_delay)
 
@@ -192,12 +188,13 @@ class ExponentialBackoff:
             ValueError: If ``jitter`` is not a supported mode, ``base_delay`` or ``multiplier`` is negative or not
                 finite, or ``max_delay`` is negative or NaN.
         """
-        _validate_jitter(jitter, type(self).__name__)
-        _validate_non_negative(base_delay, "base_delay", type(self).__name__)
-        _validate_max_delay(max_delay, type(self).__name__)
-        _validate_non_negative(multiplier, "multiplier", type(self).__name__)
+        _validate_jitter(jitter)
+        _validate_non_negative(base_delay, "base_delay")
+        _validate_max_delay(max_delay)
+        _validate_non_negative(multiplier, "multiplier")
         self._base_delay = base_delay
-        self._max_delay = _finite_cap(max_delay)
+        # An uncapped (math.inf) max_delay is clamped so raw and jittered delays stay finite.
+        self._max_delay = min(max_delay, sys.float_info.max)
         self._multiplier = multiplier
         self._jitter: JitterKind = jitter
 
@@ -210,7 +207,7 @@ class ExponentialBackoff:
         Returns:
             Delay in seconds.
         """
-        _validate_attempt(context.attempt, type(self).__name__)
+        _validate_attempt(context.attempt)
         try:
             growth = float(self._multiplier) ** (context.attempt - 1)
         except OverflowError:

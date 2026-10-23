@@ -695,7 +695,7 @@ class RetryOnServiceUnavailable(HookProvider):
 </Tab>
 </Tabs>
 
-The attempt count covers every model attempt in the invocation, including retries requested by the default retry strategy and other hooks, so `max_retries` caps total attempts rather than this hook's own retries. To give a hook an independent budget, keep a counter on the hook and reset it on `BeforeInvocationEvent`.
+The attempt count covers every attempt of the current model call, including retries requested by the default retry strategy and other hooks, and resets to 1 for the next model call in the invocation. `max_retries` therefore caps total attempts per model call rather than this hook's own retries. To give a hook an independent budget, keep a counter on the hook and reset it on `BeforeInvocationEvent`.
 
 For example, to retry up to 3 times on service unavailable errors:
 

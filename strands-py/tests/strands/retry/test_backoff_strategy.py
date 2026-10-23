@@ -85,7 +85,7 @@ def test_jitter_defaults_to_full(random_value):
 
 @pytest.mark.parametrize("backoff_class", [LinearBackoff, ExponentialBackoff])
 def test_invalid_jitter_raises(backoff_class):
-    with pytest.raises(ValueError, match=f"{backoff_class.__name__}: jitter must be one of"):
+    with pytest.raises(ValueError, match="jitter must be one of"):
         backoff_class(jitter="ful")
 
 
@@ -107,14 +107,14 @@ def test_invalid_attempt_raises(backoff, attempt):
     ],
 )
 def test_invalid_numeric_argument_raises_at_construction(backoff_class, name, value):
-    with pytest.raises(ValueError, match=f"{backoff_class.__name__}: {name} must be a non-negative finite number"):
+    with pytest.raises(ValueError, match=f"{name} must be a non-negative finite number"):
         backoff_class(**{name: value})
 
 
 @pytest.mark.parametrize("value", [-1, math.nan, True, "1"])
 @pytest.mark.parametrize("backoff_class", [LinearBackoff, ExponentialBackoff])
 def test_invalid_max_delay_raises_at_construction(backoff_class, value):
-    with pytest.raises(ValueError, match=f"{backoff_class.__name__}: max_delay must be a non-negative number"):
+    with pytest.raises(ValueError, match="max_delay must be a non-negative number"):
         backoff_class(max_delay=value)
 
 
