@@ -466,6 +466,41 @@ describe('Agent', () => {
         ])
       })
 
+      it('replaces every tool use, keeps metadata, and leaves partialMessage unmodified', async () => {
+        const usage = { inputTokens: 10, outputTokens: 100, totalTokens: 110 }
+        const model = new MockMessageModel().addTurn(
+          [
+            { type: 'toolUseBlock', name: 'story_tool', toolUseId: 'tool-1', input: {} },
+            { type: 'toolUseBlock', name: '', toolUseId: 'tool-2', input: {} },
+          ],
+          { stopReason: 'maxTokens', usage }
+        )
+        const agent = new Agent({ model })
+
+        const error = await agent.invoke('Tell me a story!').catch((e: unknown) => e)
+
+        expect(error).toBeInstanceOf(MaxTokensError)
+        expect(agent.messages[1]).toStrictEqual(
+          new Message({
+            role: 'assistant',
+            content: [
+              new TextBlock(
+                "The selected tool story_tool's tool use was incomplete due to maximum token limits being reached."
+              ),
+              new TextBlock(
+                "The selected tool <unknown>'s tool use was incomplete due to maximum token limits being reached."
+              ),
+            ],
+            trackingId: anyTrackingId,
+            metadata: { usage },
+          })
+        )
+        expect((error as MaxTokensError).partialMessage.content).toStrictEqual([
+          new ToolUseBlock({ name: 'story_tool', toolUseId: 'tool-1', input: {} }),
+          new ToolUseBlock({ name: '', toolUseId: 'tool-2', input: {} }),
+        ])
+      })
+
       it('does not add an empty partial message to history', async () => {
         const model = new MockMessageModel().addTurn([], { stopReason: 'maxTokens' })
         const agent = new Agent({ model })

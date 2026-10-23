@@ -330,6 +330,25 @@ describe('Model', () => {
         ])
       })
 
+      it('keeps the reasoning signature on a tool use cut off before its block stopped', async () => {
+        const provider = new TestModelProvider(async function* () {
+          yield { type: 'modelMessageStartEvent', role: 'assistant' }
+          yield {
+            type: 'modelContentBlockStartEvent',
+            start: { type: 'toolUseStart', toolUseId: 'tool1', name: 'get_weather', reasoningSignature: 'sig' },
+          }
+          yield { type: 'modelMessageStopEvent', stopReason: 'maxTokens' }
+        })
+
+        const messages = [new Message({ role: 'user', content: [new TextBlock('Hi')] })]
+
+        const error = await collectGenerator(provider.streamAggregated(messages)).catch((e: unknown) => e)
+        expect(error).toBeInstanceOf(MaxTokensError)
+        expect((error as MaxTokensError).partialMessage.content).toStrictEqual([
+          new ToolUseBlock({ name: 'get_weather', toolUseId: 'tool1', input: {}, reasoningSignature: 'sig' }),
+        ])
+      })
+
       it('throws MaxTokensError when contentBlockStop arrives with truncated tool input JSON and stopReason is maxTokens', async () => {
         const provider = new TestModelProvider(async function* () {
           yield { type: 'modelMessageStartEvent', role: 'assistant' }

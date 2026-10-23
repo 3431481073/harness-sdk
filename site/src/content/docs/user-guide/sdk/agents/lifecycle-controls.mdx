@@ -92,7 +92,7 @@ next. Read it from <Syntax py="result.stop_reason" ts="result.stopReason" />.
 | <Syntax py="limit_total_tokens" ts="limitTotalTokens" /> | The cumulative token budget was exhausted. | Same as above; history is reinvokable. |
 | <Syntax py="limit_output_tokens" ts="limitOutputTokens" /> | The output token budget was exhausted. | Same as above. |
 | `cancelled` | The agent was stopped via <Syntax py="agent.cancel()" ts="agent.cancel()" /> or a cancel signal. | Treat as a client-initiated stop. |
-| <Syntax py="max_tokens" ts="maxTokens" /> | A single model response exceeded the provider's per-call cap. Unrecoverable within the loop. | See [Handle a truncated model response](#handle-a-truncated-model-response). |
+| <Syntax py="max_tokens" ts="maxTokens" /> | A single model response exceeded the provider's per-call cap. The loop raises an error; the truncated response stays in history. | See [Handle a truncated model response](#handle-a-truncated-model-response). |
 | <Syntax py="content_filtered" ts="contentFiltered" /> | A safety mechanism blocked the response. | Handle per your application's policy. |
 | <Syntax py="guardrail_intervened" ts="guardrailIntervened" /> | A guardrail policy stopped generation. | Handle per your application's policy. |
 | `interrupt` | The agent paused for human input. | Resume with interrupt responses. See [Interrupts](../interrupts.md). |
@@ -238,11 +238,12 @@ you more control:
 ### Handle a truncated model response
 
 When a single model response exceeds the provider's per-call output cap, the
-loop cannot continue from a partial message. This is distinct from the graceful
-`limit_*` stop reasons: the loop raises
-<Syntax py="MaxTokensReachedException" ts="MaxTokensError" /> rather than
-returning a result. Reduce the context size, raise the provider's token limit,
-or split the task into smaller steps.
+loop stops. This is distinct from the graceful `limit_*` stop reasons: the loop
+raises <Syntax py="MaxTokensReachedException" ts="MaxTokensError" /> rather than
+returning a result. The truncated response stays in history with its tool uses
+replaced by text, so you can invoke the agent again to continue. To avoid the
+error, reduce the context size, raise the provider's token limit, or split the
+task into smaller steps. See [MaxTokensReachedException](./agent-loop.md#maxtokensreachedexception).
 
 ## Run one agent across many requests
 

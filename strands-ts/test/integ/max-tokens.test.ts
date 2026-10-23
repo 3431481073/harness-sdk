@@ -26,8 +26,9 @@ describe.skipIf(bedrock.skip)('max tokens reached', () => {
       texts.some((block) => block.text.includes('tool use was incomplete due to maximum token limits being reached'))
     ).toBe(true)
 
-    model.updateConfig({ maxTokens: 1024 })
-    const result = await agent.invoke('What is 3+3')
+    // Without story_tool, so the follow-up can't hit the token limit again.
+    const followUp = new Agent({ model: bedrock.createModel(), messages: agent.messages, printer: false })
+    const result = await followUp.invoke('What is 3+3')
 
     expect(result.stopReason).toBe('endTurn')
   })

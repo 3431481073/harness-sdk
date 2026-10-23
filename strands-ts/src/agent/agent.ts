@@ -399,6 +399,18 @@ function resolveAuxModel(auxModel: Model | string | undefined): Model | undefine
 }
 
 /**
+ * Replaces a tool use from a maxTokens-truncated response with text explaining it was cut off.
+ */
+function replaceTruncatedToolUse(block: ContentBlock): ContentBlock {
+  if (!(block instanceof ToolUseBlock)) return block
+  const displayName = block.name || '<unknown>'
+  logger.warn(`tool_name=<${displayName}> | replacing with error message due to maxTokens truncation`)
+  return new TextBlock(
+    `The selected tool ${displayName}'s tool use was incomplete due to maximum token limits being reached.`
+  )
+}
+
+/**
  * Orchestrates the interaction between a model, a set of tools, and MCP clients.
  * The Agent is responsible for managing the lifecycle of tools and clients
  * and invoking the core decision-making loop.
@@ -2268,29 +2280,7 @@ export class Agent implements LocalAgent, InvokableAgent {
           continue
         }
 
-        // Keep the truncated response in history so the agent can be invoked again to continue.
-        // Its tool uses cannot be trusted, so each is replaced with explanatory text rather than
-        // leaving an unmatched tool use in history.
-        if (error instanceof MaxTokensError && error.partialMessage.content.length > 0) {
-          logger.info('handling maxTokens stop reason - replacing all tool uses with error messages')
-          const { partialMessage } = error
-          const content = partialMessage.content.map((block) => {
-            if (!(block instanceof ToolUseBlock)) return block
-            const displayName = block.name || '<unknown>'
-            logger.warn(`tool_name=<${displayName}> | replacing with error message due to max_tokens truncation`)
-            return new TextBlock(
-              `The selected tool ${displayName}'s tool use was incomplete due to maximum token limits being reached.`
-            )
-          })
-          const recovered = new Message({
-            role: partialMessage.role,
-            content,
-            trackingId: partialMessage.trackingId,
-            ...(partialMessage.metadata !== undefined && { metadata: partialMessage.metadata }),
-          })
-          yield this._appendMessage(recovered, invocationState)
-        }
-
+        yield* this._recoverMaxTokensMessage(error, invocationState)
         throw error
       }
     }
@@ -2674,6 +2664,24 @@ export class Agent implements LocalAgent, InvokableAgent {
   private async _appendMessageAndFireHooks(message: Message, invocationState: InvocationState = {}): Promise<void> {
     this.messages.push(message)
     await this._hooksRegistry.invokeCallbacks(new MessageAddedEvent({ agent: this, message, invocationState }))
+  }
+
+  /**
+   * Keeps a truncated response in history so the agent can be invoked again to continue.
+   * Its tool uses cannot be trusted, so each is replaced with explanatory text rather than
+   * leaving an unmatched tool use in history. An empty partial message is not appended.
+   */
+  private *_recoverMaxTokensMessage(error: unknown, invocationState: InvocationState): Generator<MessageAddedEvent> {
+    if (!(error instanceof MaxTokensError) || error.partialMessage.content.length === 0) return
+    logger.info('handling maxTokens stop reason - replacing all tool uses with error messages')
+    const { partialMessage } = error
+    const recovered = new Message({
+      role: partialMessage.role,
+      content: partialMessage.content.map(replaceTruncatedToolUse),
+      trackingId: partialMessage.trackingId,
+      ...(partialMessage.metadata !== undefined && { metadata: partialMessage.metadata }),
+    })
+    yield this._appendMessage(recovered, invocationState)
   }
 
   /**

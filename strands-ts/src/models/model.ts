@@ -27,6 +27,7 @@ import {
 import { MaxTokensError, ModelError, normalizeError } from '../errors.js'
 import type { Redaction } from '../hooks/events.js'
 import { logger } from '../logging/logger.js'
+import type { JSONValue } from '../types/json.js'
 import { DEFAULT_CONTEXT_WINDOW_LIMIT, getContextWindowLimit } from './defaults.js'
 import { warnOnce } from '../logging/warn-once.js'
 
@@ -301,6 +302,27 @@ export interface StreamAggregatedResult {
 }
 
 /**
+ * Builds a tool use from its streamed input. Input that is not valid JSON, as when the
+ * response was truncated mid-tool-use, is kept as the raw string and returned as `parseError`.
+ */
+function buildToolUse(
+  name: string,
+  toolUseId: string,
+  rawInput: string,
+  reasoningSignature: string
+): { block: ToolUseBlock; parseError?: SyntaxError } {
+  const toolUse = (input: JSONValue): ToolUseBlock =>
+    new ToolUseBlock({ name, toolUseId, input, ...(reasoningSignature && { reasoningSignature }) })
+  try {
+    return { block: toolUse(rawInput ? JSON.parse(rawInput) : {}) }
+  } catch (e: unknown) {
+    if (!(e instanceof SyntaxError)) throw e
+    logger.error('unable to parse tool input JSON', e)
+    return { block: toolUse(rawInput), parseError: e }
+  }
+}
+
+/**
  * Base abstract class for model providers.
  * Defines the contract that all model provider implementations must follow.
  *
@@ -522,59 +544,49 @@ export abstract class Model<T extends BaseModelConfig = BaseModelConfig> {
 
           case 'modelContentBlockStopEvent': {
             // Finalize and emit complete ContentBlock
-            let block: ContentBlock
-            try {
-              if (toolUseId) {
-                block = new ToolUseBlock({
-                  name: toolName,
-                  toolUseId: toolUseId,
-                  input: accumulatedToolInput ? JSON.parse(accumulatedToolInput) : {},
-                  ...(toolReasoningSignature && { reasoningSignature: toolReasoningSignature }),
-                })
-                toolUseId = '' // Reset
-                toolName = ''
-                toolReasoningSignature = ''
-              } else if (Object.keys(accumulatedReasoning).length > 0) {
-                block = new ReasoningBlock({
-                  ...accumulatedReasoning,
-                })
-                accumulatedReasoning = {} // Reset after creating reasoning block
-              } else if (accumulatedCitations.hasData()) {
-                block = new CitationsBlock({
-                  citations: accumulatedCitations.citations,
-                  // Citations deltas that ground already-streamed text carry no content of their own.
-                  content:
-                    accumulatedCitations.content.length > 0
-                      ? accumulatedCitations.content
-                      : accumulatedText
-                        ? [{ text: accumulatedText }]
-                        : [],
-                })
-                accumulatedCitations.reset()
-              } else {
-                block = new TextBlock(accumulatedText)
-              }
+            if (toolUseId) {
+              const { block, parseError } = buildToolUse(
+                toolName,
+                toolUseId,
+                accumulatedToolInput,
+                toolReasoningSignature
+              )
+              toolUseId = '' // Reset
+              toolName = ''
+              toolReasoningSignature = ''
+              // An unparseable tool use is kept only for the maxTokens partial message; any other
+              // stop reason throws on toolInputParseError.
               contentBlocks.push(block)
-              yield block
-            } catch (e: unknown) {
-              if (e instanceof SyntaxError) {
-                logger.error('unable to parse tool input JSON', e)
-                toolInputParseError = e
-                // Kept only so a maxTokens partial message records the truncated tool use; any
-                // other stop reason throws on toolInputParseError and discards the message.
-                contentBlocks.push(
-                  new ToolUseBlock({
-                    name: toolName,
-                    toolUseId: toolUseId,
-                    input: accumulatedToolInput,
-                    ...(toolReasoningSignature && { reasoningSignature: toolReasoningSignature }),
-                  })
-                )
-                toolUseId = ''
-                toolName = ''
-                toolReasoningSignature = ''
+              if (parseError) {
+                toolInputParseError = parseError
+                break
               }
+              yield block
+              break
             }
+            let block: ContentBlock
+            if (Object.keys(accumulatedReasoning).length > 0) {
+              block = new ReasoningBlock({
+                ...accumulatedReasoning,
+              })
+              accumulatedReasoning = {} // Reset after creating reasoning block
+            } else if (accumulatedCitations.hasData()) {
+              block = new CitationsBlock({
+                citations: accumulatedCitations.citations,
+                // Citations deltas that ground already-streamed text carry no content of their own.
+                content:
+                  accumulatedCitations.content.length > 0
+                    ? accumulatedCitations.content
+                    : accumulatedText
+                      ? [{ text: accumulatedText }]
+                      : [],
+              })
+              accumulatedCitations.reset()
+            } else {
+              block = new TextBlock(accumulatedText)
+            }
+            contentBlocks.push(block)
+            yield block
             break
           }
 
@@ -583,7 +595,9 @@ export abstract class Model<T extends BaseModelConfig = BaseModelConfig> {
             if (messageRole) {
               // A tool use cut off before its block stopped still belongs in the maxTokens partial message.
               if (toolUseId && event.stopReason === 'maxTokens') {
-                contentBlocks.push(new ToolUseBlock({ name: toolName, toolUseId, input: accumulatedToolInput }))
+                contentBlocks.push(
+                  buildToolUse(toolName, toolUseId, accumulatedToolInput, toolReasoningSignature).block
+                )
               }
               const filtered = contentBlocks.filter(
                 (block) => !(block instanceof TextBlock && block.text.trim() === '')
@@ -645,11 +659,7 @@ export abstract class Model<T extends BaseModelConfig = BaseModelConfig> {
 
       // Handle stop reason
       if (finalStopReason === 'maxTokens') {
-        throw new MaxTokensError(
-          'Model reached maximum token limit. When raised by an agent, the partial message has been added to the ' +
-            'conversation history and you can continue by invoking the agent again.',
-          stoppedMessage
-        )
+        throw new MaxTokensError('Model reached maximum token limit.', stoppedMessage)
       }
 
       if (toolInputParseError !== undefined) {

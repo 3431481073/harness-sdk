@@ -115,9 +115,9 @@ Each model invocation ends with a stop reason that determines what happens next:
 - **Limit output tokens** (<Syntax py="limit_output_tokens" ts="limitOutputTokens" />):
   The output token budget was exhausted. See [Invocation Limits](#invocation-limits).
 - **Max tokens** (<Syntax py="max_tokens" ts="maxTokens" />): The model's response was
-  truncated because it hit the token limit. This is unrecoverable within the current loop.
-  The model cannot continue from a partial response, and the loop terminates with an
-  error.
+  truncated because it hit the token limit. The loop terminates with an error, but the
+  truncated response is kept in history so you can invoke the agent again. See
+  [MaxTokensReachedException](#maxtokensreachedexception).
 - **Stop sequence** (<Syntax py="stop_sequence" ts="stopSequence" />): The model
   encountered a configured stop sequence. Like end turn, this terminates the loop
   normally.
@@ -415,7 +415,7 @@ When the model's response exceeds the configured token limit, the loop raises a 
 
 Handle this exception by reducing context size, increasing the token limit, or breaking the task into smaller steps.
 
-Before raising, the agent adds the truncated response to the conversation history, with every tool use in it replaced by a text block noting that the tool use was incomplete. The conversation stays valid, so you can call the agent again to continue. In TypeScript the error is `MaxTokensError`, and `error.partialMessage` holds the truncated response as the model produced it (a tool use cut off mid-input keeps its raw JSON string as `input`).
+Before raising, the agent adds the truncated response to the conversation history, with every tool use in it replaced by a text block noting that the tool use was incomplete. The conversation stays valid, so you can call the agent again to continue. In TypeScript the error is `MaxTokensError`, and `error.partialMessage` holds the truncated response as the model produced it (a tool use cut off mid-input keeps its raw JSON string as `input`). TypeScript skips adding an empty truncated response to history.
 
 ## What Comes Next
 
