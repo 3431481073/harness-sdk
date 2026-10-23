@@ -47,10 +47,7 @@ import { Agent } from '@strands-agents/sdk'
 
 const agent = new Agent({
   contextManager: {
-    strategies: [
-      'proactiveSummarization',
-      'largeToolOffloading',
-    ],
+    strategies: ['proactiveSummarization', 'largeToolOffloading'],
   },
 })
 ```

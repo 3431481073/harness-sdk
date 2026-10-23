@@ -29,10 +29,7 @@ import { KeywordSearchStrategy } from '@strands-agents/sdk/storage/search'
 import { LocalFileStorage } from '@strands-agents/sdk/storage'
 
 const storage = new LocalFileStorage('./my-data/')
-const results = await KeywordSearchStrategy.search(
-  storage,
-  'dark mode toggle',
-)
+const results = await KeywordSearchStrategy.search(storage, 'dark mode toggle')
 ```
 (( /tab "TypeScript" ))
 
@@ -80,15 +77,8 @@ const storage = new LocalFileStorage('./memory/', {
   searchStrategy: search,
 })
 
-await storage.write(
-  'auth.md',
-  new TextEncoder().encode(
-    'OAuth2 authentication flow',
-  ),
-)
-const results = await storage.search(
-  'authentication',
-)
+await storage.write('auth.md', new TextEncoder().encode('OAuth2 authentication flow'))
+const results = await storage.search('authentication')
 
 await search.close()
 ```
@@ -197,10 +187,7 @@ import type {
 
 // Rank entries by how often the exact query phrase appears.
 const phraseSearch: SearchStrategy = {
-  async search(
-    storage: Storage,
-    query: string,
-  ): Promise<StorageSearchResult[]> {
+  async search(storage: Storage, query: string): Promise<StorageSearchResult[]> {
     const phrase = query.trim().toLowerCase()
     if (!phrase) return []
     const results: StorageSearchResult[] = []

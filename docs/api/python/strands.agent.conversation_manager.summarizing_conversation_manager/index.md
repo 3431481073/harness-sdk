@@ -6,7 +6,7 @@ Summarizing conversation history management with configurable options.
 class SummarizingConversationManager(ConversationManager)
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/summarizing\_conversation\_manager.py:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/summarizing_conversation_manager.py#L34)
+Defined in: [src/strands/agent/conversation\_manager/summarizing\_conversation\_manager.py:35](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/summarizing_conversation_manager.py#L35)
 
 Implements a summarizing window manager.
 
@@ -25,7 +25,7 @@ def __init__(summary_ratio: float = 0.3,
              | None = None)
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/summarizing\_conversation\_manager.py:42](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/summarizing_conversation_manager.py#L42)
+Defined in: [src/strands/agent/conversation\_manager/summarizing\_conversation\_manager.py:43](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/summarizing_conversation_manager.py#L43)
 
 Initialize the summarizing conversation manager.
 
@@ -48,7 +48,7 @@ Initialize the summarizing conversation manager.
 def restore_from_session(state: dict[str, Any]) -> list[Message] | None
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/summarizing\_conversation\_manager.py:86](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/summarizing_conversation_manager.py#L86)
+Defined in: [src/strands/agent/conversation\_manager/summarizing\_conversation\_manager.py:87](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/summarizing_conversation_manager.py#L87)
 
 Restores the Summarizing Conversation manager from its previous state in a session.
 
@@ -66,7 +66,7 @@ Optionally returns the previous conversation summary if it exists.
 def get_state() -> dict[str, Any]
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/summarizing\_conversation\_manager.py:99](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/summarizing_conversation_manager.py#L99)
+Defined in: [src/strands/agent/conversation\_manager/summarizing\_conversation\_manager.py:100](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/summarizing_conversation_manager.py#L100)
 
 Returns a dictionary representation of the state for the Summarizing Conversation Manager.
 
@@ -76,7 +76,7 @@ Returns a dictionary representation of the state for the Summarizing Conversatio
 def apply_management(agent: "Agent", **kwargs: Any) -> None
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/summarizing\_conversation\_manager.py:103](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/summarizing_conversation_manager.py#L103)
+Defined in: [src/strands/agent/conversation\_manager/summarizing\_conversation\_manager.py:104](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/summarizing_conversation_manager.py#L104)
 
 Apply management strategy to conversation history.
 
@@ -95,7 +95,7 @@ def reduce_context(agent: "Agent",
                    **kwargs: Any) -> None
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/summarizing\_conversation\_manager.py:117](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/summarizing_conversation_manager.py#L117)
+Defined in: [src/strands/agent/conversation\_manager/summarizing\_conversation\_manager.py:118](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/summarizing_conversation_manager.py#L118)
 
 Reduce context using summarization.
 
@@ -107,7 +107,7 @@ When `e` is None (proactive compression), summarization failure is logged and re
 
 -   `agent` - The agent whose conversation history will be reduced. The agent’s messages list is modified in-place.
 -   `e` - The exception that triggered the context reduction, if any. When set, this is a reactive overflow recovery call. When None, this is a proactive compression call (best-effort).
--   `**kwargs` - Additional keyword arguments for future extensibility.
+-   `**kwargs` - Additional keyword arguments for future extensibility, including the `invocation_context` the summary call’s usage adds to.
 
 **Raises**:
 

@@ -1,5 +1,151 @@
 # Strands Agents Changelog
 
+## Harness Python v0.3.2 — 2026-10-22
+Release: https://github.com/strands-agents/harness-sdk/releases/tag/harness-python/v0.3.2 · Package: https://pypi.org/project/strands-harness/0.3.2/
+
+### Features
+- add harness, CLI, and box release streams (https://github.com/strands-agents/harness-sdk/pull/5192)
+- add docs-verifier skill (https://github.com/strands-agents/harness-sdk/pull/5268)
+
+### Fixes
+- make the file tools work on Windows and run Windows CI for harness-ts, harness-py and strands-cli [tool] (https://github.com/strands-agents/harness-sdk/pull/4978)
+- enable Bedrock Mantle web search for GPT-6.1 Sol [model] (https://github.com/strands-agents/harness-sdk/pull/5188)
+- inject memory on user turns only, matching the SDK default [context] (https://github.com/strands-agents/harness-sdk/pull/5298)
+- sniff image bytes in read so a non-image or mislabeled file is not sent as an image [model, tool] (https://github.com/strands-agents/harness-sdk/pull/5311)
+- run web\_fetch's curl through PowerShell when the sandbox speaks it [tool, server] (https://github.com/strands-agents/harness-sdk/pull/5328)
+
+### Other
+- backfill harness, CLI, and box releases (https://github.com/strands-agents/harness-sdk/pull/5193)
+- add 0021 cache-friendly tool management [tool] (https://github.com/strands-agents/harness-sdk/pull/5161)
+- bump re-actors/alls-green from 1.2.2 to 1.3.0 (https://github.com/strands-agents/harness-sdk/pull/3963)
+- apply area-catalog label to PRs touching catalog entries (https://github.com/strands-agents/harness-sdk/pull/5334)
+- bump actions/upload-artifact from 7.0.1 to 7.0.2 (https://github.com/strands-agents/harness-sdk/pull/5099)
+- bump actions/download-artifact from 8.0.1 to 8.0.2 (https://github.com/strands-agents/harness-sdk/pull/5097)
+- bump astral-sh/setup-uv from 10.0.1 to 10.3.0 (https://github.com/strands-agents/harness-sdk/pull/5098)
+
+## Harness CLI v0.2.2 — 2026-10-22
+Release: https://github.com/strands-agents/harness-sdk/releases/tag/harness-cli/v0.2.2 · Package: https://www.npmjs.com/package/@strands-agents/cli/v/0.2.2
+
+### Features
+- add harness, CLI, and box release streams (https://github.com/strands-agents/harness-sdk/pull/5192)
+- add docs-verifier skill (https://github.com/strands-agents/harness-sdk/pull/5268)
+
+### Fixes
+- trim comma-separated flag values [devx] (https://github.com/strands-agents/harness-sdk/pull/5183)
+- make the file tools work on Windows and run Windows CI for harness-ts, harness-py and strands-cli [tool] (https://github.com/strands-agents/harness-sdk/pull/4978)
+- replace retired Claude Sonnet 4 model IDs with Sonnet 4.6 [model] (https://github.com/strands-agents/harness-sdk/pull/5241)
+- add GPT-6 Sol, Luna and 6.1 Sol to the fallback context windows [context, model] (https://github.com/strands-agents/harness-sdk/pull/5215)
+
+### Other
+- redraw docs diagrams as theme-aware SVGs (https://github.com/strands-agents/harness-sdk/pull/5135)
+- backfill harness, CLI, and box releases (https://github.com/strands-agents/harness-sdk/pull/5193)
+- add 0021 cache-friendly tool management [tool] (https://github.com/strands-agents/harness-sdk/pull/5161)
+
+## SDK Python v1.62.0 — 2026-10-21
+Release: https://github.com/strands-agents/harness-sdk/releases/tag/python/v1.62.0 · Package: https://pypi.org/project/strands-agents/1.62.0/
+
+### Features
+- add swarm tool in TypeScript [multiagent, tool] (https://github.com/strands-agents/harness-sdk/pull/5204)
+- make the Python middleware system public [devx, hooks] (https://github.com/strands-agents/harness-sdk/pull/4976)
+- add swarm tool in Python [multiagent, tool] (https://github.com/strands-agents/harness-sdk/pull/4922)
+- use agent.cancel() to stop the event loop (Python) [hil, agent] (https://github.com/strands-agents/harness-sdk/pull/4833)
+- add harness, CLI, and box release streams (https://github.com/strands-agents/harness-sdk/pull/5192)
+- add docs-verifier skill (https://github.com/strands-agents/harness-sdk/pull/5268)
+- add experimental OpenAI Live provider [model, bidirectional-streaming] (https://github.com/strands-agents/harness-sdk/pull/5286)
+
+### Fixes
+- add context window limits for GPT-6 Sol, Luna and 6.1 Sol (py + ts) [context, model] (https://github.com/strands-agents/harness-sdk/pull/5147)
+- invoke endpoints off the event loop [async, model] (https://github.com/strands-agents/harness-sdk/pull/5034)
+- keep assistant text that sits beside tool calls [model] (https://github.com/strands-agents/harness-sdk/pull/4919)
+- retry with drop\_block when a history edit invalidates replayed thinking [context, model] (https://github.com/strands-agents/harness-sdk/pull/5171)
+- delegate FileMemoryStore search, scope storage namespaces [persistence] (https://github.com/strands-agents/harness-sdk/pull/5117)
+- replace retired Claude Sonnet 4 model IDs with Sonnet 4.6 [model] (https://github.com/strands-agents/harness-sdk/pull/5241)
+- preserve tool result adjacency in mistral, writer and llamacpp [model] (https://github.com/strands-agents/harness-sdk/pull/5248)
+- run the default local environment's commands on Windows [server] (https://github.com/strands-agents/harness-sdk/pull/5244)
+- add DISPATCHED status to prevent fan-in double-execution on resume (#3633) [async, multiagent] (https://github.com/strands-agents/harness-sdk/pull/3724)
+- let providers enforce structured output when a model cannot be forced [model, structured-output] (https://github.com/strands-agents/harness-sdk/pull/5190)
+- inherit the parent's interventions in the default subagent builder [multiagent, interventions] (https://github.com/strands-agents/harness-sdk/pull/5200)
+- drop unsigned reasoning instead of raising KeyError [model] (https://github.com/strands-agents/harness-sdk/pull/5247)
+- fix test flakiness caused by set\_tracer\_provider pollution [otel] (https://github.com/strands-agents/harness-sdk/pull/5270)
+- add context window limits for GLM-5, 5.3 and 4.7 Flash (py + ts) [context, model] (https://github.com/strands-agents/harness-sdk/pull/5301)
+- always append the JSON output format to ModelExtractor prompts [tool, agent] (https://github.com/strands-agents/harness-sdk/pull/5269)
+- cap litellm below 1.107.0 [model] (https://github.com/strands-agents/harness-sdk/pull/5307)
+- run Bedrock knowledge base calls off the event loop [async, persistence] (https://github.com/strands-agents/harness-sdk/pull/5053)
+- render tool calls as text in summarizer input [context, model] (https://github.com/strands-agents/harness-sdk/pull/5293)
+
+### Other
+- fix typos in comments and docstrings (https://github.com/strands-agents/harness-sdk/pull/4997)
+- backfill harness, CLI, and box releases (https://github.com/strands-agents/harness-sdk/pull/5193)
+- add 0021 cache-friendly tool management [tool] (https://github.com/strands-agents/harness-sdk/pull/5161)
+- skip audio integ tests when Bedrock rejects audio input [model] (https://github.com/strands-agents/harness-sdk/pull/5310)
+- skip flaky multi-turn cache read test [model] (https://github.com/strands-agents/harness-sdk/pull/5314)
+
+## SDK TypeScript v1.22.0 — 2026-10-21
+Release: https://github.com/strands-agents/harness-sdk/releases/tag/typescript/v1.22.0 · Package: https://www.npmjs.com/package/@strands-agents/sdk/v/1.22.0
+
+### Features
+- add swarm tool in TypeScript [multiagent, tool] (https://github.com/strands-agents/harness-sdk/pull/5204)
+- port baggage propagation to TypeScript [otel, language] (https://github.com/strands-agents/harness-sdk/pull/5073)
+- make the Python middleware system public [devx, hooks] (https://github.com/strands-agents/harness-sdk/pull/4976)
+- use agent.cancel() to stop the event loop (Python) [hil, agent] (https://github.com/strands-agents/harness-sdk/pull/4833)
+- add harness, CLI, and box release streams (https://github.com/strands-agents/harness-sdk/pull/5192)
+- enforce invoke limits and usage accounting across the whole agent tree [multiagent, agent] (https://github.com/strands-agents/harness-sdk/pull/4667)
+- add docs-verifier skill (https://github.com/strands-agents/harness-sdk/pull/5268)
+- add decision usage to the request's invocation context [context, model] (https://github.com/strands-agents/harness-sdk/pull/5304)
+
+### Fixes
+- return portable filename from TS FileStorage.store [persistence] (https://github.com/strands-agents/harness-sdk/pull/4668)
+- keep removal markers and summaries out of message 0 [context] (https://github.com/strands-agents/harness-sdk/pull/5121)
+- add context window limits for GPT-6 Sol, Luna and 6.1 Sol (py + ts) [context, model] (https://github.com/strands-agents/harness-sdk/pull/5147)
+- report correct paths for values after nested objects in deepCopyWithValidation [devx] (https://github.com/strands-agents/harness-sdk/pull/4981)
+- retry with drop\_block when a history edit invalidates replayed thinking [context, model] (https://github.com/strands-agents/harness-sdk/pull/5171)
+- delegate FileMemoryStore search, scope storage namespaces [persistence] (https://github.com/strands-agents/harness-sdk/pull/5117)
+- replace retired Claude Sonnet 4 model IDs with Sonnet 4.6 [model] (https://github.com/strands-agents/harness-sdk/pull/5241)
+- drop reasoning blocks the target model rejects (TypeScript) [model] (https://github.com/strands-agents/harness-sdk/pull/5246)
+- omit empty citation source when replaying citations [model] (https://github.com/strands-agents/harness-sdk/pull/5266)
+- run the default local environment's commands on Windows [server] (https://github.com/strands-agents/harness-sdk/pull/5244)
+- inherit the parent's interventions in the default subagent builder [multiagent, interventions] (https://github.com/strands-agents/harness-sdk/pull/5200)
+- add context window limits for GLM-5, 5.3 and 4.7 Flash (py + ts) [context, model] (https://github.com/strands-agents/harness-sdk/pull/5301)
+- always append the JSON output format to ModelExtractor prompts [tool, agent] (https://github.com/strands-agents/harness-sdk/pull/5269)
+- render tool calls as text in summarizer input [context] (https://github.com/strands-agents/harness-sdk/pull/5292)
+- prevent text duplication across streamed content blocks [model, agent] (https://github.com/strands-agents/harness-sdk/pull/5308)
+
+### Other
+- redraw docs diagrams as theme-aware SVGs (https://github.com/strands-agents/harness-sdk/pull/5135)
+- backfill harness, CLI, and box releases (https://github.com/strands-agents/harness-sdk/pull/5193)
+- add 0021 cache-friendly tool management [tool] (https://github.com/strands-agents/harness-sdk/pull/5161)
+- skip audio integ tests when Bedrock rejects audio input [model] (https://github.com/strands-agents/harness-sdk/pull/5310)
+
+## Evals v1.7.0 — 2026-10-21
+Release: https://github.com/strands-agents/evals/releases/tag/v1.7.0 · Package: https://pypi.org/project/strands-agents-evals/1.7.0/
+
+### Features
+- graduate red teaming out of experimental [redteam] (https://github.com/strands-agents/evals/pull/465)
+
+### Fixes
+- replace retired Sonnet 4 model ID in integ tests (https://github.com/strands-agents/evals/pull/441)
+- judge EventLoopException by its original cause [core] (https://github.com/strands-agents/evals/pull/464)
+
+## Harness TypeScript v0.3.1 — 2026-10-21
+Release: https://github.com/strands-agents/harness-sdk/releases/tag/harness-typescript/v0.3.1 · Package: https://www.npmjs.com/package/@strands-agents/harness/v/0.3.1
+
+### Features
+- add harness, CLI, and box release streams (https://github.com/strands-agents/harness-sdk/pull/5192)
+- add docs-verifier skill (https://github.com/strands-agents/harness-sdk/pull/5268)
+
+### Fixes
+- send adaptive thinking to Claude Haiku 5.5 [model] (https://github.com/strands-agents/harness-sdk/pull/5159)
+- surface the child's stop reason instead of masking blocked runs as success [multiagent, interventions] (https://github.com/strands-agents/harness-sdk/pull/5165)
+- make the file tools work on Windows and run Windows CI for harness-ts, harness-py and strands-cli [tool] (https://github.com/strands-agents/harness-sdk/pull/4978)
+- enable Bedrock Mantle web search for GPT-6.1 Sol [model] (https://github.com/strands-agents/harness-sdk/pull/5188)
+- inject memory on user turns only, matching the SDK default [context] (https://github.com/strands-agents/harness-sdk/pull/5298)
+- sniff image bytes in read so a non-image or mislabeled file is not sent as an image [model, tool] (https://github.com/strands-agents/harness-sdk/pull/5311)
+
+### Other
+- redraw docs diagrams as theme-aware SVGs (https://github.com/strands-agents/harness-sdk/pull/5135)
+- backfill harness, CLI, and box releases (https://github.com/strands-agents/harness-sdk/pull/5193)
+- add 0021 cache-friendly tool management [tool] (https://github.com/strands-agents/harness-sdk/pull/5161)
+
 ## SDK Python v1.61.1 — 2026-10-15
 Release: https://github.com/strands-agents/harness-sdk/releases/tag/python/v1.61.1 · Package: https://pypi.org/project/strands-agents/1.61.1/
 

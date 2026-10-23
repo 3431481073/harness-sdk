@@ -35,7 +35,7 @@ Create a model router.
 | Parameter | Type | Description |
 | --- | --- | --- |
 | `models` | readonly [`CandidateInput`](/docs/api/typescript/CandidateInput/index.md)\[\] | Candidate models, nested routers, or candidate wrappers |
-| `options` | [`ModelRouterOptions`](/docs/api/typescript/ModelRouterOptions/index.md) | Routing strategy and switch cap |
+| `options?` | [`ModelRouterOptions`](/docs/api/typescript/ModelRouterOptions/index.md) | Routing strategy and switch cap |
 
 #### Returns
 

@@ -12,6 +12,7 @@
         -   [Null Conversation Manager](/docs/api/python/strands.agent.conversation_manager.null_conversation_manager)
         -   [Sliding Window Conversation Manager](/docs/api/python/strands.agent.conversation_manager.sliding_window_conversation_manager)
         -   [Summarizing Conversation Manager](/docs/api/python/strands.agent.conversation_manager.summarizing_conversation_manager)
+    -   [Invocation Context](/docs/api/python/strands.agent.invocation_context)
 -   **Bidi**
     -   [Agent](/docs/api/python/strands.bidi.agent)
     -   [Hooks](/docs/api/python/strands.bidi.hooks)

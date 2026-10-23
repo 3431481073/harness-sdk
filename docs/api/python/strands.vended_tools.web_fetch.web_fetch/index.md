@@ -13,7 +13,7 @@ The tool delegates all networking to the `httpx.AsyncClient` instance provided b
 class WebFetchError(ValueError)
 ```
 
-Defined in: [src/strands/vended\_tools/web\_fetch/web\_fetch.py:32](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/web_fetch/web_fetch.py#L32)
+Defined in: [src/strands/vended\_tools/web\_fetch/web\_fetch.py:33](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/web_fetch/web_fetch.py#L33)
 
 Raised when a web fetch request fails.
 
@@ -32,7 +32,7 @@ def make_web_fetch(
                       "agentic"] = "agentic") -> DecoratedFunctionTool
 ```
 
-Defined in: [src/strands/vended\_tools/web\_fetch/web\_fetch.py:56](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/web_fetch/web_fetch.py#L56)
+Defined in: [src/strands/vended\_tools/web\_fetch/web\_fetch.py:57](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/web_fetch/web_fetch.py#L57)
 
 Create a web fetch tool.
 

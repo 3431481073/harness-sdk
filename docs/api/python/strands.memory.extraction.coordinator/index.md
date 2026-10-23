@@ -8,7 +8,7 @@ The :class:`ExtractionCoordinator` buffers every message the agent produces and,
 class ExtractionCoordinator()
 ```
 
-Defined in: [src/strands/memory/extraction/coordinator.py:58](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/coordinator.py#L58)
+Defined in: [src/strands/memory/extraction/coordinator.py:59](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/coordinator.py#L59)
 
 Saves conversation messages to memory stores in the background.
 
@@ -20,7 +20,7 @@ Buffers every recorded message and, per store, tracks a high-water mark of the l
 def __init__(bindings: list[_ExtractionBinding], default_model: Model) -> None
 ```
 
-Defined in: [src/strands/memory/extraction/coordinator.py:68](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/coordinator.py#L68)
+Defined in: [src/strands/memory/extraction/coordinator.py:69](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/coordinator.py#L69)
 
 Initialize the coordinator.
 
@@ -35,17 +35,18 @@ Initialize the coordinator.
 def record(message: Message) -> None
 ```
 
-Defined in: [src/strands/memory/extraction/coordinator.py:98](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/coordinator.py#L98)
+Defined in: [src/strands/memory/extraction/coordinator.py:99](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/coordinator.py#L99)
 
 Add a message to the buffer.
 
 #### schedule
 
 ```python
-def schedule(store: MemoryStore) -> None
+def schedule(store: MemoryStore,
+             invocation_context: InvocationContext | None = None) -> None
 ```
 
-Defined in: [src/strands/memory/extraction/coordinator.py:103](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/coordinator.py#L103)
+Defined in: [src/strands/memory/extraction/coordinator.py:104](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/coordinator.py#L104)
 
 Save this store’s unsaved messages in the background, non-blocking.
 
@@ -54,11 +55,14 @@ Dispatches the save and returns immediately. A no-op when the store is backed of
 #### process
 
 ```python
-def process(store: MemoryStore,
-            link_context: SpanContext | None = None) -> asyncio.Task | None
+def process(
+    store: MemoryStore,
+    link_context: SpanContext | None = None,
+    invocation_context: InvocationContext | None = None
+) -> asyncio.Task | None
 ```
 
-Defined in: [src/strands/memory/extraction/coordinator.py:127](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/coordinator.py#L127)
+Defined in: [src/strands/memory/extraction/coordinator.py:128](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/coordinator.py#L128)
 
 Queue a save for this store behind its previous save.
 
@@ -70,7 +74,7 @@ Returns the task running the save, or `None` when the store is backed off and th
 async def flush() -> None
 ```
 
-Defined in: [src/strands/memory/extraction/coordinator.py:174](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/coordinator.py#L174)
+Defined in: [src/strands/memory/extraction/coordinator.py:189](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/memory/extraction/coordinator.py#L189)
 
 Save every store’s remaining buffered messages and wait for completion.
 

@@ -31,7 +31,7 @@ Defined in: [src/memory/extraction/model-extractor.ts:47](https://github.com/str
 
 | Parameter | Type |
 | --- | --- |
-| `options` | [`ModelExtractorOptions`](/docs/api/typescript/ModelExtractorOptions/index.md) |
+| `options?` | [`ModelExtractorOptions`](/docs/api/typescript/ModelExtractorOptions/index.md) |
 
 #### Returns
 

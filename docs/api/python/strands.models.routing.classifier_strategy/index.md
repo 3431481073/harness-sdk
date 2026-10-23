@@ -6,7 +6,7 @@ Route among configured candidates using model classification.
 class ClassifierStrategy()
 ```
 
-Defined in: [src/strands/models/routing/classifier\_strategy.py:102](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/classifier_strategy.py#L102)
+Defined in: [src/strands/models/routing/classifier\_strategy.py:115](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/classifier_strategy.py#L115)
 
 Choose a candidate by applying a configurable policy with a classifier model.
 
@@ -28,7 +28,7 @@ def __init__(
         max_candidate_chars: int = _DEFAULT_CANDIDATE_CHARACTER_LIMIT) -> None
 ```
 
-Defined in: [src/strands/models/routing/classifier\_strategy.py:116](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/classifier_strategy.py#L116)
+Defined in: [src/strands/models/routing/classifier\_strategy.py:129](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/classifier_strategy.py#L129)
 
 Initialize the strategy.
 
@@ -53,7 +53,7 @@ async def select(context: RoutingContext,
                  **kwargs: Any) -> RoutingCandidate | None
 ```
 
-Defined in: [src/strands/models/routing/classifier\_strategy.py:165](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/classifier_strategy.py#L165)
+Defined in: [src/strands/models/routing/classifier\_strategy.py:178](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/classifier_strategy.py#L178)
 
 Select one opening candidate, declining on classification or serving-time failure.
 

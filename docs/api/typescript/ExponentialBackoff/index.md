@@ -20,7 +20,7 @@ Defined in: [src/retry/backoff-strategy.ts:138](https://github.com/strands-agent
 
 | Parameter | Type |
 | --- | --- |
-| `opts` | [`ExponentialBackoffOptions`](/docs/api/typescript/ExponentialBackoffOptions/index.md) |
+| `opts?` | [`ExponentialBackoffOptions`](/docs/api/typescript/ExponentialBackoffOptions/index.md) |
 
 #### Returns
 

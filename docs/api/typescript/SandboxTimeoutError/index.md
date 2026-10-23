@@ -27,8 +27,8 @@ Defined in: [src/sandbox/errors.ts:14](https://github.com/strands-agents/harness
 | Parameter | Type | Default value |
 | --- | --- | --- |
 | `seconds` | `number` | `undefined` |
-| `stdout` | `string` | `''` |
-| `stderr` | `string` | `''` |
+| `stdout?` | `string` | `''` |
+| `stderr?` | `string` | `''` |
 
 #### Returns
 

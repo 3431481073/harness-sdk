@@ -20,7 +20,7 @@ Defined in: [src/retry/backoff-strategy.ts:71](https://github.com/strands-agents
 
 | Parameter | Type |
 | --- | --- |
-| `opts` | [`ConstantBackoffOptions`](/docs/api/typescript/ConstantBackoffOptions/index.md) |
+| `opts?` | [`ConstantBackoffOptions`](/docs/api/typescript/ConstantBackoffOptions/index.md) |
 
 #### Returns
 

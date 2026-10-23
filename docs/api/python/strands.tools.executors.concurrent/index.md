@@ -6,6 +6,6 @@ Concurrent tool executor implementation.
 class ConcurrentToolExecutor(ToolExecutor)
 ```
 
-Defined in: [src/strands/tools/executors/concurrent.py:19](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/executors/concurrent.py#L19)
+Defined in: [src/strands/tools/executors/concurrent.py:20](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/executors/concurrent.py#L20)
 
 Concurrent tool executor.

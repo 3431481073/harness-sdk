@@ -40,7 +40,7 @@ Create a classifier strategy.
 | Parameter | Type | Description |
 | --- | --- | --- |
 | `model` | [`Model`](/docs/api/typescript/Model/index.md) | Model used for classification; it must honor forced tool selection (`toolChoice`), since a provider that ignores it fails classification silently and every selection falls back to candidate zero |
-| `options` | [`ClassifierStrategyOptions`](/docs/api/typescript/ClassifierStrategyOptions/index.md) | Routing policy, timeout, and character budgets |
+| `options?` | [`ClassifierStrategyOptions`](/docs/api/typescript/ClassifierStrategyOptions/index.md) | Routing policy, timeout, and character budgets |
 
 #### Returns
 

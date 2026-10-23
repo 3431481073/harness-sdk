@@ -380,7 +380,10 @@ Combining with HumanInTheLoop
 (( tab "TypeScript" ))
 ```typescript
 import { Agent, InterruptResponseContent } from '@strands-agents/sdk'
-import { handoffToUser, HANDOFF_INTERRUPT_NAME } from '@strands-agents/sdk/vended-tools/handoff-to-user'
+import {
+  handoffToUser,
+  HANDOFF_INTERRUPT_NAME,
+} from '@strands-agents/sdk/vended-tools/handoff-to-user'
 
 const agent = new Agent({
   tools: [handoffToUser],
@@ -612,7 +615,10 @@ import { makeMcpRouter } from '@strands-agents/sdk/vended-tools/mcp-router'
 
 const mcpRouter = makeMcpRouter({
   servers: {
-    files: { command: 'npx', args: ['-y', '@modelcontextprotocol/server-filesystem', '/tmp'] },
+    files: {
+      command: 'npx',
+      args: ['-y', '@modelcontextprotocol/server-filesystem', '/tmp'],
+    },
     'my-api': { url: 'https://mcp.example.com/mcp' },
   },
   maxConnections: 5,
@@ -620,7 +626,7 @@ const mcpRouter = makeMcpRouter({
 const agent = new Agent({ tools: [mcpRouter] })
 await agent.invoke(
   "Connect to 'files', list its tools, " +
-  'call the read_file tool on /tmp/hello.txt, then disconnect.'
+    'call the read_file tool on /tmp/hello.txt, then disconnect.'
 )
 ```
 (( /tab "TypeScript" ))
@@ -683,7 +689,13 @@ Endpoint security
 (( tab "TypeScript" ))
 ```typescript
 import { Agent } from '@strands-agents/sdk'
-import { ClientFactory, DefaultAgentCardResolver, JsonRpcTransportFactory, RestTransportFactory, createAuthenticatingFetchWithRetry } from '@a2a-js/sdk/client'
+import {
+  ClientFactory,
+  DefaultAgentCardResolver,
+  JsonRpcTransportFactory,
+  RestTransportFactory,
+  createAuthenticatingFetchWithRetry,
+} from '@a2a-js/sdk/client'
 import { makeA2AClient } from '@strands-agents/sdk/vended-tools/a2a-client'
 
 const authFetch = createAuthenticatingFetchWithRetry(fetch, {
@@ -696,13 +708,16 @@ const a2aClient = makeA2AClient({
     // No auth needed
     'https://agent.example.com',
     // Custom ClientFactory for authenticated requests
-    ['https://researcher.example.com', new ClientFactory({
-      transports: [
-        new JsonRpcTransportFactory({ fetchImpl: authFetch }),
-        new RestTransportFactory({ fetchImpl: authFetch }),
-      ],
-      cardResolver: new DefaultAgentCardResolver({ fetchImpl: authFetch }),
-    })],
+    [
+      'https://researcher.example.com',
+      new ClientFactory({
+        transports: [
+          new JsonRpcTransportFactory({ fetchImpl: authFetch }),
+          new RestTransportFactory({ fetchImpl: authFetch }),
+        ],
+        cardResolver: new DefaultAgentCardResolver({ fetchImpl: authFetch }),
+      }),
+    ],
   ],
 })
 
@@ -754,7 +769,9 @@ import { Agent } from '@strands-agents/sdk'
 import { pythonRepl } from '@strands-agents/sdk/vended-tools/python-repl'
 
 const agent = new Agent({ tools: [pythonRepl] })
-await agent.invoke('Use python_repl to compute the first 10 Fibonacci numbers and print them.')
+await agent.invoke(
+  'Use python_repl to compute the first 10 Fibonacci numbers and print them.'
+)
 ```
 (( /tab "TypeScript" ))
 
@@ -776,10 +793,9 @@ import { Agent } from '@strands-agents/sdk'
 import { DockerSandbox } from '@strands-agents/sdk/sandbox/docker'
 import { makePythonRepl } from '@strands-agents/sdk/vended-tools/python-repl'
 
-const pythonRepl = makePythonRepl(
-  new DockerSandbox({ container: 'my-container' }),
-  { language: 'python3.12' }
-)
+const pythonRepl = makePythonRepl(new DockerSandbox({ container: 'my-container' }), {
+  language: 'python3.12',
+})
 const agent = new Agent({ tools: [pythonRepl] })
 ```
 (( /tab "TypeScript" ))
@@ -922,7 +938,9 @@ import { Agent } from '@strands-agents/sdk'
 import { swarm } from '@strands-agents/sdk/vended-tools/swarm'
 
 const agent = new Agent({ tools: [swarm] })
-await agent.invoke('Research the pros and cons of microservices vs monoliths and write a summary')
+await agent.invoke(
+  'Research the pros and cons of microservices vs monoliths and write a summary'
+)
 ```
 
 Custom configuration with `makeSwarm`. `maxAgents` caps agents per call; the other limits pass through to `Swarm`: `maxSteps` caps total agent executions, and `timeout` and `nodeTimeout` are in milliseconds.
@@ -947,7 +965,11 @@ const swarm = makeSwarm({
     }),
   },
   defaultPreset: 'researcher',
-  instructions: new Choice(['You are a researcher.', 'You are a writer.', 'You are an editor.']),
+  instructions: new Choice([
+    'You are a researcher.',
+    'You are a writer.',
+    'You are an editor.',
+  ]),
   tools: new Inherit(),
   model: new Fixed('us.amazon.nova-pro-v1:0'),
   maxAgents: 5,

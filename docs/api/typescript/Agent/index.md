@@ -903,7 +903,7 @@ await agent.invoke('summarize the repo')
 ### \[asyncDispose\]()
 
 ```ts
-asyncDispose: Promise<void>;
+[asyncDispose](): Promise<void>;
 ```
 
 Defined in: [src/agent/agent.ts:1183](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/agent/agent.ts#L1183)

@@ -177,7 +177,9 @@ import { BedrockModel } from '@strands-agents/sdk/models/bedrock'
 
 const agent = new Agent({
   model: new BedrockModel({ modelId: 'global.anthropic.claude-opus-5-20260301-v1:0' }),
-  auxModel: new BedrockModel({ modelId: 'global.anthropic.claude-haiku-4-5-20251001-v1:0' }),
+  auxModel: new BedrockModel({
+    modelId: 'global.anthropic.claude-haiku-4-5-20251001-v1:0',
+  }),
   contextManager: 'auto',
 })
 

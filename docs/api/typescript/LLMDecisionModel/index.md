@@ -45,7 +45,7 @@ Create an LLM-backed decision model.
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `options` | [`LLMDecisionModelOptions`](/docs/api/typescript/LLMDecisionModelOptions/index.md) | Model and prompt configuration. |
+| `options?` | [`LLMDecisionModelOptions`](/docs/api/typescript/LLMDecisionModelOptions/index.md) | Model and prompt configuration. |
 
 #### Returns
 

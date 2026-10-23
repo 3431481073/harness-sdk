@@ -17,7 +17,7 @@ def adjust_split_point_for_tool_pairs(messages: list[Message],
                                       split_point: int) -> int
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/compression/context\_compression.py:62](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/compression/context_compression.py#L62)
+Defined in: [src/strands/agent/conversation\_manager/compression/context\_compression.py:63](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/compression/context_compression.py#L63)
 
 Adjust a split point forward to avoid breaking toolUse/toolResult pairs.
 
@@ -42,7 +42,7 @@ The adjusted split point that doesn’t break a toolUse/toolResult pair.
 def find_valid_trim_point(messages: list[Message], start_index: int) -> int
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/compression/context\_compression.py:107](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/compression/context_compression.py#L107)
+Defined in: [src/strands/agent/conversation\_manager/compression/context\_compression.py:108](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/compression/context_compression.py#L108)
 
 Find a valid trim point for truncation starting at `start_index`.
 
@@ -64,12 +64,14 @@ The valid trim index, or `len(messages)` if none is found.
 #### generate\_summary
 
 ```python
-async def generate_summary(messages_to_summarize: list[Message],
-                           model: "Model",
-                           system_prompt: str | None = None) -> Message
+async def generate_summary(
+        messages_to_summarize: list[Message],
+        model: "Model",
+        system_prompt: str | None = None,
+        invocation_context: "InvocationContext | None" = None) -> Message
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/compression/context\_compression.py:149](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/compression/context_compression.py#L149)
+Defined in: [src/strands/agent/conversation\_manager/compression/context\_compression.py:150](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/compression/context_compression.py#L150)
 
 Generate a summary of the provided messages by calling the model directly.
 
@@ -80,6 +82,7 @@ This bypasses the full agent pipeline (lock, metrics, traces, tool loop) and sim
 -   `messages_to_summarize` - The messages to summarize.
 -   `model` - The model used to generate the summary.
 -   `system_prompt` - Optional system prompt override. Defaults to :data:`DEFAULT_SUMMARIZATION_PROMPT`.
+-   `invocation_context` - The request the summary call’s usage adds to.
 
 **Returns**:
 
@@ -95,7 +98,7 @@ A user-role message containing the model-generated summary.
 def as_user_summary(message: Message) -> Message
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/compression/context\_compression.py:194](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/compression/context_compression.py#L194)
+Defined in: [src/strands/agent/conversation\_manager/compression/context\_compression.py:197](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/compression/context_compression.py#L197)
 
 Re-role a model reply as the user-role summary message kept in history.
 
@@ -119,7 +122,7 @@ A user-role message holding the reply’s text blocks.
 def matches_message_type(message: Message, filter: MessageType) -> bool
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/compression/context\_compression.py:223](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/compression/context_compression.py#L223)
+Defined in: [src/strands/agent/conversation\_manager/compression/context\_compression.py:226](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/compression/context_compression.py#L226)
 
 Return True if the message matches the given type filter.
 

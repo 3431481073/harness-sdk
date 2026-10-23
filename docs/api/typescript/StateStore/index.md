@@ -326,7 +326,7 @@ Array of state keys
 ### \[stateToJSONSymbol\]()
 
 ```ts
-stateToJSONSymbol: JSONValue;
+[stateToJSONSymbol](): JSONValue;
 ```
 
 Defined in: [src/state-store.ts:147](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/state-store.ts#L147)
@@ -350,7 +350,7 @@ StateSerializable.[stateToJSONSymbol]
 ### \[loadStateFromJSONSymbol\]()
 
 ```ts
-loadStateFromJSONSymbol: void;
+[loadStateFromJSONSymbol](json): void;
 ```
 
 Defined in: [src/state-store.ts:156](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/state-store.ts#L156)

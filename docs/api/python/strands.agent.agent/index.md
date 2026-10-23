@@ -13,7 +13,7 @@ The Agent interface supports two complementary interaction patterns:
 class Agent(AgentBase, LocalAgent)
 ```
 
-Defined in: [src/strands/agent/agent.py:197](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L197)
+Defined in: [src/strands/agent/agent.py:219](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L219)
 
 Core Agent implementation.
 
@@ -69,7 +69,7 @@ def __init__(
         background_tasks: bool | BackgroundTasksConfig | None = None)
 ```
 
-Defined in: [src/strands/agent/agent.py:215](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L215)
+Defined in: [src/strands/agent/agent.py:237](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L237)
 
 Initialize the Agent with the specified configuration.
 
@@ -167,7 +167,7 @@ def cancel(*,
            after_current_tools: bool = False) -> None
 ```
 
-Defined in: [src/strands/agent/agent.py:647](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L647)
+Defined in: [src/strands/agent/agent.py:669](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L669)
 
 Cancel the currently running agent invocation.
 
@@ -217,7 +217,7 @@ Multiple calls to cancel() are safe and idempotent.
 def cancel_signal() -> threading.Event
 ```
 
-Defined in: [src/strands/agent/agent.py:704](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L704)
+Defined in: [src/strands/agent/agent.py:726](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L726)
 
 The cancellation signal for the current invocation.
 
@@ -232,7 +232,7 @@ Treat as read-only: call :meth:`cancel` to trigger cancellation. Setting or clea
 def sandbox() -> Sandbox
 ```
 
-Defined in: [src/strands/agent/agent.py:718](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L718)
+Defined in: [src/strands/agent/agent.py:740](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L740)
 
 Execution environment for running commands, code, and file operations.
 
@@ -245,7 +245,7 @@ Returns the configured sandbox, or a per-agent host default (:class:`~strands.sa
 def storage() -> Storage | None
 ```
 
-Defined in: [src/strands/agent/agent.py:728](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L728)
+Defined in: [src/strands/agent/agent.py:750](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L750)
 
 Default storage backend for agent subsystems.
 
@@ -256,7 +256,7 @@ Default storage backend for agent subsystems.
 def aux_model() -> Model
 ```
 
-Defined in: [src/strands/agent/agent.py:733](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L733)
+Defined in: [src/strands/agent/agent.py:755](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L755)
 
 Model for auxiliary side calls (summarization, memory extraction, classification, steering, web fetch).
 
@@ -269,7 +269,7 @@ Resolution order: the `aux_model` passed at construction > `model`.
 def aux_model(aux_model: Model | str | None) -> None
 ```
 
-Defined in: [src/strands/agent/agent.py:741](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L741)
+Defined in: [src/strands/agent/agent.py:763](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L763)
 
 Reassign the auxiliary model; `None` reverts to following `model`.
 
@@ -280,7 +280,7 @@ Reassign the auxiliary model; `None` reverts to following `model`.
 def context_manager() -> "ContextManager | None"
 ```
 
-Defined in: [src/strands/agent/agent.py:746](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L746)
+Defined in: [src/strands/agent/agent.py:768](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L768)
 
 The ContextManager plugin, if one is registered on this agent.
 
@@ -291,7 +291,7 @@ The ContextManager plugin, if one is registered on this agent.
 def session_id() -> str
 ```
 
-Defined in: [src/strands/agent/agent.py:751](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L751)
+Defined in: [src/strands/agent/agent.py:773](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L773)
 
 Identifier for the current conversation session.
 
@@ -304,7 +304,7 @@ When a session manager is attached, returns its persistent, caller-supplied sess
 def system_prompt() -> str | None
 ```
 
-Defined in: [src/strands/agent/agent.py:767](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L767)
+Defined in: [src/strands/agent/agent.py:789](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L789)
 
 Get the system prompt as a string for backwards compatibility.
 
@@ -321,7 +321,7 @@ The system prompt as a string, or None if no text content exists.
 def system_prompt(value: str | list[SystemContentBlock] | None) -> None
 ```
 
-Defined in: [src/strands/agent/agent.py:780](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L780)
+Defined in: [src/strands/agent/agent.py:802](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L802)
 
 Set the system prompt and update internal content representation.
 
@@ -341,7 +341,7 @@ Accepts either a string or list of SystemContentBlock objects. The string repres
 def system_prompt_content() -> list[SystemContentBlock] | None
 ```
 
-Defined in: [src/strands/agent/agent.py:795](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L795)
+Defined in: [src/strands/agent/agent.py:817](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L817)
 
 Get the system prompt as a list of content blocks.
 
@@ -358,7 +358,7 @@ The system prompt as a list of content blocks, or None if no system prompt is se
 def tool() -> _ToolCaller
 ```
 
-Defined in: [src/strands/agent/agent.py:807](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L807)
+Defined in: [src/strands/agent/agent.py:829](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L829)
 
 Call tool as a function.
 
@@ -380,7 +380,7 @@ agent.tool.calculator(...)
 def tool_names() -> list[str]
 ```
 
-Defined in: [src/strands/agent/agent.py:822](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L822)
+Defined in: [src/strands/agent/agent.py:844](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L844)
 
 Get a list of all registered tool names.
 
@@ -395,7 +395,7 @@ Names of all tools available to this agent.
 def concurrent_invocation_mode() -> ConcurrentInvocationMode
 ```
 
-Defined in: [src/strands/agent/agent.py:832](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L832)
+Defined in: [src/strands/agent/agent.py:854](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L854)
 
 The concurrency posture this agent was configured with.
 
@@ -407,7 +407,7 @@ Mirrors the `concurrent_invocation_mode` constructor argument.
 def shutdown() -> None
 ```
 
-Defined in: [src/strands/agent/agent.py:839](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L839)
+Defined in: [src/strands/agent/agent.py:861](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L861)
 
 Run the agent’s shutdown procedures at end of life.
 
@@ -419,7 +419,7 @@ Safe to call more than once, and a no-op when there is nothing to release. Call 
 async def shutdown_async() -> None
 ```
 
-Defined in: [src/strands/agent/agent.py:851](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L851)
+Defined in: [src/strands/agent/agent.py:873](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L873)
 
 Run the agent’s shutdown procedures at end of life.
 
@@ -431,7 +431,7 @@ Asynchronous variant of :meth:`shutdown`. Safe to call more than once, and a no-
 def __enter__() -> "Agent"
 ```
 
-Defined in: [src/strands/agent/agent.py:860](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L860)
+Defined in: [src/strands/agent/agent.py:882](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L882)
 
 Enter a `with` scope, returning the agent unchanged.
 
@@ -443,7 +443,7 @@ Pairs with `__exit__`, which runs :meth:`shutdown` when the scope exits.
 def __exit__(*_: Any) -> None
 ```
 
-Defined in: [src/strands/agent/agent.py:867](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L867)
+Defined in: [src/strands/agent/agent.py:889](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L889)
 
 Run :meth:`shutdown` when leaving a `with` scope.
 
@@ -455,7 +455,7 @@ Runs on normal exit and when the block raises; any exception still propagates.
 async def __aenter__() -> "Agent"
 ```
 
-Defined in: [src/strands/agent/agent.py:874](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L874)
+Defined in: [src/strands/agent/agent.py:896](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L896)
 
 Enter an `async with` scope, returning the agent unchanged.
 
@@ -467,7 +467,7 @@ Pairs with `__aexit__`, which runs :meth:`shutdown_async` when the scope exits.
 async def __aexit__(*_: Any) -> None
 ```
 
-Defined in: [src/strands/agent/agent.py:881](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L881)
+Defined in: [src/strands/agent/agent.py:903](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L903)
 
 Run :meth:`shutdown_async` when leaving an `async with` scope.
 
@@ -484,10 +484,11 @@ def __call__(prompt: AgentInput = None,
              idempotency_token: Any = None,
              limits: Limits | None = None,
              cancel_signal: threading.Event | None = None,
+             invocation_context: InvocationContext | None = None,
              **kwargs: Any) -> AgentResult
 ```
 
-Defined in: [src/strands/agent/agent.py:888](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L888)
+Defined in: [src/strands/agent/agent.py:910](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L910)
 
 Process a natural language prompt through the agent’s event loop.
 
@@ -509,8 +510,9 @@ This method implements the conversational interface with multiple input patterns
 -   `structured_output_model` - Pydantic model type(s) for structured output (overrides agent default).
 -   `structured_output_prompt` - Custom prompt for forcing structured output (overrides agent default).
 -   `idempotency_token` - Dedup token for THROW mode (ignored in UNSAFE\_REENTRANT). If a matching token is already inflight, this call blocks until the original finishes, then gets its final result — only the result, not the streamed events, though `callback_handler` still fires once with it. Matched by `==` (any equatable object; need not be hashable). Raises `IdempotencyAbortedError` if the original is aborted before producing a result.
--   `limits` - Per-invocation budget caps (turns / output\_tokens / total\_tokens). See :class:`~strands.types.agent.Limits`. When a cap is reached, the loop terminates gracefully at the next turn boundary with a corresponding `stop_reason` (e.g. `"limit_turns"`); no exception is raised. Token caps are soft — a single oversized model response can overshoot the budget by one turn, since checks run at turn boundaries, not within a model call.
+-   `limits` - Limits for the whole request this call starts (turns / output\_tokens / total\_tokens). See :class:`~strands.types.agent.Limits`. When a limit is reached, the loop stops at the next turn boundary with a corresponding `stop_reason` (e.g. `"limit_turns"`); no exception is raised. Token limits are soft — a single oversized model response can overshoot them, since checks run at turn boundaries.
 -   `cancel_signal` - Caller-owned event that cancels this invocation. Use it when cancellation is driven from outside the agent — a client disconnect, a request lifecycle, a timeout. The agent observes both this event and `cancel()`, so either cancels independently, and it never sets or clears the caller’s event. An event that is already set cancels the invocation at its first checkpoint; that checkpoint sits inside model streaming, so the user turn is still recorded and one model request may be issued, then aborted. Clear the event before reusing it for another invocation. On cancellation the result carries `stop_reason="cancelled"`. A duplicate call waiting on an `idempotency_token` does not observe this event; only the primary invocation does.
+-   `invocation_context` - Runs this call as a nested call in the request a hook event’s or `tool_context.invocation_context` handle belongs to, sharing its limits and usage even after that request returned; `limits` set alongside it only add stricter limits.
 -   `**kwargs` - Additional parameters to pass through the event loop.\[Deprecating\]
 
 **Returns**:
@@ -527,7 +529,7 @@ Result object containing:
 
 -   `ConcurrencyException` - If another invocation is already in progress on this agent instance.
 -   `IdempotencyAbortedError` - If this call is a duplicate of an inflight `idempotency_token` whose primary invocation was aborted before producing a result.
--   `TypeError` - If `limits` contains an unrecognized key or a value that is not a positive integer.
+-   `TypeError` - If `limits` contains an unrecognized key or a value that is not a positive integer, or if `invocation_context` is not an `InvocationContext`.
 -   `Exception` - Any exceptions from the agent invocation will be propagated to the caller.
 
 #### invoke\_async
@@ -541,10 +543,11 @@ async def invoke_async(prompt: AgentInput = None,
                        idempotency_token: Any = None,
                        limits: Limits | None = None,
                        cancel_signal: threading.Event | None = None,
+                       invocation_context: InvocationContext | None = None,
                        **kwargs: Any) -> AgentResult
 ```
 
-Defined in: [src/strands/agent/agent.py:982](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L982)
+Defined in: [src/strands/agent/agent.py:1010](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1010)
 
 Process a natural language prompt through the agent’s event loop.
 
@@ -566,8 +569,9 @@ This method implements the conversational interface with multiple input patterns
 -   `structured_output_model` - Pydantic model type(s) for structured output (overrides agent default).
 -   `structured_output_prompt` - Custom prompt for forcing structured output (overrides agent default).
 -   `idempotency_token` - Dedup token for THROW mode (ignored in UNSAFE\_REENTRANT). If a matching token is already inflight, this call blocks until the original finishes, then gets its final result — only the result, not the streamed events, though `callback_handler` still fires once with it. Matched by `==` (any equatable object; need not be hashable). Raises `IdempotencyAbortedError` if the original is aborted before producing a result.
--   `limits` - Per-invocation budget caps (turns / output\_tokens / total\_tokens). See :class:`~strands.types.agent.Limits`. When a cap is reached, the loop terminates gracefully at the next turn boundary with a corresponding `stop_reason` (e.g. `"limit_turns"`); no exception is raised. Token caps are soft — a single oversized model response can overshoot the budget by one turn, since checks run at turn boundaries, not within a model call.
+-   `limits` - Limits for the whole request this call starts (turns / output\_tokens / total\_tokens). See :class:`~strands.types.agent.Limits`. When a limit is reached, the loop stops at the next turn boundary with a corresponding `stop_reason` (e.g. `"limit_turns"`); no exception is raised. Token limits are soft — a single oversized model response can overshoot them, since checks run at turn boundaries.
 -   `cancel_signal` - Caller-owned event that cancels this invocation. Use it when cancellation is driven from outside the agent — a client disconnect, a request lifecycle, a timeout. The agent observes both this event and `cancel()`, so either cancels independently, and it never sets or clears the caller’s event. An event that is already set cancels the invocation at its first checkpoint; that checkpoint sits inside model streaming, so the user turn is still recorded and one model request may be issued, then aborted. Clear the event before reusing it for another invocation. On cancellation the result carries `stop_reason="cancelled"`. A duplicate call waiting on an `idempotency_token` does not observe this event; only the primary invocation does.
+-   `invocation_context` - Runs this call as a nested call in the request a hook event’s or `tool_context.invocation_context` handle belongs to, sharing its limits and usage even after that request returned; `limits` set alongside it only add stricter limits.
 -   `**kwargs` - Additional parameters to pass through the event loop.\[Deprecating\]
 
 **Returns**:
@@ -583,7 +587,7 @@ This method implements the conversational interface with multiple input patterns
 
 -   `ConcurrencyException` - If another invocation is already in progress on this agent instance.
 -   `IdempotencyAbortedError` - If this call is a duplicate of an inflight `idempotency_token` whose primary invocation was aborted before producing a result.
--   `TypeError` - If `limits` contains an unrecognized key or a value that is not a positive integer.
+-   `TypeError` - If `limits` contains an unrecognized key or a value that is not a positive integer, or if `invocation_context` is not an `InvocationContext`.
 -   `Exception` - Any exceptions from the agent invocation will be propagated to the caller.
 
 #### structured\_output
@@ -592,7 +596,7 @@ This method implements the conversational interface with multiple input patterns
 def structured_output(output_model: type[T], prompt: AgentInput = None) -> T
 ```
 
-Defined in: [src/strands/agent/agent.py:1064](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1064)
+Defined in: [src/strands/agent/agent.py:1098](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1098)
 
 This method allows you to get structured output from the agent.
 
@@ -620,7 +624,7 @@ async def structured_output_async(output_model: type[T],
                                   prompt: AgentInput = None) -> T
 ```
 
-Defined in: [src/strands/agent/agent.py:1095](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1095)
+Defined in: [src/strands/agent/agent.py:1129](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1129)
 
 This method allows you to get structured output from the agent.
 
@@ -648,7 +652,7 @@ def as_tool(*,
             delegate: bool = False) -> AgentTool
 ```
 
-Defined in: [src/strands/agent/agent.py:1166](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1166)
+Defined in: [src/strands/agent/agent.py:1200](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1200)
 
 Convert this agent into a tool for use by another agent.
 
@@ -682,7 +686,7 @@ orchestrator("What is my balance?")
 def cleanup() -> None
 ```
 
-Defined in: [src/strands/agent/agent.py:1215](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1215)
+Defined in: [src/strands/agent/agent.py:1249](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1249)
 
 Clean up resources used by the agent.
 
@@ -699,7 +703,7 @@ def add_hook(callback: HookCallback[TEvent],
              order: float = HookOrder.DEFAULT) -> None
 ```
 
-Defined in: [src/strands/agent/agent.py:1227](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1227)
+Defined in: [src/strands/agent/agent.py:1261](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1261)
 
 Register a callback function for a specific event type.
 
@@ -756,7 +760,7 @@ Docs: [https://strandsagents.com/docs/user-guide/concepts/agents/hooks/](https:/
 def add_middleware(stage_or_phase: Any, handler: Any) -> None
 ```
 
-Defined in: [src/strands/agent/agent.py:1311](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1311)
+Defined in: [src/strands/agent/agent.py:1345](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1345)
 
 Register a middleware handler for a stage or one of its phases.
 
@@ -794,7 +798,7 @@ Docs: [https://strandsagents.com/docs/user-guide/sdk/agents/middleware/](https:/
 def __del__() -> None
 ```
 
-Defined in: [src/strands/agent/agent.py:1351](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1351)
+Defined in: [src/strands/agent/agent.py:1385](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1385)
 
 Clean up resources when agent is garbage collected.
 
@@ -809,10 +813,11 @@ async def stream_async(prompt: AgentInput = None,
                        idempotency_token: Any = None,
                        limits: Limits | None = None,
                        cancel_signal: threading.Event | None = None,
+                       invocation_context: InvocationContext | None = None,
                        **kwargs: Any) -> AsyncIterator[Any]
 ```
 
-Defined in: [src/strands/agent/agent.py:1391](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1391)
+Defined in: [src/strands/agent/agent.py:1425](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L1425)
 
 Process a natural language prompt and yield events as an async iterator.
 
@@ -834,8 +839,9 @@ This method provides an asynchronous interface for streaming agent events with m
 -   `structured_output_model` - Pydantic model type(s) for structured output (overrides agent default).
 -   `structured_output_prompt` - Custom prompt for forcing structured output (overrides agent default).
 -   `idempotency_token` - Dedup token for THROW mode (ignored in UNSAFE\_REENTRANT). If a matching token is already inflight, this call blocks until the original finishes, then gets its final result — only the result, not the streamed events, though `callback_handler` still fires once with it. Matched by `==` (any equatable object; need not be hashable). Raises `IdempotencyAbortedError` if the original is aborted before producing a result.
--   `limits` - Per-invocation budget caps (turns / output\_tokens / total\_tokens). See :class:`~strands.types.agent.Limits`. When a cap is reached, the loop terminates gracefully at the next turn boundary with a corresponding `stop_reason` (e.g. `"limit_turns"`); no exception is raised. Token caps are soft — a single oversized model response can overshoot the budget by one turn, since checks run at turn boundaries, not within a model call.
+-   `limits` - Limits for the whole request this call starts (turns / output\_tokens / total\_tokens). See :class:`~strands.types.agent.Limits`. When a limit is reached, the loop stops at the next turn boundary with a corresponding `stop_reason` (e.g. `"limit_turns"`); no exception is raised. Token limits are soft — a single oversized model response can overshoot them, since checks run at turn boundaries.
 -   `cancel_signal` - Caller-owned event that cancels this invocation. Use it when cancellation is driven from outside the agent — a client disconnect, a request lifecycle, a timeout. The agent observes both this event and `cancel()`, so either cancels independently, and it never sets or clears the caller’s event. An event that is already set cancels the invocation at its first checkpoint; that checkpoint sits inside model streaming, so the user turn is still recorded and one model request may be issued, then aborted. Clear the event before reusing it for another invocation. On cancellation the result carries `stop_reason="cancelled"`. A duplicate call waiting on an `idempotency_token` does not observe this event; only the primary invocation does.
+-   `invocation_context` - Runs this call as a nested call in the request a hook event’s or `tool_context.invocation_context` handle belongs to, sharing its limits and usage even after that request returned; `limits` set alongside it only add stricter limits.
 -   `**kwargs` - Additional parameters to pass to the event loop.\[Deprecating\]
 
 **Yields**:
@@ -851,7 +857,7 @@ An async iterator that yields events. Each event is a dictionary containing info
 
 -   `ConcurrencyException` - If another invocation is already in progress on this agent instance.
 -   `IdempotencyAbortedError` - If this call is a duplicate of an inflight `idempotency_token` whose primary invocation was aborted before producing a result.
--   `TypeError` - If `limits` contains an unrecognized key or a value that is not a positive integer.
+-   `TypeError` - If `limits` contains an unrecognized key or a value that is not a positive integer, or if `invocation_context` is not an `InvocationContext`.
 -   `Exception` - Any exceptions from the agent invocation will be propagated to the caller.
 
 **Example**:
@@ -872,7 +878,7 @@ def take_snapshot(*,
                   app_data: dict[str, Any] | None = None) -> Snapshot
 ```
 
-Defined in: [src/strands/agent/agent.py:2123](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L2123)
+Defined in: [src/strands/agent/agent.py:2219](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L2219)
 
 Capture current agent state as an in-memory snapshot.
 
@@ -897,7 +903,7 @@ A Snapshot containing the captured agent state.
 def load_snapshot(snapshot: Snapshot) -> None
 ```
 
-Defined in: [src/strands/agent/agent.py:2171](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L2171)
+Defined in: [src/strands/agent/agent.py:2267](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/agent.py#L2267)
 
 Restore agent state from a previously captured snapshot.
 

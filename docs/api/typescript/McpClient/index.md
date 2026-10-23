@@ -267,7 +267,7 @@ A client configured with `url` retries on a fresh transport and connection. A cl
 
 | Parameter | Type | Default value | Description |
 | --- | --- | --- | --- |
-| `reconnect` | `boolean` | `false` | When true, forces a reconnect even if already connected or failed. |
+| `reconnect?` | `boolean` | `false` | When true, forces a reconnect even if already connected or failed. |
 | `options?` | { `signal?`: `AbortSignal`; } | `undefined` | Optional abort signal that stops this caller’s wait. The connection attempt itself continues for other callers awaiting it. |
 | `options.signal?` | `AbortSignal` | `undefined` | \- |
 
@@ -300,7 +300,7 @@ A promise that resolves when the disconnection is complete.
 ### \[asyncDispose\]()
 
 ```ts
-asyncDispose: Promise<void>;
+[asyncDispose](): Promise<void>;
 ```
 
 Defined in: [src/mcp/client.ts:667](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L667)

@@ -6,7 +6,7 @@ Abstract interface for conversation history management.
 class ProactiveCompressionConfig(TypedDict)
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:19](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L19)
+Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:20](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L20)
 
 Configuration for proactive compression when passed as an object.
 
@@ -20,7 +20,7 @@ Configuration for proactive compression when passed as an object.
 class ConversationManager(ABC, HookProvider)
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:31](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L31)
+Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:32](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L32)
 
 Abstract base class for managing conversation history.
 
@@ -56,7 +56,7 @@ def __init__(
 ) -> None
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:65](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L65)
+Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:66](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L66)
 
 Initialize the ConversationManager.
 
@@ -81,7 +81,7 @@ Initialize the ConversationManager.
 def register_hooks(registry: HookRegistry, **kwargs: Any) -> None
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:96](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L96)
+Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:97](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L97)
 
 Register hooks for agent lifecycle events.
 
@@ -100,7 +100,7 @@ Derived classes that override this method must call the base implementation to e
 def restore_from_session(state: dict[str, Any]) -> list[Message] | None
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:146](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L146)
+Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:152](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L152)
 
 Restore the Conversation Manager’s state from a session.
 
@@ -118,7 +118,7 @@ Optional list of messages to prepend to the agents messages. By default returns 
 def get_state() -> dict[str, Any]
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:159](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L159)
+Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:165](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L165)
 
 Get the current state of a Conversation Manager as a Json serializable dictionary.
 
@@ -129,7 +129,7 @@ Get the current state of a Conversation Manager as a Json serializable dictionar
 def apply_management(agent: "Agent", **kwargs: Any) -> None
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:167](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L167)
+Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:173](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L173)
 
 Applies management strategy to the provided agent.
 
@@ -138,7 +138,8 @@ Processes the conversation history to maintain appropriate size by modifying the
 **Arguments**:
 
 -   `agent` - The agent whose conversation history will be manage. This list is modified in-place.
--   `**kwargs` - Additional keyword arguments for future extensibility.
+-   `**kwargs` - Additional keyword arguments for future extensibility. The SDK passes
+-   `invocation_context` - the request this management runs for, if any; a nested call that joins it adds to the request’s usage, but the request’s limits don’t apply.
 
 #### reduce\_context
 
@@ -149,7 +150,7 @@ def reduce_context(agent: "Agent",
                    **kwargs: Any) -> None
 ```
 
-Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:182](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L182)
+Defined in: [src/strands/agent/conversation\_manager/conversation\_manager.py:190](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/agent/conversation_manager/conversation_manager.py#L190)
 
 Reduce the conversation history.
 
@@ -164,4 +165,5 @@ Implementations should modify `agent.messages` in-place.
 
 -   `agent` - The agent whose conversation history will be reduced. This list is modified in-place.
 -   `e` - The exception that triggered the context reduction, if any. When set, this is a reactive overflow recovery call — the implementation MUST reduce enough history for the next model call to succeed. When None, this is a proactive compression call — best-effort reduction to avoid hitting the context window limit.
--   `**kwargs` - Additional keyword arguments for future extensibility.
+-   `**kwargs` - Additional keyword arguments for future extensibility. The SDK passes
+-   `invocation_context` - the request this reduction runs for, if any; a nested call that joins it adds to the request’s usage, but the request’s limits don’t apply.

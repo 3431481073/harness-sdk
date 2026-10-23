@@ -9,7 +9,7 @@ A `RoutingStrategy` decides which candidate an invocation uses. `ModelRouter` as
 class RoutingAttempt()
 ```
 
-Defined in: [src/strands/models/routing/strategy.py:23](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/strategy.py#L23)
+Defined in: [src/strands/models/routing/strategy.py:24](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/strategy.py#L24)
 
 A candidate this invocation already used, and how the attempt ended.
 
@@ -22,7 +22,7 @@ A candidate this invocation already used, and how the attempt ended.
 class RoutingContext()
 ```
 
-Defined in: [src/strands/models/routing/strategy.py:38](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/strategy.py#L38)
+Defined in: [src/strands/models/routing/strategy.py:39](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/strategy.py#L39)
 
 Read-only inputs a strategy sees when choosing a candidate.
 
@@ -32,6 +32,8 @@ Read-only inputs a strategy sees when choosing a candidate.
 
 A strategy is asked on every invocation, since the right model usually depends on the request. One that is expensive to evaluate should narrow what it looks at — typically the latest turn rather than the whole transcript — instead of caching a verdict across invocations.
 
+`invocation_context` is the request this routing decision runs for, if any; a nested call that joins it adds to the request’s usage, but the request’s limits don’t apply.
+
 ## RoutingStrategy
 
 ```python
@@ -39,7 +41,7 @@ A strategy is asked on every invocation, since the right model usually depends o
 class RoutingStrategy(Protocol)
 ```
 
-Defined in: [src/strands/models/routing/strategy.py:66](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/strategy.py#L66)
+Defined in: [src/strands/models/routing/strategy.py:71](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/strategy.py#L71)
 
 Chooses the candidate an invocation uses, including after a failure.
 
@@ -52,7 +54,7 @@ async def select(context: RoutingContext,
                  **kwargs: Any) -> RoutingCandidate | None
 ```
 
-Defined in: [src/strands/models/routing/strategy.py:73](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/strategy.py#L73)
+Defined in: [src/strands/models/routing/strategy.py:78](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/models/routing/strategy.py#L78)
 
 Return the candidate to use, from `context.candidates`, or `None` to decline.
 

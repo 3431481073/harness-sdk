@@ -600,7 +600,9 @@ const bedrockModel = new BedrockModel({
 
 const guardrailAgent = new Agent({ model: bedrockModel })
 
-const response = await guardrailAgent.invoke('Can you tell me about the Strands Harness SDK?')
+const response = await guardrailAgent.invoke(
+  'Can you tell me about the Strands Harness SDK?'
+)
 ```
 
 When a guardrail is triggered:

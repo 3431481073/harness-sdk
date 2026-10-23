@@ -6,7 +6,7 @@ LLM-based steering handler that uses an LLM to provide contextual guidance.
 class LLMSteeringHandler(SteeringHandler)
 ```
 
-Defined in: [src/strands/vended\_plugins/steering/handlers/llm/llm\_handler.py:33](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/handlers/llm/llm_handler.py#L33)
+Defined in: [src/strands/vended\_plugins/steering/handlers/llm/llm\_handler.py:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/handlers/llm/llm_handler.py#L34)
 
 Steering handler that uses an LLM to provide contextual guidance.
 
@@ -21,7 +21,7 @@ def __init__(system_prompt: str,
              context_providers: list[SteeringContextProvider] | None = None)
 ```
 
-Defined in: [src/strands/vended\_plugins/steering/handlers/llm/llm\_handler.py:40](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/handlers/llm/llm_handler.py#L40)
+Defined in: [src/strands/vended\_plugins/steering/handlers/llm/llm\_handler.py:41](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/handlers/llm/llm_handler.py#L41)
 
 Initialize the LLMSteeringHandler.
 
@@ -35,11 +35,15 @@ Initialize the LLMSteeringHandler.
 #### steer\_before\_tool
 
 ```python
-async def steer_before_tool(*, agent: Agent, tool_use: ToolUse,
+async def steer_before_tool(*,
+                            agent: Agent,
+                            tool_use: ToolUse,
+                            invocation_context: InvocationContext
+                            | None = None,
                             **kwargs: Any) -> ToolSteeringAction
 ```
 
-Defined in: [src/strands/vended\_plugins/steering/handlers/llm/llm\_handler.py:66](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/handlers/llm/llm_handler.py#L66)
+Defined in: [src/strands/vended\_plugins/steering/handlers/llm/llm\_handler.py:67](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/handlers/llm/llm_handler.py#L67)
 
 Provide contextual guidance for tool usage.
 
@@ -47,6 +51,7 @@ Provide contextual guidance for tool usage.
 
 -   `agent` - The agent instance
 -   `tool_use` - The tool use object with name and arguments
+-   `invocation_context` - The request this tool call belongs to; the steering call’s usage adds to it.
 -   `**kwargs` - Additional keyword arguments for steering evaluation
 
 **Returns**:

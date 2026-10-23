@@ -19,9 +19,7 @@ const agent = new Agent({
   systemPrompt: 'You are a helpful assistant.',
 })
 
-const result = await agent.invoke(
-  'What makes TypeScript great for building agents?'
-)
+const result = await agent.invoke('What makes TypeScript great for building agents?')
 console.log(result)
 ```
 

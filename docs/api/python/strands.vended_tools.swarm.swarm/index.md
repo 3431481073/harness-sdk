@@ -29,13 +29,13 @@ def make_swarm(
 ) -> DecoratedFunctionTool
 ```
 
-Defined in: [src/strands/vended\_tools/swarm/swarm.py:63](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/swarm/swarm.py#L63)
+Defined in: [src/strands/vended\_tools/swarm/swarm.py:73](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/swarm/swarm.py#L73)
 
 Create a swarm tool with developer-controlled safety limits and authority modes.
 
 The swarm tool is a meta-agent tool: the model defines the agents it needs at runtime. Each agent spec from the model is resolved through the authority-mode system (see :mod:`~strands.multiagent.spec`), then built via `builder`. A running swarm cannot be cancelled from the parent agent. Children never receive a swarm tool, so swarms do not nest. If no swarm limits are configured, the Swarm primitive’s defaults are used.
 
-A child’s interrupt is surfaced as an interrupt of this tool. An interrupted swarm is held in memory until resumed, so it cannot be resumed after a process restart.
+A child’s interrupt is surfaced as an interrupt of this tool and can be resumed after a parent-agent snapshot restore.
 
 **Arguments**:
 

@@ -1,6 +1,6 @@
 Iterative-refinement plugin for Strands agents.
 
-Validates the agent’s response after each invocation; if it doesn’t satisfy the goal, feeds validator feedback back as a user message and re-enters the agent loop via `AfterInvocationEvent.resume`. Loops until validation passes, `max_attempts` is reached, or `timeout` elapses.
+Validates the agent’s response after each invocation; if it doesn’t satisfy the goal, feeds validator feedback back as a user message and re-enters the agent loop via `AfterInvocationEvent.resume`. Loops until validation passes, `max_attempts` is reached, `timeout` elapses, or one of the request’s `limits` is reached.
 
 **Example**:
 
@@ -41,7 +41,7 @@ word_count = GoalLoop(goal=word_count_validator, max_attempts=5, timeout=30.0)
 class ValidationOutcome()
 ```
 
-Defined in: [src/strands/vended\_plugins/goal/plugin.py:64](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L64)
+Defined in: [src/strands/vended\_plugins/goal/plugin.py:70](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L70)
 
 Outcome a validator returns.
 
@@ -58,7 +58,7 @@ Booleans are shorthand: True -> pass, False -> fail with no feedback. Use the di
 class Validator(Protocol)
 ```
 
-Defined in: [src/strands/vended\_plugins/goal/plugin.py:81](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L81)
+Defined in: [src/strands/vended\_plugins/goal/plugin.py:87](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L87)
 
 Programmatic validator callable.
 
@@ -73,13 +73,13 @@ def __call__(response: Message, agent: Agent,
              **kwargs: Any) -> ValidatorReturn | Awaitable[ValidatorReturn]
 ```
 
-Defined in: [src/strands/vended\_plugins/goal/plugin.py:92](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L92)
+Defined in: [src/strands/vended\_plugins/goal/plugin.py:98](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L98)
 
 Validate the agent’s response.
 
 #### GoalStopReason
 
-Why a goal run ended.
+Why a goal run ended. `"limit"` means one of the request’s `limits` was reached, so no further attempt could run.
 
 ## GoalAttempt
 
@@ -88,7 +88,7 @@ Why a goal run ended.
 class GoalAttempt()
 ```
 
-Defined in: [src/strands/vended\_plugins/goal/plugin.py:102](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L102)
+Defined in: [src/strands/vended\_plugins/goal/plugin.py:109](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L109)
 
 Single attempt summary preserved on GoalResult.
 
@@ -99,7 +99,7 @@ Single attempt summary preserved on GoalResult.
 class GoalResult()
 ```
 
-Defined in: [src/strands/vended\_plugins/goal/plugin.py:111](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L111)
+Defined in: [src/strands/vended\_plugins/goal/plugin.py:118](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L118)
 
 Aggregate result of a goal run, exposed via `GoalLoop.last_result`.
 
@@ -110,7 +110,7 @@ Aggregate result of a goal run, exposed via `GoalLoop.last_result`.
 class JudgeConfig()
 ```
 
-Defined in: [src/strands/vended\_plugins/goal/plugin.py:120](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L120)
+Defined in: [src/strands/vended\_plugins/goal/plugin.py:127](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L127)
 
 Tuning for the auto-built judge used when `goal` is a natural-language string.
 
@@ -130,7 +130,7 @@ Harmlessly ignored when `goal` is a validator function — no judge is built in 
 class GoalLoop(Plugin)
 ```
 
-Defined in: [src/strands/vended\_plugins/goal/plugin.py:197](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L197)
+Defined in: [src/strands/vended\_plugins/goal/plugin.py:207](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L207)
 
 Iterative-refinement plugin.
 
@@ -162,7 +162,7 @@ def __init__(
 ) -> None
 ```
 
-Defined in: [src/strands/vended\_plugins/goal/plugin.py:222](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L222)
+Defined in: [src/strands/vended\_plugins/goal/plugin.py:232](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L232)
 
 Initialize the GoalLoop plugin.
 
@@ -183,7 +183,7 @@ Initialize the GoalLoop plugin.
 def name() -> str
 ```
 
-Defined in: [src/strands/vended\_plugins/goal/plugin.py:280](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L280)
+Defined in: [src/strands/vended\_plugins/goal/plugin.py:290](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L290)
 
 Plugin name.
 
@@ -193,7 +193,7 @@ Plugin name.
 def last_result(agent: Agent) -> GoalResult | None
 ```
 
-Defined in: [src/strands/vended\_plugins/goal/plugin.py:284](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L284)
+Defined in: [src/strands/vended\_plugins/goal/plugin.py:294](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L294)
 
 Result of the most recent completed run on `agent`.
 
@@ -205,6 +205,6 @@ Returns None if no run has finished on that agent since this plugin was construc
 def init_agent(agent: Agent) -> None
 ```
 
-Defined in: [src/strands/vended\_plugins/goal/plugin.py:295](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L295)
+Defined in: [src/strands/vended\_plugins/goal/plugin.py:305](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/goal/plugin.py#L305)
 
 Register hooks on the agent. Called by the plugin registry.

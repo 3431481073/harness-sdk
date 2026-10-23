@@ -37,7 +37,7 @@ Defined in: [src/retry/default-model-retry-strategy.ts:74](https://github.com/st
 
 | Parameter | Type |
 | --- | --- |
-| `opts` | [`DefaultModelRetryStrategyOptions`](/docs/api/typescript/DefaultModelRetryStrategyOptions/index.md) |
+| `opts?` | [`DefaultModelRetryStrategyOptions`](/docs/api/typescript/DefaultModelRetryStrategyOptions/index.md) |
 
 #### Returns
 

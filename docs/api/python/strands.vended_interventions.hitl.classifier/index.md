@@ -9,7 +9,7 @@ Uses an inner agent with structured output to evaluate whether a tool call requi
 class ClassifierResult()
 ```
 
-Defined in: [src/strands/vended\_interventions/hitl/classifier.py:21](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_interventions/hitl/classifier.py#L21)
+Defined in: [src/strands/vended\_interventions/hitl/classifier.py:22](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_interventions/hitl/classifier.py#L22)
 
 Result from a classifier evaluation.
 
@@ -20,7 +20,7 @@ Result from a classifier evaluation.
 class HumanInTheLoopClassifier(Protocol)
 ```
 
-Defined in: [src/strands/vended\_interventions/hitl/classifier.py:29](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_interventions/hitl/classifier.py#L29)
+Defined in: [src/strands/vended\_interventions/hitl/classifier.py:30](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_interventions/hitl/classifier.py#L30)
 
 Callable (sync or async) that decides whether a tool call requires human approval.
 
@@ -31,7 +31,7 @@ def __call__(event: BeforeToolCallEvent,
              **kwargs: Any) -> ClassifierResult | Awaitable[ClassifierResult]
 ```
 
-Defined in: [src/strands/vended\_interventions/hitl/classifier.py:32](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_interventions/hitl/classifier.py#L32)
+Defined in: [src/strands/vended\_interventions/hitl/classifier.py:33](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_interventions/hitl/classifier.py#L33)
 
 Evaluate whether a tool call requires human approval.
 
@@ -51,7 +51,7 @@ ClassifierResult indicating whether approval is required.
 class LLMClassifierConfig()
 ```
 
-Defined in: [src/strands/vended\_interventions/hitl/classifier.py:46](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_interventions/hitl/classifier.py#L46)
+Defined in: [src/strands/vended\_interventions/hitl/classifier.py:47](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_interventions/hitl/classifier.py#L47)
 
 Configuration for the built-in LLM risk classifier.
 

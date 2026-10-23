@@ -24,7 +24,7 @@ SteeringAction handling for steer\_after\_model: Proceed: Model response accepte
 class SteeringHandler(Plugin)
 ```
 
-Defined in: [src/strands/vended\_plugins/steering/core/handler.py:54](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L54)
+Defined in: [src/strands/vended\_plugins/steering/core/handler.py:55](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L55)
 
 Base class for steering handlers that provide contextual guidance to agents.
 
@@ -36,7 +36,7 @@ Steering handlers maintain local context and register hook callbacks to populate
 def __init__(context_providers: list[SteeringContextProvider] | None = None)
 ```
 
-Defined in: [src/strands/vended\_plugins/steering/core/handler.py:63](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L63)
+Defined in: [src/strands/vended\_plugins/steering/core/handler.py:64](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L64)
 
 Initialize the steering handler.
 
@@ -50,7 +50,7 @@ Initialize the steering handler.
 def init_agent(agent: "Agent") -> None
 ```
 
-Defined in: [src/strands/vended\_plugins/steering/core/handler.py:79](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L79)
+Defined in: [src/strands/vended\_plugins/steering/core/handler.py:80](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L80)
 
 Initialize the steering handler with an agent.
 
@@ -67,7 +67,7 @@ Registers hook callbacks for steering guidance and context updates.
 async def provide_tool_steering_guidance(event: BeforeToolCallEvent) -> None
 ```
 
-Defined in: [src/strands/vended\_plugins/steering/core/handler.py:92](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L92)
+Defined in: [src/strands/vended\_plugins/steering/core/handler.py:93](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L93)
 
 Provide steering guidance for tool call.
 
@@ -78,7 +78,7 @@ Provide steering guidance for tool call.
 async def provide_model_steering_guidance(event: AfterModelCallEvent) -> None
 ```
 
-Defined in: [src/strands/vended\_plugins/steering/core/handler.py:133](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L133)
+Defined in: [src/strands/vended\_plugins/steering/core/handler.py:138](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L138)
 
 Provide steering guidance for model response.
 
@@ -89,7 +89,7 @@ async def steer_before_tool(*, agent: "Agent", tool_use: ToolUse,
                             **kwargs: Any) -> ToolSteeringAction
 ```
 
-Defined in: [src/strands/vended\_plugins/steering/core/handler.py:170](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L170)
+Defined in: [src/strands/vended\_plugins/steering/core/handler.py:175](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L175)
 
 Provide contextual guidance before tool execution.
 
@@ -121,7 +121,7 @@ async def steer_after_model(*, agent: "Agent", message: Message,
                             **kwargs: Any) -> ModelSteeringAction
 ```
 
-Defined in: [src/strands/vended\_plugins/steering/core/handler.py:193](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L193)
+Defined in: [src/strands/vended\_plugins/steering/core/handler.py:198](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_plugins/steering/core/handler.py#L198)
 
 Provide contextual guidance after model response.
 
