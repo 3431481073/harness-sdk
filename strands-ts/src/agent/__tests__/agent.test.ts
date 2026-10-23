@@ -2709,14 +2709,65 @@ describe('normalizeToolUseNames', () => {
       expect(provider.consumers.size).toBe(0)
     })
 
-    it('removes the registry as a consumer even if shutdown runs before initialize', async () => {
+    it('does not add a consumer until the agent is initialized', async () => {
       const provider = new RecordingToolProvider()
+      const loadTools = vi.spyOn(provider, 'loadTools')
       const model = new MockMessageModel()
       const agent = new Agent({ model, tools: [provider], printer: false })
+
+      expect(provider.consumers.size).toBe(0)
 
       await agent.shutdown()
 
       expect(provider.consumers.size).toBe(0)
+      expect(loadTools).not.toHaveBeenCalled()
+    })
+
+    it('does not add the same consumer twice when initialize is retried after a failed load', async () => {
+      const provider = new RecordingToolProvider([createRandomTool('retried-tool')])
+      const addConsumer = vi.spyOn(provider, 'addConsumer')
+      vi.spyOn(provider, 'loadTools').mockRejectedValueOnce(new Error('load failed'))
+      const model = new MockMessageModel()
+      const agent = new Agent({ model, tools: [provider], printer: false })
+
+      await expect(agent.initialize()).rejects.toThrow('load failed')
+      await agent.initialize()
+
+      expect(addConsumer).toHaveBeenCalledTimes(1)
+      expect(agent.toolRegistry.get('retried-tool')).toBeDefined()
+    })
+
+    it('registers provider tools in config order regardless of load latency', async () => {
+      let releaseAlpha!: () => void
+      const alphaLoaded = new Promise<void>((resolve) => (releaseAlpha = resolve))
+      const alpha = new RecordingToolProvider([createRandomTool('alpha')])
+      vi.spyOn(alpha, 'loadTools').mockImplementation(async () => {
+        await alphaLoaded
+        return alpha.tools
+      })
+      const beta = new RecordingToolProvider([createRandomTool('beta')])
+      vi.spyOn(beta, 'loadTools').mockImplementation(async () => {
+        releaseAlpha()
+        return beta.tools
+      })
+      const model = new MockMessageModel()
+      const agent = new Agent({ model, tools: [alpha, beta], printer: false })
+
+      await agent.initialize()
+
+      expect(agent.toolRegistry.list().map((tool) => tool.name)).toStrictEqual(['alpha', 'beta'])
+    })
+
+    it('registers no provider tools when any provider fails to load', async () => {
+      const healthy = new RecordingToolProvider([createRandomTool('healthy-tool')])
+      const failing = new RecordingToolProvider()
+      vi.spyOn(failing, 'loadTools').mockRejectedValue(new Error('load failed'))
+      const model = new MockMessageModel()
+      const agent = new Agent({ model, tools: [healthy, failing], printer: false })
+
+      await expect(agent.initialize()).rejects.toThrow('load failed')
+
+      expect(agent.toolRegistry.get('healthy-tool')).toBeUndefined()
     })
 
     it('still flushes the memory manager when a provider throws while releasing', async () => {
@@ -2740,42 +2791,13 @@ describe('normalizeToolUseNames', () => {
       expect(flush).toHaveBeenCalledTimes(1)
     })
 
-    it('marks the agent disposed even when shutdown throws', async () => {
-      class FailingToolProvider extends ToolProvider {
-        async loadTools(): Promise<Tool[]> {
-          return []
-        }
-        addConsumer(): void {}
-        removeConsumer(): void {
-          throw new Error('close failed')
-        }
-      }
-      const model = new MockMessageModel()
-      const agent = new Agent({ model, tools: [new FailingToolProvider()], printer: false })
-      await agent.initialize()
-
-      await expect(agent.shutdown()).rejects.toThrow('close failed')
-
-      await expect(agent.initialize()).rejects.toThrow(/shut down/)
-    })
-
-    it('rejects reinitialization after shutdown', async () => {
-      const model = new MockMessageModel()
-      const agent = new Agent({ model, printer: false })
-
-      await agent.initialize()
-      await agent.shutdown()
-
-      await expect(agent.initialize()).rejects.toThrow(/shut down/)
-    })
-
-    it('rejects invoke/stream on a disposed agent', async () => {
+    it('keeps an agent usable after shutdown', async () => {
       const model = new MockMessageModel().addTurn({ type: 'textBlock', text: 'Hello' })
       const agent = new Agent({ model, printer: false })
 
       await agent.shutdown()
 
-      await expect(agent.invoke('hi')).rejects.toThrow(/shut down/)
+      await expect(agent.invoke('hi')).resolves.toBeDefined()
     })
 
     it("names the provider when a provider's tool collides with an already-registered name", async () => {
@@ -2791,7 +2813,22 @@ describe('normalizeToolUseNames', () => {
       const model = new MockMessageModel()
       const agent = new Agent({ model, tools: [existingTool, new CollidingToolProvider()], printer: false })
 
-      await expect(agent.initialize()).rejects.toThrow(/CollidingToolProvider/)
+      await expect(agent.initialize()).rejects.toThrow(
+        "provider=<CollidingToolProvider> | failed to register provided tool: Tool with name 'duplicate-tool' already registered"
+      )
+    })
+
+    it('rolls back every provider tool when registration collides, so initialize can be retried', async () => {
+      const first = new RecordingToolProvider([createRandomTool('first-tool')])
+      const second = new RecordingToolProvider([createRandomTool('second-tool'), createRandomTool('first-tool')])
+      const model = new MockMessageModel()
+      const agent = new Agent({ model, tools: [first, second], printer: false })
+
+      await expect(agent.initialize()).rejects.toThrow(/first-tool/)
+      expect(agent.toolRegistry.list()).toStrictEqual([])
+
+      await expect(agent.initialize()).rejects.toThrow(/first-tool/)
+      expect(agent.toolRegistry.list()).toStrictEqual([])
     })
 
     it('recognizes a structural implementer of ToolProvider even without `instanceof`', async () => {

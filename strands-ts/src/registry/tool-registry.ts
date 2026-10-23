@@ -32,9 +32,14 @@ export class ToolRegistry {
    * Does not load the provider's tools — the caller awaits {@link ToolProvider.loadTools} and
    * registers the results separately, since loading is async and this method is not.
    *
+   * Idempotent: a provider already tracked by this registry is not added as a consumer again.
+   *
    * @param provider - The tool provider to register.
    */
   addProvider(provider: ToolProvider): void {
+    if (this._toolProviders.includes(provider)) {
+      return
+    }
     this._toolProviders.push(provider)
     provider.addConsumer(this._registryId)
   }

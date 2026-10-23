@@ -534,9 +534,9 @@ export class Agent implements LocalAgent, InvokableAgent {
   private readonly _interventionRegistry: InterventionRegistry
   private _toolRegistry: ToolRegistry
   private _mcpClients: McpClient[]
+  private _toolProviders: ToolProvider[]
+  private _providerToolsLoaded: boolean = false
   private _initialized: boolean
-  /** Set once {@link shutdown} has run; guards against reuse of an agent whose resources were released. */
-  private _disposed: boolean = false
   private _isInvoking: boolean = false
   private _abortController = new AbortController()
   private _abortSignal: AbortSignal = this._abortController.signal
@@ -613,9 +613,7 @@ export class Agent implements LocalAgent, InvokableAgent {
     }
     this._toolRegistry = new ToolRegistry(tools)
     this._mcpClients = mcpClients
-    for (const provider of toolProviders) {
-      this._toolRegistry.addProvider(provider)
-    }
+    this._toolProviders = toolProviders
 
     // Initialize hooks registry
     this._hooksRegistry = new HookRegistryImplementation()
@@ -863,11 +861,6 @@ export class Agent implements LocalAgent, InvokableAgent {
   }
 
   public async initialize(): Promise<void> {
-    if (this._disposed) {
-      throw new AgentDisposedError(
-        'Agent has been shut down and cannot be reinitialized; construct a new Agent instance instead.'
-      )
-    }
     if (this._initialized) {
       return
     }
@@ -884,19 +877,7 @@ export class Agent implements LocalAgent, InvokableAgent {
       })
     )
 
-    // Load tools from tool providers, registered as consumers in the constructor
-    await Promise.all(
-      this._toolRegistry.toolProviders.map(async (provider) => {
-        const tools = await provider.loadTools()
-        try {
-          this._toolRegistry.add(tools)
-        } catch (error) {
-          throw new ToolValidationError(
-            `provider=<${provider.constructor.name}> | failed to register provided tools: ${String(error)}`
-          )
-        }
-      })
-    )
+    await this._loadProviderTools()
 
     // Register tools vended by the sandbox. The host default vends nothing. A tool
     // is skipped if the user already registered one with that name.
@@ -1141,6 +1122,46 @@ export class Agent implements LocalAgent, InvokableAgent {
   }
 
   /**
+   * Registers this agent's registry as a consumer of each tool provider, then loads and registers
+   * their tools in config order once every load has settled, so tool order is independent of load
+   * latency. All-or-nothing: on failure no provider tools stay registered, so `initialize()` can be retried.
+   */
+  private async _loadProviderTools(): Promise<void> {
+    if (this._providerToolsLoaded) {
+      return
+    }
+    for (const provider of this._toolProviders) {
+      this._toolRegistry.addProvider(provider)
+    }
+    const loaded = await Promise.all(
+      this._toolProviders.map(async (provider) => ({ provider, tools: await provider.loadTools() }))
+    )
+    const providedTools = loaded.flatMap(({ provider, tools }) => tools.map((tool) => ({ provider, tool })))
+    const registered: string[] = []
+    try {
+      for (const { provider, tool } of providedTools) {
+        this._addProviderTool(provider, tool)
+        registered.push(tool.name)
+      }
+    } catch (error) {
+      registered.forEach((name) => this._toolRegistry.remove(name))
+      throw error
+    }
+    this._providerToolsLoaded = true
+  }
+
+  private _addProviderTool(provider: ToolProvider, tool: Tool): void {
+    try {
+      this._toolRegistry.add(tool)
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error)
+      throw new ToolValidationError(
+        `provider=<${provider.constructor.name}> | failed to register provided tool: ${reason}`
+      )
+    }
+  }
+
+  /**
    * Runs the agent's shutdown procedures at end of life. Safe to call more
    * than once, and a no-op when there is nothing to release.
    *
@@ -1150,9 +1171,8 @@ export class Agent implements LocalAgent, InvokableAgent {
    * so a provider that throws while releasing never prevents the memory manager from flushing;
    * the first failure (if any) is thrown once both have settled.
    *
-   * Marks the agent disposed regardless of outcome. After `shutdown()` returns (or throws), the
-   * agent cannot be reinitialized: `initialize()` — and therefore `invoke()`/`stream()`, which call
-   * it — throws {@link AgentDisposedError}. Construct a new `Agent` instance to continue.
+   * Treat the agent as end-of-life afterwards: tools vended by a released provider may no longer
+   * work. Construct a new `Agent` instance to continue.
    *
    * Call it directly when you own the agent's lifecycle (e.g. draining on a shutdown signal), or bind
    * the agent with `await using` to run it automatically on scope exit.
@@ -1165,17 +1185,13 @@ export class Agent implements LocalAgent, InvokableAgent {
    * ```
    */
   async shutdown(): Promise<void> {
-    try {
-      const results = await Promise.allSettled([
-        this._toolRegistry.cleanup(),
-        this.memoryManager?.flush() ?? Promise.resolve(),
-      ])
-      const failure = results.find((result): result is PromiseRejectedResult => result.status === 'rejected')
-      if (failure) {
-        throw failure.reason
-      }
-    } finally {
-      this._disposed = true
+    const results = await Promise.allSettled([
+      this._toolRegistry.cleanup(),
+      this.memoryManager?.flush() ?? Promise.resolve(),
+    ])
+    const failure = results.find((result): result is PromiseRejectedResult => result.status === 'rejected')
+    if (failure) {
+      throw failure.reason
     }
   }
 

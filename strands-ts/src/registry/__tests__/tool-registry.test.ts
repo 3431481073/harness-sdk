@@ -287,6 +287,16 @@ describe('ToolRegistry', () => {
       expect(provider.consumers.size).toBe(1)
     })
 
+    it('addProvider is idempotent for a provider already tracked', () => {
+      const provider = new MockToolProvider()
+      const addConsumer = vi.spyOn(provider, 'addConsumer')
+      registry.addProvider(provider)
+      registry.addProvider(provider)
+
+      expect(registry.toolProviders).toStrictEqual([provider])
+      expect(addConsumer).toHaveBeenCalledTimes(1)
+    })
+
     it('uses the same registry id (consumer id) across every provider', () => {
       const provider1 = new MockToolProvider()
       const provider2 = new MockToolProvider()

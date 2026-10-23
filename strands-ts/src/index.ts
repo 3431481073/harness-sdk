@@ -36,7 +36,6 @@ export {
   MaxTokensError,
   JsonValidationError,
   ConcurrentInvocationError,
-  AgentDisposedError,
   ModelThrottledError,
   ToolValidationError,
   StructuredOutputError,

@@ -9,11 +9,7 @@ import type { Tool } from './tool.js'
  * additional consumers. A provider is free to release its resources once its last consumer calls
  * {@link ToolProvider.removeConsumer}.
  *
- * An abstract class (rather than a structural interface) so the agent can distinguish a provider
- * from a plain tool with `instanceof`. Subclass with `extends`; a class that only `implements`
- * `ToolProvider` type-checks, but produces an object that is not `instanceof ToolProvider`, so
- * {@link isToolProvider} falls back to a structural check to still recognize it rather than
- * silently treating it as a plain tool.
+ * Subclass with `extends`; structural implementers (`implements ToolProvider`) are also accepted.
  */
 export abstract class ToolProvider {
   /**
@@ -26,9 +22,8 @@ export abstract class ToolProvider {
   /**
    * Registers a consumer that depends on this provider's tools.
    *
-   * Must stay synchronous: it runs on the registry's synchronous {@link ToolRegistry.addProvider}
-   * path (typically from an agent's constructor), so there is nothing to `await` here. Record the
-   * consumer id only; defer any async setup work to {@link ToolProvider.loadTools} instead.
+   * Called synchronously from {@link ToolRegistry.addProvider} during agent initialization, just
+   * before {@link ToolProvider.loadTools}. Record the consumer id only; do async setup in `loadTools`.
    *
    * @param consumerId - Unique identifier for the consumer.
    */
@@ -46,12 +41,9 @@ export abstract class ToolProvider {
 }
 
 /**
- * Reports whether `value` behaves like a {@link ToolProvider}.
+ * Reports whether `value` is a {@link ToolProvider}, by `instanceof` or structurally.
  *
- * Prefers `instanceof`, which covers the common case of subclassing with `extends`. Falls back to
- * a structural check so a class that uses `implements ToolProvider` — which type-checks but is not
- * `instanceof ToolProvider` — is still recognized as a provider instead of silently falling through
- * to plain-tool handling, where it would fail with a confusing tool-name validation error.
+ * @internal
  *
  * @param value - The value to test.
  * @returns Whether `value` can be used as a {@link ToolProvider}.
