@@ -1698,6 +1698,11 @@ export class Agent implements LocalAgent, InvokableAgent {
       throw new TypeError('Agent is in an interrupted state. Resume by invoking with interruptResponse content blocks.')
     }
 
+    // Control-only resumes continue an existing cycle and must not append new hook input.
+    if (resumeCheckpoint || interruptResponses.length > 0) {
+      pendingInputMessages = undefined
+    }
+
     // Normalize input to get the user messages for telemetry
     const traceInputMessages = pendingInputMessages ?? this._normalizeInput(args)
 
