@@ -30,6 +30,10 @@ function captureRequests(model: MockMessageModel): Message[][] {
   return requests
 }
 
+function messageShape(message: Message): { role: string; content: unknown[] } {
+  return { role: message.role, content: message.content.map((block) => block.toJSON()) }
+}
+
 describe('Agent continuation input', () => {
   it('combines multiple follow-up contributions with public resume input', async () => {
     const model = textModel('initial', 'final')
@@ -80,6 +84,22 @@ describe('Agent continuation input', () => {
     const appended = vi.fn()
     const agent = new Agent({ model, printer: false })
     const beforeInvocationInputs: string[][] = []
+    const continuationMessages = [
+      new Message({
+        role: 'assistant',
+        content: [new ToolUseBlock({ name: 'backgroundTask', toolUseId: 'task-1', input: {} })],
+      }),
+      new Message({
+        role: 'user',
+        content: [
+          new ToolResultBlock({
+            toolUseId: 'task-1',
+            status: 'success',
+            content: [new TextBlock('done')],
+          }),
+        ],
+      }),
+    ]
     let resumed = false
 
     agent.addHook(BeforeInvocationEvent, (event) => {
@@ -91,22 +111,7 @@ describe('Agent continuation input', () => {
       if (resumed) return
       resumed = true
       continuations.addInput(event, {
-        args: [
-          new Message({
-            role: 'assistant',
-            content: [new ToolUseBlock({ name: 'backgroundTask', toolUseId: 'task-1', input: {} })],
-          }),
-          new Message({
-            role: 'user',
-            content: [
-              new ToolResultBlock({
-                toolUseId: 'task-1',
-                status: 'success',
-                content: [new TextBlock('done')],
-              }),
-            ],
-          }),
-        ],
+        args: continuationMessages,
         onAppended: appended,
       })
       event.resume = 'public'
@@ -115,8 +120,28 @@ describe('Agent continuation input', () => {
     await agent.invoke('start')
 
     expect(beforeInvocationInputs).toEqual([['start'], ['public']])
-    expect(requests[1]!.at(-2)?.content.some((block) => block.type === 'toolUseBlock')).toBe(true)
-    expect(requests[1]!.at(-1)?.content.some((block) => block.type === 'toolResultBlock')).toBe(true)
+    expect(requests[1]!.map(messageShape)).toEqual([
+      {
+        role: 'user',
+        content: [{ text: 'start' }],
+      },
+      {
+        role: 'assistant',
+        content: [{ text: 'initial' }, { toolUse: { name: 'backgroundTask', toolUseId: 'task-1', input: {} } }],
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            toolResult: {
+              toolUseId: 'task-1',
+              status: 'success',
+              content: [{ text: 'done' }],
+            },
+          },
+        ],
+      },
+    ])
     expect(requests[1]!.some((message) => textOf(message) === 'public')).toBe(false)
     expect(appended).toHaveBeenCalledOnce()
   })
