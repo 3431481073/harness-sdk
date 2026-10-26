@@ -1419,6 +1419,8 @@ export class Agent implements LocalAgent, InvokableAgent {
           const combineWith = (base: InvokeArgs): InvokeArgs =>
             continuations.combine(continuationEvent, base, (continuationArgs) => self._normalizeInput(continuationArgs))
 
+          // Middleware replacements provide the continuation base. Otherwise, continuations apply to
+          // post-hook messages; without either, post-hook messages are appended separately.
           const middlewareReplacedArgs = ctx.args !== args
           const combinedArgs = combineWith(ctx.args)
           const continuationApplied = combinedArgs !== ctx.args
