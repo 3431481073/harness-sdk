@@ -1283,7 +1283,7 @@ export class Agent implements LocalAgent, InvokableAgent {
           agent: this,
           invocationContext,
           invocationState,
-          messages: inputMessages,
+          messages: [...inputMessages],
         })
         yield await this._invokeCallbacks(beforeInvocationEvent)
 

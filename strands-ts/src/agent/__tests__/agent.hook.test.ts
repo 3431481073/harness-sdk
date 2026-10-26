@@ -205,6 +205,30 @@ describe('Agent Hooks Integration', () => {
       ])
     })
 
+    it('does not mutate a caller-owned message array', async () => {
+      const model = new MockMessageModel().addTurn({ type: 'textBlock', text: 'Hello' })
+      const agent = new Agent({ model, printer: false })
+      const inputMessage = new Message({ role: 'user', content: [new TextBlock('original')] })
+      const contextMessage = new Message({ role: 'user', content: [new TextBlock('context')] })
+      const inputMessages = [inputMessage]
+      agent.addHook(BeforeInvocationEvent, (event) => {
+        event.messages.push(contextMessage)
+      })
+
+      await agent.invoke(inputMessages)
+
+      expect(inputMessages).toEqual([inputMessage])
+      expect(agent.messages).toEqual([
+        inputMessage,
+        contextMessage,
+        new Message({
+          role: 'assistant',
+          content: [new TextBlock('Hello')],
+          trackingId: anyTrackingId,
+        }),
+      ])
+    })
+
     it('uses messages replaced by a hook', async () => {
       const model = new MockMessageModel().addTurn({ type: 'textBlock', text: 'Hello' })
       const agent = new Agent({ model, printer: false })
