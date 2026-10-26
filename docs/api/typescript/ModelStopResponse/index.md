@@ -31,7 +31,7 @@ The reason the model stopped generating.
 ### redaction?
 
 ```ts
-readonly optional redaction?: Redaction;
+readonly redaction?: Redaction;
 ```
 
 Defined in: [src/hooks/events.ts:485](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L485)

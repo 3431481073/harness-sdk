@@ -71,7 +71,7 @@ Total number of tokens (input + output).
 ### cacheReadInputTokens?
 
 ```ts
-optional cacheReadInputTokens?: number;
+cacheReadInputTokens?: number;
 ```
 
 Defined in: [src/models/streaming.ts:513](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L513)
@@ -87,7 +87,7 @@ Number of input tokens read from cache. This can reduce latency and cost.
 ### cacheWriteInputTokens?
 
 ```ts
-optional cacheWriteInputTokens?: number;
+cacheWriteInputTokens?: number;
 ```
 
 Defined in: [src/models/streaming.ts:519](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L519)

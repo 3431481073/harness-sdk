@@ -39,7 +39,7 @@ S3 URI in format: s3://bucket-name/key-name
 ### bucketOwner?
 
 ```ts
-optional bucketOwner?: string;
+bucketOwner?: string;
 ```
 
 Defined in: [src/types/media.ts:96](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/media.ts#L96)

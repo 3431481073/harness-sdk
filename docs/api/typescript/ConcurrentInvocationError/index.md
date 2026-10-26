@@ -32,6 +32,4 @@ Creates a new ConcurrentInvocationError.
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+`Error.constructor`

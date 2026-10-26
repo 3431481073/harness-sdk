@@ -100,7 +100,7 @@ OTEL_METRICS_EXPORTER = "otlp"
 
 A switch left at `none` means that signal never arrives, whatever `include` names. The OpenTelemetry default metric interval is 60 seconds, so a short run ends before the first metric leaves. Set `OTEL_METRIC_EXPORT_INTERVAL` in `[agent] env` for a short run.
 
-The Strands CLI reads `OTEL_TRACES_EXPORTER` but sets up no meter. [Collect the Strands CLI’s traces and metrics](/docs/user-guide/box/guides/strands-cli-telemetry/index.md) turns on both for the box from Getting started.
+The Strands CLI reads `OTEL_TRACES_EXPORTER` but sets up no meter. [Collect the Strands CLI’s traces and metrics](/docs/user-guide/box/guides/strands-cli-telemetry/index.md) turns on both for the box from the quickstart.
 
 ## What a record carries
 

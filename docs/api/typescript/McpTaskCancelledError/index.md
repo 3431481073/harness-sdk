@@ -28,9 +28,7 @@ Defined in: [src/mcp/client.ts:209](https://github.com/strands-agents/harness-sd
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+`Error.constructor`
 
 ## Properties
 

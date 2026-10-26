@@ -1,4 +1,4 @@
-[pi](https://pi.dev) runs in a box like any other program. In this guide the project stays out of pi’s own reach, so its `bash` tool is its only way to a project file, and that tool runs [Strands Shell](/docs/user-guide/box/reference/shell/index.md#invocation), the box’s own shell, where the policy decides the command and every file it reads, writes, or deletes. By the end you have pi working on the project from [Getting started](/docs/user-guide/box/getting-started/index.md), and you have watched the policy permit three tasks and refuse two, with the refusal text pi quoted back.
+[pi](https://pi.dev) runs in a box like any other program. In this guide the project stays out of pi’s own reach, so its `bash` tool is its only way to a project file, and that tool runs [Strands Shell](/docs/user-guide/box/reference/shell/index.md#invocation), the box’s own shell, where the policy decides the command and every file it reads, writes, or deletes. By the end you have pi working on the project from [the quickstart](/docs/user-guide/box/quickstart/index.md), and you have watched the policy permit three tasks and refuse two, with the refusal text pi quoted back.
 
 The files are in [`examples/pi`](https://github.com/strands-agents/box/tree/main/examples/pi) in the Box repository, and this guide walks through them.
 
@@ -8,7 +8,7 @@ The action vocabulary and the context fields can change before 1.0.0. Pin the Bo
 
 ## Before you start
 
--   The box from [Getting started](/docs/user-guide/box/getting-started/index.md) under `~/box-tutorial`: Box in `box-core`, Node.js from Homebrew, the project in `my-project`, and your Amazon Bedrock API key in `AWS_BEARER_TOKEN_BEDROCK`, made in `us-west-2`. Run every command in this guide from `~/box-tutorial`.
+-   The box from [the quickstart](/docs/user-guide/box/quickstart/index.md) under `~/box-tutorial`: Box in `box-core`, Node.js from Homebrew, the project in `my-project`, and your Amazon Bedrock API key in `AWS_BEARER_TOKEN_BEDROCK`, made in `us-west-2`. Run every command in this guide from `~/box-tutorial`.
     
 -   pi, from its installer:
     
@@ -34,7 +34,7 @@ The action vocabulary and the context fields can change before 1.0.0. Pin the Bo
 
 ## Step 1: Copy the example
 
-Clone the Box repository, unless `box-src` is already there from Getting started, and copy the example directory to `~/box-tutorial/pi`:
+Clone the Box repository, unless `box-src` is already there from the quickstart, and copy the example directory to `~/box-tutorial/pi`:
 
 ```bash
 [ -d box-src ] || git clone --depth 1 https://github.com/strands-agents/box.git box-src
@@ -74,7 +74,7 @@ pi/settings.json
 
 ## Step 3: Read the box
 
-The complete file is [`box.toml`](https://github.com/strands-agents/box/blob/main/examples/pi/box.toml) in the example directory. Its `name`, `box_dir`, `policy`, and `[egress.model]` table follow the box from Getting started. These are the three tables this guide explains, with your home directory and pi version where `<HOME>` and `<VERSION>` stand after the `sed` in step 1:
+The complete file is [`box.toml`](https://github.com/strands-agents/box/blob/main/examples/pi/box.toml) in the example directory. Its `name`, `box_dir`, `policy`, and `[egress.model]` table follow the box from the quickstart. These are the three tables this guide explains, with your home directory and pi version where `<HOME>` and `<VERSION>` stand after the `sed` in step 1:
 
 pi/box.toml
 
@@ -119,7 +119,7 @@ list = ["~/box-tutorial/my-project"]
 
 ## Step 4: Read the policy
 
-The complete file is [`policy.dw`](https://github.com/strands-agents/box/blob/main/examples/pi/policy.dw) in the example directory. It keeps the rules from Getting started, adds `project_write` for writes in the project, and adds four `forbid` rules. The tasks below exercise two of them, and each carries an `@id` and a `@description` that the denial text quotes:
+The complete file is [`policy.dw`](https://github.com/strands-agents/box/blob/main/examples/pi/policy.dw) in the example directory. It keeps the rules from the quickstart, adds `project_write` for writes in the project, and adds four `forbid` rules. The tasks below exercise two of them, and each carries an `@id` and a `@description` that the denial text quotes:
 
 pi/policy.dw
 

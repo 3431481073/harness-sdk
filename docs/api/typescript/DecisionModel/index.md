@@ -6,7 +6,9 @@ The public `ask` opens a `decision` span, validates the question map, delegates 
 
 ## Extended by
 
+-   [`DecisionsAPIDecisionModel`](/docs/api/typescript/DecisionsAPIDecisionModel/index.md)
 -   [`LLMDecisionModel`](/docs/api/typescript/LLMDecisionModel/index.md)
+-   [`TypeSafeDecisionModel`](/docs/api/typescript/TypeSafeDecisionModel/index.md)
 
 ## Constructors
 

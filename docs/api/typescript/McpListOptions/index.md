@@ -7,7 +7,7 @@ Options for the paginated MCP list methods (prompts, resources, resource templat
 ### paginationToken?
 
 ```ts
-optional paginationToken?: string;
+paginationToken?: string;
 ```
 
 Defined in: [src/mcp/client.ts:131](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L131)

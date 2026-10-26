@@ -92,7 +92,7 @@ The input parameters for the tool. This can be any JSON-serializable value.
 ### reasoningSignature?
 
 ```ts
-readonly optional reasoningSignature?: string;
+readonly reasoningSignature?: string;
 ```
 
 Defined in: [src/types/messages.ts:307](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L307)
@@ -131,9 +131,7 @@ Serializes the ToolUseBlock to a JSON-compatible ContentBlockData object. Called
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

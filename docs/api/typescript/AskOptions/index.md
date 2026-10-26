@@ -7,7 +7,7 @@ Per-call options for [DecisionModel.ask](/docs/api/typescript/DecisionModel/inde
 ### invocationContext?
 
 ```ts
-optional invocationContext?: InvocationContext;
+invocationContext?: InvocationContext;
 ```
 
 Defined in: [src/decisions/types.ts:21](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L21)

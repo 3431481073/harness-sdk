@@ -83,7 +83,7 @@ The content returned by the tool.
 ### error?
 
 ```ts
-readonly optional error?: Error;
+readonly error?: Error;
 ```
 
 Defined in: [src/types/messages.ts:415](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L415)
@@ -118,9 +118,7 @@ Serializes the ToolResultBlock to a JSON-compatible ContentBlockData object. Cal
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

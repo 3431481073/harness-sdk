@@ -37,7 +37,7 @@ Defined in: [src/mcp/task-types.ts:20](https://github.com/strands-agents/harness
 ### statusMessage?
 
 ```ts
-optional statusMessage?: string;
+statusMessage?: string;
 ```
 
 Defined in: [src/mcp/task-types.ts:21](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/task-types.ts#L21)
@@ -83,7 +83,7 @@ Retention duration from creation in milliseconds, or `null` for unlimited retent
 ### pollIntervalMs?
 
 ```ts
-optional pollIntervalMs?: number;
+pollIntervalMs?: number;
 ```
 
 Defined in: [src/mcp/task-types.ts:29](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/task-types.ts#L29)

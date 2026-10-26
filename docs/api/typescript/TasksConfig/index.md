@@ -13,7 +13,7 @@ Field names and defaults match the Python SDK’s `TasksConfig` (milliseconds in
 ### pollTimeout?
 
 ```ts
-optional pollTimeout?: number;
+pollTimeout?: number;
 ```
 
 Defined in: [src/mcp/client.ts:164](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L164)
@@ -25,7 +25,7 @@ Overall deadline in milliseconds for an automatic task operation. Defaults to 30
 ### requestTimeout?
 
 ```ts
-optional requestTimeout?: number;
+requestTimeout?: number;
 ```
 
 Defined in: [src/mcp/client.ts:167](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L167)
@@ -37,7 +37,7 @@ Timeout in milliseconds for each task lifecycle request; progress resets it. Def
 ### pollInterval?
 
 ```ts
-optional pollInterval?: number;
+pollInterval?: number;
 ```
 
 Defined in: [src/mcp/client.ts:170](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L170)
@@ -49,7 +49,7 @@ Polling delay in milliseconds when a legacy (2025-11-25) server omits its interv
 ### ~ttl?~
 
 ```ts
-optional ttl?: number;
+ttl?: number;
 ```
 
 Defined in: [src/mcp/client.ts:177](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L177)

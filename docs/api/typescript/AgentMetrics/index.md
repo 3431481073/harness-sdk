@@ -243,6 +243,4 @@ A plain object suitable for round-trip serialization
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`

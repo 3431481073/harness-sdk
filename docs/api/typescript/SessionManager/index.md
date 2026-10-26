@@ -274,6 +274,4 @@ Initializes the multi-agent plugin by registering orchestrator lifecycle hooks.
 
 #### Implementation of
 
-```ts
-MultiAgentPlugin.initMultiAgent
-```
+`MultiAgentPlugin.initMultiAgent`

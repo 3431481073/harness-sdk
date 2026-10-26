@@ -22,6 +22,4 @@ Defined in: [src/sandbox/errors.ts:28](https://github.com/strands-agents/harness
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+`Error.constructor`

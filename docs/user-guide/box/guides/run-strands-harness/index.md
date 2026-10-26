@@ -1,6 +1,6 @@
-An agent you build with the [Strands harness](/docs/user-guide/harness/index.md) runs in a box like any other program. In this guide the harness gets one tool, its shell, and the box runs each command the shell tool sends in the box’s own shell, so the policy decides every command and every file a command touches. By the end you have the harness working on the project from [Getting started](/docs/user-guide/box/getting-started/index.md), and you have watched the policy permit two tasks and refuse two, with the refusal text the agent read.
+An agent you build with the [Strands harness](/docs/user-guide/harness/index.md) runs in a box like any other program. In this guide the harness gets one tool, its shell, and the box runs each command the shell tool sends in the box’s own shell, so the policy decides every command and every file a command touches. By the end you have the harness working on the project from [the quickstart](/docs/user-guide/box/quickstart/index.md), and you have watched the policy permit two tasks and refuse two, with the refusal text the agent read.
 
-The [Strands CLI in Getting started](/docs/user-guide/box/getting-started/index.md) is the same harness behind a terminal chat. Use this guide when you build the agent yourself in Python.
+The [Strands CLI in the quickstart](/docs/user-guide/box/quickstart/index.md) is the same harness behind a terminal chat. Use this guide when you build the agent yourself in Python.
 
 Pre-release
 
@@ -8,7 +8,7 @@ Box is at version 0.1.x. Keys, flags, and policy actions can change between rele
 
 ## Before you start
 
--   The box from [Getting started](/docs/user-guide/box/getting-started/index.md) under `~/box-tutorial`: Box in `box-core`, the project in `my-project`, and your Amazon Bedrock API key in `AWS_BEARER_TOKEN_BEDROCK`, made in `us-west-2`. Run every command in this guide from `~/box-tutorial`.
+-   The box from [the quickstart](/docs/user-guide/box/quickstart/index.md) under `~/box-tutorial`: Box in `box-core`, the project in `my-project`, and your Amazon Bedrock API key in `AWS_BEARER_TOKEN_BEDROCK`, made in `us-west-2`. Run every command in this guide from `~/box-tutorial`.
     
 -   Homebrew’s Python 3.14: `brew install python@3.14`.
     

@@ -7,7 +7,7 @@ Options for [ConstantBackoff](/docs/api/typescript/ConstantBackoff/index.md).
 ### delayMs?
 
 ```ts
-optional delayMs?: number;
+delayMs?: number;
 ```
 
 Defined in: [src/retry/backoff-strategy.ts:62](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/retry/backoff-strategy.ts#L62)

@@ -135,7 +135,7 @@ The matching keys, sorted ascending
 ### namespace()?
 
 ```ts
-optional namespace(prefix): Storage;
+namespace?(prefix): Storage;
 ```
 
 Defined in: [src/storage/storage.ts:160](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/storage/storage.ts#L160)
@@ -161,7 +161,7 @@ A Storage view scoped to the given prefix
 ### search()?
 
 ```ts
-optional search(query): Promise<StorageSearchResult[]>;
+search?(query): Promise<StorageSearchResult[]>;
 ```
 
 Defined in: [src/storage/storage.ts:177](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/storage/storage.ts#L177)

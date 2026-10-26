@@ -9,7 +9,7 @@ Lets the manager hand an extractor a fallback model without the extractor having
 ### defaultModel?
 
 ```ts
-optional defaultModel?: Model;
+defaultModel?: Model;
 ```
 
 Defined in: [src/memory/extraction/types.ts:58](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/extraction/types.ts#L58)
@@ -21,7 +21,7 @@ Model an extractor without its own falls back to (`agent.auxModel > agent.model`
 ### invocationContext?
 
 ```ts
-readonly optional invocationContext?: InvocationContext;
+readonly invocationContext?: InvocationContext;
 ```
 
 Defined in: [src/memory/extraction/types.ts:67](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/extraction/types.ts#L67)

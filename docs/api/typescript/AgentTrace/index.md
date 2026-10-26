@@ -173,6 +173,4 @@ Defined in: [src/telemetry/tracer.ts:125](https://github.com/strands-agents/harn
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`

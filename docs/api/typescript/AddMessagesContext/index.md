@@ -9,7 +9,7 @@ An extension point: fields are added here without changing the [MemoryStore.addM
 ### sequenceNumbers?
 
 ```ts
-readonly optional sequenceNumbers?: readonly number[];
+readonly sequenceNumbers?: readonly number[];
 ```
 
 Defined in: [src/memory/types.ts:51](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L51)

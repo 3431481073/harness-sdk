@@ -27,7 +27,7 @@ Defined in: [src/decisions/types.ts:70](https://github.com/strands-agents/harnes
 ### reason?
 
 ```ts
-readonly optional reason?: string;
+readonly reason?: string;
 ```
 
 Defined in: [src/decisions/types.ts:70](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/types.ts#L70)

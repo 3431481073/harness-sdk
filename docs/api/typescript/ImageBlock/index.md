@@ -131,9 +131,7 @@ Serializes the ImageBlock to a JSON-compatible ContentBlockData object. Called a
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

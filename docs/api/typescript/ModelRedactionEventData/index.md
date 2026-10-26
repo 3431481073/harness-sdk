@@ -19,7 +19,7 @@ Discriminator for redact events.
 ### inputRedaction?
 
 ```ts
-optional inputRedaction?: RedactInputContent;
+inputRedaction?: RedactInputContent;
 ```
 
 Defined in: [src/models/streaming.ts:333](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L333)
@@ -31,7 +31,7 @@ Input redaction information (when input is blocked).
 ### outputRedaction?
 
 ```ts
-optional outputRedaction?: RedactOutputContent;
+outputRedaction?: RedactOutputContent;
 ```
 
 Defined in: [src/models/streaming.ts:338](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L338)

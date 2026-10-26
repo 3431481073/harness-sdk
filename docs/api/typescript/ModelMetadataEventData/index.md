@@ -19,7 +19,7 @@ Discriminator for metadata events.
 ### usage?
 
 ```ts
-optional usage?: Usage;
+usage?: Usage;
 ```
 
 Defined in: [src/models/streaming.ts:240](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L240)
@@ -31,7 +31,7 @@ Token usage information.
 ### metrics?
 
 ```ts
-optional metrics?: Metrics;
+metrics?: Metrics;
 ```
 
 Defined in: [src/models/streaming.ts:245](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L245)
@@ -43,7 +43,7 @@ Performance metrics.
 ### trace?
 
 ```ts
-optional trace?: unknown;
+trace?: unknown;
 ```
 
 Defined in: [src/models/streaming.ts:250](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L250)

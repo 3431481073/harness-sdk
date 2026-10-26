@@ -217,7 +217,7 @@
 
 - Get started
   - [Overview](https://strandsagents.com/docs/user-guide/box/index.md): Strands Box is an open source sandbox engine for AI agents. It pairs OS isolation with Dogwood policies that decide an agent's commands, file operations, network requests, and MCP calls.
-  - [getting-started](https://strandsagents.com/docs/user-guide/box/getting-started/index.md): Download Strands Box on macOS, put the Strands CLI in a box by hand, watch the box refuse a write, read the decision log, and add a permit.
+  - [quickstart](https://strandsagents.com/docs/user-guide/box/quickstart/index.md): Download Strands Box on macOS, put the Strands CLI in a box by hand, watch the box refuse a write, read the decision log, and add a permit.
 - How-to guides
   - [run-strands-harness](https://strandsagents.com/docs/user-guide/box/guides/run-strands-harness/index.md): Run an agent you build with the Strands harness under a Strands Box policy on macOS, with only its shell tool, so the policy decides every command it runs and every file a command touches.
   - [run-claude-code](https://strandsagents.com/docs/user-guide/box/guides/run-claude-code/index.md): Run Claude Code under a Strands Box policy on macOS, with its own file tools kept out of the project so every read, write, and delete goes through the box's shell and the policy.
@@ -229,7 +229,7 @@
   - [write-a-policy](https://strandsagents.com/docs/user-guide/box/guides/write-a-policy/index.md): Write Dogwood permit and forbid rules for a box, add temporal rules that depend on earlier actions, fix load errors, and read decision records to see what policy decided.
   - [write-shell-policy](https://strandsagents.com/docs/user-guide/box/guides/write-shell-policy/index.md): Write Dogwood rules for the commands a boxed agent runs in Strands Shell, the files they touch, the host programs it starts, the programs it builds, and a cap on a command.
   - [record-telemetry](https://strandsagents.com/docs/user-guide/box/guides/record-telemetry/index.md): Choose where a Strands Box box writes its policy decisions, control-plane records, and the agent's own spans, logs, and metrics, filter them with include, and read the records file with jq.
-  - [strands-cli-telemetry](https://strandsagents.com/docs/user-guide/box/guides/strands-cli-telemetry/index.md): Add the Strands CLI's own spans and metrics to the records file from Getting started, beside the box's decisions, and read both together with otel-tui or jq.
+  - [strands-cli-telemetry](https://strandsagents.com/docs/user-guide/box/guides/strands-cli-telemetry/index.md): Add the Strands CLI's own spans and metrics to the records file from the quickstart, beside the box's decisions, and read both together with otel-tui or jq.
 - Security
   - [Security model](https://strandsagents.com/docs/user-guide/box/security/index.md): What Strands Box protects, what it trusts, how it enforces sandbox grants, credentials, and policy, and the residual risks an operator should plan for.
   - [agent-and-tool-containment](https://strandsagents.com/docs/user-guide/box/security/agent-and-tool-containment/index.md): How a Strands Box contains the agent, each tool, and each MCP server in separate sandboxes, which enforcement point decides each action, and where the boundaries differ.
@@ -496,6 +496,7 @@
 - [strands.vended_plugins.steering.handlers.llm.mappers](https://strandsagents.com/docs/api/python/strands.vended_plugins.steering.handlers.llm.mappers/index.md)
 - [strands.vended_tools.a2a_client.a2a_client](https://strandsagents.com/docs/api/python/strands.vended_tools.a2a_client.a2a_client/index.md)
 - [strands.vended_tools.file_editor.file_editor](https://strandsagents.com/docs/api/python/strands.vended_tools.file_editor.file_editor/index.md)
+- [strands.vended_tools.graph.graph](https://strandsagents.com/docs/api/python/strands.vended_tools.graph.graph/index.md)
 - [strands.vended_tools.handoff_to_user.handoff_to_user](https://strandsagents.com/docs/api/python/strands.vended_tools.handoff_to_user.handoff_to_user/index.md)
 - [strands.vended_tools.handoff_to_user.types](https://strandsagents.com/docs/api/python/strands.vended_tools.handoff_to_user.types/index.md)
 - [strands.vended_tools.http_request.http_request](https://strandsagents.com/docs/api/python/strands.vended_tools.http_request.http_request/index.md)
@@ -591,6 +592,8 @@
 - [DecisionInput](https://strandsagents.com/docs/api/typescript/DecisionInput/index.md)
 - [DecisionModel](https://strandsagents.com/docs/api/typescript/DecisionModel/index.md)
 - [DecisionResult](https://strandsagents.com/docs/api/typescript/DecisionResult/index.md)
+- [DecisionsAPIDecisionModel](https://strandsagents.com/docs/api/typescript/DecisionsAPIDecisionModel/index.md)
+- [DecisionsAPIDecisionModelOptions](https://strandsagents.com/docs/api/typescript/DecisionsAPIDecisionModelOptions/index.md)
 - [DefaultModelRetryStrategy](https://strandsagents.com/docs/api/typescript/DefaultModelRetryStrategy/index.md)
 - [DefaultModelRetryStrategyOptions](https://strandsagents.com/docs/api/typescript/DefaultModelRetryStrategyOptions/index.md)
 - [DefaultNotConfiguredError](https://strandsagents.com/docs/api/typescript/DefaultNotConfiguredError/index.md)
@@ -875,6 +878,8 @@
 - [ToolUseStart](https://strandsagents.com/docs/api/typescript/ToolUseStart/index.md)
 - [ToolValidationError](https://strandsagents.com/docs/api/typescript/ToolValidationError/index.md)
 - [TruncateConfig](https://strandsagents.com/docs/api/typescript/TruncateConfig/index.md)
+- [TypeSafeDecisionModel](https://strandsagents.com/docs/api/typescript/TypeSafeDecisionModel/index.md)
+- [TypeSafeDecisionModelOptions](https://strandsagents.com/docs/api/typescript/TypeSafeDecisionModelOptions/index.md)
 - [Uncertain](https://strandsagents.com/docs/api/typescript/Uncertain/index.md)
 - [Usage](https://strandsagents.com/docs/api/typescript/Usage/index.md)
 - [VideoBlock](https://strandsagents.com/docs/api/typescript/VideoBlock/index.md)
@@ -887,6 +892,7 @@
 
 ## Blog
 
+- [Red team your harness before your customers do, with Strands Evals](https://strandsagents.com/blog/red-team-your-agent-strands-evals/index.md): Red teaming in Strands Evals 1.7.0 runs adversarial conversations against your agent or harness. Attack a refund agent with GOAT, then check its tool calls, not just the score.
 - [Evaluating structured agent output, field by field, with Strands Evals](https://strandsagents.com/blog/structured-output-similarity-strands-evals/index.md): StructuredOutputSimilarity scores structured agent output field by field with Stickler: deterministic, per-field accuracy with no LLM judge in the default path.
 - [Strands Decider adds four Gemma 4 models](https://strandsagents.com/blog/strands-decider-gemma-4-models/index.md): Four new Strands Decider models built on Gemma 4 let developers compare sizes for routing, guardrails, evaluation, and other agent decisions.
 - [We ran 94,000 trials to measure the cost of harness choice](https://strandsagents.com/blog/we-ran-94000-trials-to-measure-the-cost-of-harness-choice/index.md): We analyzed 94,000 benchmark trials to measure how harness choice affects token usage, estimated costs, and accuracy with Claude, GPT, and open-weight models.

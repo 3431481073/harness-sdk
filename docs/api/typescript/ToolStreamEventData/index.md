@@ -19,7 +19,7 @@ Discriminator for tool stream events.
 ### data?
 
 ```ts
-optional data?: unknown;
+data?: unknown;
 ```
 
 Defined in: [src/tools/tool.ts:58](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/tool.ts#L58)

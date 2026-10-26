@@ -19,7 +19,7 @@ User-defined name for the interrupt. Must be unique within a single hook callbac
 ### reason?
 
 ```ts
-optional reason?: JSONValue;
+reason?: JSONValue;
 ```
 
 Defined in: [src/types/interrupt.ts:24](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/interrupt.ts#L24)
@@ -31,7 +31,7 @@ User-provided reason for the interrupt.
 ### response?
 
 ```ts
-optional response?: JSONValue;
+response?: JSONValue;
 ```
 
 Defined in: [src/types/interrupt.ts:42](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/interrupt.ts#L42)

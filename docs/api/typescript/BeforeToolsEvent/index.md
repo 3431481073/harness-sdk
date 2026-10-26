@@ -39,7 +39,7 @@ Defined in: [src/hooks/events.ts:790](https://github.com/strands-agents/harness-
 ### invocationContext?
 
 ```ts
-readonly optional invocationContext?: InvocationContext;
+readonly invocationContext?: InvocationContext;
 ```
 
 Defined in: [src/hooks/events.ts:100](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L100)
@@ -134,9 +134,7 @@ The user’s response when resuming from an interrupt
 
 #### Implementation of
 
-```ts
-Interruptible.interrupt
-```
+`Interruptible.interrupt`
 
 ---
 

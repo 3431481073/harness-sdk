@@ -33,6 +33,4 @@ Creates a new StorageError.
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+`Error.constructor`

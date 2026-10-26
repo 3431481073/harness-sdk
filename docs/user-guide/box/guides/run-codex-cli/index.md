@@ -1,4 +1,4 @@
-[Codex CLI](https://github.com/openai/codex) runs in a box like any other program. In this guide the project stays out of Codex’s own reach, so its shell tool is its only way to a project file. Each command it runs goes to Strands Shell, the box’s own shell, where the policy decides the command and every file it reads, writes, or deletes. By the end you have Codex working on the project from [Getting started](/docs/user-guide/box/getting-started/index.md), and you have watched the policy permit three tasks and refuse two, with the refusal text Codex quoted back.
+[Codex CLI](https://github.com/openai/codex) runs in a box like any other program. In this guide the project stays out of Codex’s own reach, so its shell tool is its only way to a project file. Each command it runs goes to Strands Shell, the box’s own shell, where the policy decides the command and every file it reads, writes, or deletes. By the end you have Codex working on the project from [the quickstart](/docs/user-guide/box/quickstart/index.md), and you have watched the policy permit three tasks and refuse two, with the refusal text Codex quoted back.
 
 The files are in [`examples/codex-cli`](https://github.com/strands-agents/box/tree/main/examples/codex-cli) in the Box repository, and this guide walks through them. It uses Codex 0.160.1.
 
@@ -8,7 +8,7 @@ The action vocabulary and the context fields can change before 1.0.0. Pin the Bo
 
 ## Before you start
 
--   The box from [Getting started](/docs/user-guide/box/getting-started/index.md) under `~/box-tutorial`: Box in `box-core`, the project in `my-project`, and your Amazon Bedrock API key in `AWS_BEARER_TOKEN_BEDROCK`, made in `us-west-2`. The key needs access to `openai.gpt-5.6-terra` on Bedrock. Run every command in this guide from `~/box-tutorial`.
+-   The box from [the quickstart](/docs/user-guide/box/quickstart/index.md) under `~/box-tutorial`: Box in `box-core`, the project in `my-project`, and your Amazon Bedrock API key in `AWS_BEARER_TOKEN_BEDROCK`, made in `us-west-2`. The key needs access to `openai.gpt-5.6-terra` on Bedrock. Run every command in this guide from `~/box-tutorial`.
     
 -   Codex CLI from Homebrew’s `npm`:
     
@@ -31,7 +31,7 @@ The action vocabulary and the context fields can change before 1.0.0. Pin the Bo
 
 ## Step 1: Copy the example
 
-Clone the Box repository, unless `box-src` is already there from Getting started, and copy the example directory to `~/box-tutorial/codex`:
+Clone the Box repository, unless `box-src` is already there from the quickstart, and copy the example directory to `~/box-tutorial/codex`:
 
 ```bash
 [ -d box-src ] || git clone --depth 1 https://github.com/strands-agents/box.git box-src
@@ -156,7 +156,7 @@ secret.ref = "env://AWS_BEARER_TOKEN_BEDROCK"
 
 ## Step 4: Read the policy
 
-The complete file is [`policy.dw`](https://github.com/strands-agents/box/blob/main/examples/codex-cli/policy.dw) in the example directory. It keeps the rules from Getting started, with `bedrock-mantle.us-west-2.api.aws` as the model host, adds `project_write` for writes in the project, and adds four `forbid` rules. The tasks below exercise two of them, and each carries an `@id` and a `@description` that the denial text quotes:
+The complete file is [`policy.dw`](https://github.com/strands-agents/box/blob/main/examples/codex-cli/policy.dw) in the example directory. It keeps the rules from the quickstart, with `bedrock-mantle.us-west-2.api.aws` as the model host, adds `project_write` for writes in the project, and adds four `forbid` rules. The tasks below exercise two of them, and each carries an `@id` and a `@description` that the denial text quotes:
 
 codex/policy.dw (excerpt)
 

@@ -7,7 +7,7 @@ Options for direct tool call execution.
 ### recordDirectToolCall?
 
 ```ts
-optional recordDirectToolCall?: boolean;
+recordDirectToolCall?: boolean;
 ```
 
 Defined in: [src/agent/tool-caller.ts:31](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/agent/tool-caller.ts#L31)

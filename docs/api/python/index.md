@@ -188,6 +188,8 @@
         -   [A2a Client](/docs/api/python/strands.vended_tools.a2a_client.a2a_client)
     -   **File Editor**
         -   [File Editor](/docs/api/python/strands.vended_tools.file_editor.file_editor)
+    -   **Graph**
+        -   [Graph](/docs/api/python/strands.vended_tools.graph.graph)
     -   **Handoff To User**
         -   [Handoff To User](/docs/api/python/strands.vended_tools.handoff_to_user.handoff_to_user)
         -   [Types](/docs/api/python/strands.vended_tools.handoff_to_user.types)

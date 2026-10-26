@@ -1,4 +1,4 @@
-Defined in: [src/models/bedrock.ts:183](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L183)
+Defined in: [src/models/bedrock.ts:193](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L193)
 
 Redaction configuration for Bedrock guardrails. Controls whether and how blocked content is replaced.
 
@@ -7,10 +7,10 @@ Redaction configuration for Bedrock guardrails. Controls whether and how blocked
 ### input?
 
 ```ts
-optional input?: boolean;
+input?: boolean;
 ```
 
-Defined in: [src/models/bedrock.ts:185](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L185)
+Defined in: [src/models/bedrock.ts:195](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L195)
 
 Redact input when blocked.
 
@@ -25,10 +25,10 @@ true
 ### inputMessage?
 
 ```ts
-optional inputMessage?: string;
+inputMessage?: string;
 ```
 
-Defined in: [src/models/bedrock.ts:188](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L188)
+Defined in: [src/models/bedrock.ts:198](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L198)
 
 Replacement message for redacted input.
 
@@ -43,10 +43,10 @@ Replacement message for redacted input.
 ### output?
 
 ```ts
-optional output?: boolean;
+output?: boolean;
 ```
 
-Defined in: [src/models/bedrock.ts:191](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L191)
+Defined in: [src/models/bedrock.ts:201](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L201)
 
 Redact output when blocked.
 
@@ -61,10 +61,10 @@ false
 ### outputMessage?
 
 ```ts
-optional outputMessage?: string;
+outputMessage?: string;
 ```
 
-Defined in: [src/models/bedrock.ts:194](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L194)
+Defined in: [src/models/bedrock.ts:204](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/bedrock.ts#L204)
 
 Replacement message for redacted output.
 

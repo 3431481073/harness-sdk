@@ -13,7 +13,7 @@ Configuration options for the ConversationManager base class.
 ### proactiveCompression?
 
 ```ts
-optional proactiveCompression?: boolean | ProactiveCompressionConfig;
+proactiveCompression?: boolean | ProactiveCompressionConfig;
 ```
 
 Defined in: [src/conversation-manager/conversation-manager.ts:80](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L80)

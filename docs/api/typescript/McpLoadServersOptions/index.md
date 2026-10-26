@@ -7,7 +7,7 @@ Options controlling how `McpClient.loadServers` translates config entries into c
 ### prefixWithServerName?
 
 ```ts
-optional prefixWithServerName?: boolean;
+prefixWithServerName?: boolean;
 ```
 
 Defined in: [src/mcp/config.ts:59](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/config.ts#L59)

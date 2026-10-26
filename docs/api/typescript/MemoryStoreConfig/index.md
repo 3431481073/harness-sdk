@@ -25,7 +25,7 @@ Identifier for this store, used to target specific stores in search/add tools. M
 ### description?
 
 ```ts
-readonly optional description?: string;
+readonly description?: string;
 ```
 
 Defined in: [src/memory/types.ts:65](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L65)
@@ -37,7 +37,7 @@ Human-readable description of what this store contains. Included in tool descrip
 ### maxSearchResults?
 
 ```ts
-readonly optional maxSearchResults?: number;
+readonly maxSearchResults?: number;
 ```
 
 Defined in: [src/memory/types.ts:70](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L70)
@@ -49,7 +49,7 @@ Default maximum number of results this store returns per search, used when a cal
 ### writable?
 
 ```ts
-readonly optional writable?: boolean;
+readonly writable?: boolean;
 ```
 
 Defined in: [src/memory/types.ts:77](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L77)
@@ -67,7 +67,7 @@ false
 ### extraction?
 
 ```ts
-readonly optional extraction?: boolean | ExtractionConfig;
+readonly extraction?: boolean | ExtractionConfig;
 ```
 
 Defined in: [src/memory/types.ts:90](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L90)

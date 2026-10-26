@@ -9,7 +9,7 @@ Full configuration for a ContextManager instance.
 ### strategies?
 
 ```ts
-optional strategies?: (
+strategies?: (
   | ContextStrategy
   | "proactiveSummarization"
   | "largeToolOffloading"
@@ -30,7 +30,7 @@ Accepts raw `ContextStrategy` objects, preset name strings (e.g. `'largeToolOffl
 ### stash?
 
 ```ts
-optional stash?: boolean | StashConfig;
+stash?: boolean | StashConfig;
 ```
 
 Defined in: [src/context-manager/types.ts:131](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L131)

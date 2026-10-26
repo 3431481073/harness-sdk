@@ -32,9 +32,7 @@ Creates a new ToolNotFoundError.
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+`Error.constructor`
 
 ## Properties
 

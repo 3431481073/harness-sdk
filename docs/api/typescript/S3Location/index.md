@@ -64,7 +64,7 @@ S3 URI in format: s3://bucket-name/key-name
 ### bucketOwner?
 
 ```ts
-readonly optional bucketOwner?: string;
+readonly bucketOwner?: string;
 ```
 
 Defined in: [src/types/media.ts:105](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/media.ts#L105)
@@ -93,9 +93,7 @@ Serializes the S3Location to a JSON-compatible S3LocationData object. Called aut
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

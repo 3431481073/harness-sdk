@@ -40,6 +40,4 @@ Discriminator for content block stop events.
 
 #### Implementation of
 
-```ts
-ModelContentBlockStopEventData.type
-```
+`ModelContentBlockStopEventData.type`

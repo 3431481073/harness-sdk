@@ -19,7 +19,7 @@ Stable identifier for this observer. Used for logging and duplicate detection.
 ### observeAgent()?
 
 ```ts
-optional observeAgent(agent): void | Promise<void>;
+observeAgent?(agent): void | Promise<void>;
 ```
 
 Defined in: [src/types/lifecycle-observer.ts:18](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/lifecycle-observer.ts#L18)

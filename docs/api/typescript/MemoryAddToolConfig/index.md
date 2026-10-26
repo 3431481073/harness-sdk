@@ -11,7 +11,7 @@ Configuration for the `add_memory` tool. Extends [MemoryToolConfig](/docs/api/ty
 ### name?
 
 ```ts
-optional name?: string;
+name?: string;
 ```
 
 Defined in: [src/memory/types.ts:191](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L191)
@@ -27,7 +27,7 @@ Custom tool name.
 ### description?
 
 ```ts
-optional description?: string;
+description?: string;
 ```
 
 Defined in: [src/memory/types.ts:193](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L193)
@@ -43,7 +43,7 @@ Custom tool description.
 ### stores?
 
 ```ts
-optional stores?: (string | MemoryStore)[];
+stores?: (string | MemoryStore)[];
 ```
 
 Defined in: [src/memory/types.ts:206](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L206)
@@ -55,7 +55,7 @@ The writable stores the `add_memory` tool may write to, given as store names or 
 ### waitForWrites?
 
 ```ts
-optional waitForWrites?: boolean;
+waitForWrites?: boolean;
 ```
 
 Defined in: [src/memory/types.ts:214](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L214)

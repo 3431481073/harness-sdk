@@ -7,7 +7,7 @@ Options for constructing an [LLMDecisionModel](/docs/api/typescript/LLMDecisionM
 ### model?
 
 ```ts
-readonly optional model?: Model;
+readonly model?: Model;
 ```
 
 Defined in: [src/decisions/llm-decision-model.ts:32](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/llm-decision-model.ts#L32)
@@ -19,7 +19,7 @@ Underlying vended model; must honor forced `toolChoice` so the structured-output
 ### systemPrompt?
 
 ```ts
-readonly optional systemPrompt?: string;
+readonly systemPrompt?: string;
 ```
 
 Defined in: [src/decisions/llm-decision-model.ts:38](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/llm-decision-model.ts#L38)

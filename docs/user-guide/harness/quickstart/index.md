@@ -1,8 +1,20 @@
 Strands harness is a state-of-the-art, fully assembled agent harness. You can get started in a few different ways:
 
--   **[Set up with your coding agent](#set-up-with-your-coding-agent)** — paste a prompt into Codex, Claude Code, or Kiro and let it guide you through the setup.
--   **[Build an agent with the CLI](#build-an-agent-with-the-cli)** — connect a model provider in the terminal and start chatting, then export to Python or TypeScript when you’re ready.
--   **[Use it as a library](#use-it-as-a-library)** — install the Python or TypeScript package and write a few lines yourself.
+-   **[Set up with your coding agent](#set-up-with-your-coding-agent)**: paste a prompt into Codex, Claude Code, or Kiro and let it guide you through the setup.
+-   **[Build an agent with the CLI](#build-an-agent-with-the-cli)**: connect a model provider in the terminal and start chatting, then export to Python or TypeScript when you’re ready.
+-   **[Use it as a library](#use-it-as-a-library)**: install the Python or TypeScript package and write a few lines yourself.
+
+Building with another Strands project? Each one has its own starting point.
+
+[Strands Harness SDK quickstart](../../sdk/quickstart/overview/index.md)Build an agent harness from the ground up in Python or TypeScript.
+
+[Strands Box quickstart](../../box/quickstart/index.md)Put an agent in a sandbox on macOS, watch it refuse a write, and add a permit.
+
+[Strands Shell quickstart](../../shell/quickstart/index.md)Install Strands Shell and run your first sandboxed command.
+
+[Strands Evals quickstart](../../evals-sdk/quickstart/index.md)Score an agent with a built-in evaluator and read the results.
+
+[Strands Labs](../../../labs/index.md)Explore experimental projects for robotics, world models, benchmarks, and more.
 
 ## Set up with your coding agent
 
@@ -48,11 +60,11 @@ When you’re ready to embed the agent in an application, run `/export` in a cha
 Prefer to write the code yourself? Install the Python or TypeScript package and run your first agent in a few lines. The source lives on GitHub:
 
 (( tab "Python" ))
-[`harness-py`](https://github.com/strands-agents/harness-sdk/tree/main/harness-py) — the Python package.
+[`harness-py`](https://github.com/strands-agents/harness-sdk/tree/main/harness-py)
 (( /tab "Python" ))
 
 (( tab "TypeScript" ))
-[`harness-ts`](https://github.com/strands-agents/harness-sdk/tree/main/harness-ts) — the TypeScript package.
+[`harness-ts`](https://github.com/strands-agents/harness-sdk/tree/main/harness-ts)
 (( /tab "TypeScript" ))
 
 ### Install
@@ -230,7 +242,7 @@ await agent.invoke("Which of those would you pick for an API with external custo
 ```
 (( /tab "TypeScript" ))
 
-See [persist sessions](/docs/user-guide/harness/configure/sessions/index.md) for how session storage works and how it differs from long-term memory. The CLI persists sessions the same way — resume one with `strands --session-id api-design`.
+See [persist sessions](/docs/user-guide/harness/configure/sessions/index.md) for how session storage works and how it differs from long-term memory. The CLI persists sessions the same way: resume one with `strands --session-id api-design`.
 
 ## The agent you get
 

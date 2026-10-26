@@ -1,0 +1,125 @@
+Defined in: [src/decisions/typesafe-decision-model.ts:37](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/typesafe-decision-model.ts#L37)
+
+Decision model backed by TypeSafe’s hosted Jev API.
+
+## Example
+
+```typescript
+const decisions = new TypeSafeDecisionModel()
+const result = await decisions.ask('A customer needs a refund today.', {
+  urgent: { question: 'Is this urgent?', choices: 'boolean' },
+})
+```
+
+## Extends
+
+-   [`DecisionModel`](/docs/api/typescript/DecisionModel/index.md)
+
+## Constructors
+
+### Constructor
+
+```ts
+new TypeSafeDecisionModel(options?): TypeSafeDecisionModel;
+```
+
+Defined in: [src/decisions/typesafe-decision-model.ts:44](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/typesafe-decision-model.ts#L44)
+
+#### Parameters
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `options?` | [`TypeSafeDecisionModelOptions`](/docs/api/typescript/TypeSafeDecisionModelOptions/index.md) | Provider, model, and confidence configuration. |
+
+#### Returns
+
+`TypeSafeDecisionModel`
+
+#### Throws
+
+Error if the API key, confidence threshold, or fetch implementation is invalid.
+
+#### Overrides
+
+[`DecisionModel`](/docs/api/typescript/DecisionModel/index.md).[`constructor`](/docs/api/typescript/DecisionModel/index.md#constructor)
+
+## Methods
+
+### ask()
+
+```ts
+ask<Q>(
+   state,
+   questions,
+   options?
+): Promise<DecisionResult<Q>>;
+```
+
+Defined in: [src/decisions/decision-model.ts:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/decision-model.ts#L34)
+
+Ask one or more closed questions over the given state.
+
+#### Type Parameters
+
+| Type Parameter |
+| --- |
+| `Q` *extends* `Record`<`string`, [`Question`](/docs/api/typescript/Question/index.md)<`"boolean"` | readonly `string`\[\]>> |
+
+#### Parameters
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `state` | [`DecisionInput`](/docs/api/typescript/DecisionInput/index.md) | A plain string, a one-shot content list, or a message history. |
+| `questions` | `Q` | Map of identifier → question. The returned `answers` object is keyed off this same map and statically narrowed per question. |
+| `options?` | [`AskOptions`](/docs/api/typescript/AskOptions/index.md) | Per-call options, such as the request to add the decision’s usage to. |
+
+#### Returns
+
+`Promise`<[`DecisionResult`](/docs/api/typescript/DecisionResult/index.md)<`Q`\>>
+
+A [DecisionResult](/docs/api/typescript/DecisionResult/index.md) whose answers are statically narrowed from each question’s `choices`.
+
+#### Throws
+
+Error if `questions` is empty or contains an invalid `question`, `choices`, or `uncertainty`.
+
+#### Throws
+
+TypeError if `options.invocationContext` was not created by the SDK.
+
+#### Inherited from
+
+[`DecisionModel`](/docs/api/typescript/DecisionModel/index.md).[`ask`](/docs/api/typescript/DecisionModel/index.md#ask)
+
+---
+
+### \_ask()
+
+```ts
+protected _ask<Q>(state, questions): Promise<DecisionResult<Q>>;
+```
+
+Defined in: [src/decisions/typesafe-decision-model.ts:57](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/typesafe-decision-model.ts#L57)
+
+Implementation-specific decision logic. Must return a complete [DecisionResult](/docs/api/typescript/DecisionResult/index.md), including `metadata.latencyMs` sourced from the underlying model provider.
+
+#### Type Parameters
+
+| Type Parameter |
+| --- |
+| `Q` *extends* `Record`<`string`, [`Question`](/docs/api/typescript/Question/index.md)<`"boolean"` | readonly `string`\[\]>> |
+
+#### Parameters
+
+| Parameter | Type |
+| --- | --- |
+| `state` | [`DecisionInput`](/docs/api/typescript/DecisionInput/index.md) |
+| `questions` | `Q` |
+
+#### Returns
+
+`Promise`<[`DecisionResult`](/docs/api/typescript/DecisionResult/index.md)<`Q`\>>
+
+#### Overrides
+
+[`DecisionModel`](/docs/api/typescript/DecisionModel/index.md).[`_ask`](/docs/api/typescript/DecisionModel/index.md#_ask)

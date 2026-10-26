@@ -36,9 +36,7 @@ Defined in: [src/sandbox/errors.ts:14](https://github.com/strands-agents/harness
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+`Error.constructor`
 
 ## Properties
 

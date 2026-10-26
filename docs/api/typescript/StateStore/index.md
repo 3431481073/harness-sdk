@@ -341,9 +341,7 @@ Deep copy of all state
 
 #### Implementation of
 
-```ts
-StateSerializable.[stateToJSONSymbol]
-```
+`StateSerializable.[stateToJSONSymbol]`
 
 ---
 
@@ -369,6 +367,4 @@ Loads state from a previously serialized JSON value.
 
 #### Implementation of
 
-```ts
-StateSerializable.[loadStateFromJSONSymbol]
-```
+`StateSerializable.[loadStateFromJSONSymbol]`

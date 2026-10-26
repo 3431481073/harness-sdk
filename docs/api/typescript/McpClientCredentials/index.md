@@ -27,7 +27,7 @@ Defined in: [src/mcp/client.ts:106](https://github.com/strands-agents/harness-sd
 ### scopes?
 
 ```ts
-optional scopes?: string[];
+scopes?: string[];
 ```
 
 Defined in: [src/mcp/client.ts:108](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L108)

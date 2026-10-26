@@ -31,7 +31,7 @@ Human-readable description of the tool’s purpose
 ### inputSchema?
 
 ```ts
-optional inputSchema?: JSONSchema7;
+inputSchema?: JSONSchema7;
 ```
 
 Defined in: [src/tools/function-tool.ts:66](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/function-tool.ts#L66)

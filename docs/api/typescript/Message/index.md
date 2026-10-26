@@ -83,7 +83,7 @@ Durable, stable UUID for the message, assigned at construction. Every Message ha
 ### metadata?
 
 ```ts
-optional metadata?: MessageMetadata;
+metadata?: MessageMetadata;
 ```
 
 Defined in: [src/types/messages.ts:99](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L99)
@@ -130,9 +130,7 @@ Serializes the Message to a JSON-compatible MessageData object. Called automatic
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

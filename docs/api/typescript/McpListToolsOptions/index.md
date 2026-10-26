@@ -7,7 +7,7 @@ Per-call overrides for [McpClient.listTools](/docs/api/typescript/McpClient/inde
 ### prefix?
 
 ```ts
-optional prefix?: string;
+prefix?: string;
 ```
 
 Defined in: [src/mcp/client.ts:137](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L137)
@@ -19,7 +19,7 @@ Prefix for agent-facing tool names. An empty string disables a prefix set on the
 ### toolFilters?
 
 ```ts
-optional toolFilters?: McpToolFilters;
+toolFilters?: McpToolFilters;
 ```
 
 Defined in: [src/mcp/client.ts:139](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L139)

@@ -7,7 +7,7 @@ Options for a single agent invocation.
 ### structuredOutputSchema?
 
 ```ts
-optional structuredOutputSchema?: ZodSchema;
+structuredOutputSchema?: ZodSchema;
 ```
 
 Defined in: [src/types/agent.ts:99](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L99)
@@ -19,7 +19,7 @@ Zod schema for structured output validation, overriding the constructor-provided
 ### invocationState?
 
 ```ts
-optional invocationState?: InvocationState;
+invocationState?: InvocationState;
 ```
 
 Defined in: [src/types/agent.ts:108](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L108)
@@ -33,7 +33,7 @@ Defaults to an empty object when omitted.
 ### cancelSignal?
 
 ```ts
-optional cancelSignal?: AbortSignal;
+cancelSignal?: AbortSignal;
 ```
 
 Defined in: [src/types/agent.ts:138](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L138)
@@ -66,7 +66,7 @@ app.post('/chat', async (req, res) => {
 ### invocationContext?
 
 ```ts
-optional invocationContext?: InvocationContext;
+invocationContext?: InvocationContext;
 ```
 
 Defined in: [src/types/agent.ts:141](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L141)
@@ -78,12 +78,12 @@ Runs this call as a nested call in the request a hook event’s or [ToolContext.
 ### limits?
 
 ```ts
-optional limits?: InvokeLimits;
+limits?: InvokeLimits;
 ```
 
-Defined in: [src/types/agent.ts:172](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L172)
+Defined in: [src/types/agent.ts:173](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/agent.ts#L173)
 
-Limits for the whole request this `invoke()` / `stream()` call starts. They apply to this agent’s loop and to every nested call: agents passed as tools, and any Graph or Swarm you pass the request’s `invocationContext` to (Graph and Swarm have no `limits` option of their own). An agent run by a hand-written tool joins only when the tool forwards [ToolContext.invocationContext](/docs/api/typescript/ToolContext/index.md#invocationcontext) as [InvokeOptions.invocationContext](#invocationcontext); otherwise it runs standalone under its own limits. A nested call can also set its own `limits`: it stops at whichever limit is reached first, its own or the request’s.
+Limits for the whole request this `invoke()` / `stream()` call starts. They apply to this agent’s loop and to every nested call: agents passed as tools, and any Graph or Swarm you pass the request’s `invocationContext` to. A Graph or Swarm can also start a limited request itself through MultiAgentInvokeOptions.limits. An agent run by a hand-written tool joins only when the tool forwards [ToolContext.invocationContext](/docs/api/typescript/ToolContext/index.md#invocationcontext) as [InvokeOptions.invocationContext](#invocationcontext); otherwise it runs standalone under its own limits. A nested call can also set its own `limits`: it stops at whichever limit is reached first, its own or the request’s.
 
 Auxiliary calls (summarization, routing, memory extraction, steering, HITL, goal judging, web-fetch, and decision models asked with the request’s `invocationContext`) add their tokens to the request’s usage, but no limits apply to them. The same holds for an agent that an extension point (a conversation manager, context or routing strategy, or memory extractor) runs with the `invocationContext` it receives, unless the extension point also passes `limits`. Usage starts from zero on each top-level call; pass [AgentResult.invocationContext](/docs/api/typescript/AgentResult/index.md#invocationcontext) to a later call to continue on the same limits and usage.
 

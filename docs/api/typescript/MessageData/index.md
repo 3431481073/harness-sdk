@@ -31,7 +31,7 @@ Array of content blocks that make up this message.
 ### trackingId?
 
 ```ts
-optional trackingId?: string;
+trackingId?: string;
 ```
 
 Defined in: [src/types/messages.ts:50](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L50)
@@ -43,7 +43,7 @@ Durable, stable UUID for the message. Optional here because serialized/legacy da
 ### metadata?
 
 ```ts
-optional metadata?: MessageMetadata;
+metadata?: MessageMetadata;
 ```
 
 Defined in: [src/types/messages.ts:55](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L55)

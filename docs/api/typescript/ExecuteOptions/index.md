@@ -7,7 +7,7 @@ Options for command and code execution.
 ### timeout?
 
 ```ts
-optional timeout?: number;
+timeout?: number;
 ```
 
 Defined in: [src/sandbox/base.ts:17](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/sandbox/base.ts#L17)
@@ -19,7 +19,7 @@ Maximum execution time in seconds. `undefined` means no timeout.
 ### cwd?
 
 ```ts
-optional cwd?: string;
+cwd?: string;
 ```
 
 Defined in: [src/sandbox/base.ts:19](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/sandbox/base.ts#L19)
@@ -31,7 +31,7 @@ Working directory for execution. `undefined` means use the sandbox default.
 ### signal?
 
 ```ts
-optional signal?: AbortSignal;
+signal?: AbortSignal;
 ```
 
 Defined in: [src/sandbox/base.ts:21](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/sandbox/base.ts#L21)
@@ -43,7 +43,7 @@ Abort signal to cancel execution. The process is killed when the signal fires.
 ### env?
 
 ```ts
-optional env?: Record<string, string>;
+env?: Record<string, string>;
 ```
 
 Defined in: [src/sandbox/base.ts:27](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/sandbox/base.ts#L27)

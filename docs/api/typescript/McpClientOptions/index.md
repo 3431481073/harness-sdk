@@ -11,39 +11,35 @@ Behavioral options shared by all MCP client configurations.
 ### applicationName?
 
 ```ts
-optional applicationName?: string;
+applicationName?: string;
 ```
 
 Defined in: [src/mcp/client.ts:81](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L81)
 
 #### Inherited from
 
-```ts
-RuntimeConfig.applicationName
-```
+`RuntimeConfig.applicationName`
 
 ---
 
 ### applicationVersion?
 
 ```ts
-optional applicationVersion?: string;
+applicationVersion?: string;
 ```
 
 Defined in: [src/mcp/client.ts:82](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L82)
 
 #### Inherited from
 
-```ts
-RuntimeConfig.applicationVersion
-```
+`RuntimeConfig.applicationVersion`
 
 ---
 
 ### disableMcpInstrumentation?
 
 ```ts
-optional disableMcpInstrumentation?: boolean;
+disableMcpInstrumentation?: boolean;
 ```
 
 Defined in: [src/mcp/client.ts:256](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L256)
@@ -55,7 +51,7 @@ Disable OpenTelemetry MCP instrumentation.
 ### prefix?
 
 ```ts
-optional prefix?: string;
+prefix?: string;
 ```
 
 Defined in: [src/mcp/client.ts:259](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L259)
@@ -67,7 +63,7 @@ Prefix for agent-facing tool names, applied as `<prefix>_<toolName>`.
 ### toolFilters?
 
 ```ts
-optional toolFilters?: McpToolFilters;
+toolFilters?: McpToolFilters;
 ```
 
 Defined in: [src/mcp/client.ts:262](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L262)
@@ -79,7 +75,7 @@ Filters controlling which tools this client exposes.
 ### tasksConfig?
 
 ```ts
-optional tasksConfig?: TasksConfig;
+tasksConfig?: TasksConfig;
 ```
 
 Defined in: [src/mcp/client.ts:265](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L265)
@@ -91,7 +87,7 @@ Enables automatic execution for legacy task tools. Experimental: subject to chan
 ### listMaxPages?
 
 ```ts
-optional listMaxPages?: number;
+listMaxPages?: number;
 ```
 
 Defined in: [src/mcp/client.ts:268](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L268)
@@ -103,7 +99,7 @@ Page cap for the no-token list methods, which aggregate every page. 0 disables t
 ### progressCallback?
 
 ```ts
-optional progressCallback?: McpProgressCallback;
+progressCallback?: McpProgressCallback;
 ```
 
 Defined in: [src/mcp/client.ts:276](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L276)
@@ -115,7 +111,7 @@ Callback for progress notifications during tool calls, including calls an agent 
 ### elicitationCallback?
 
 ```ts
-optional elicitationCallback?: ElicitationCallback;
+elicitationCallback?: ElicitationCallback;
 ```
 
 Defined in: [src/mcp/client.ts:283](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L283)
@@ -127,7 +123,7 @@ Callback to handle server-initiated elicitation requests. When provided, the cli
 ### continueOnError?
 
 ```ts
-optional continueOnError?: boolean;
+continueOnError?: boolean;
 ```
 
 Defined in: [src/mcp/client.ts:286](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L286)
@@ -139,7 +135,7 @@ When true, connection failures and overlong prefixed names during tool listing a
 ### logHandler?
 
 ```ts
-optional logHandler?: (params) => void;
+logHandler?: (params) => void;
 ```
 
 Defined in: [src/mcp/client.ts:289](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L289)

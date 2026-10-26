@@ -11,7 +11,7 @@ Configuration common to every injection consumer: when to inject. What text to i
 ### trigger?
 
 ```ts
-optional trigger?:
+trigger?:
   | InjectionTrigger
   | ((context) => boolean);
 ```

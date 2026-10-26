@@ -181,9 +181,7 @@ Serializes the CitationsBlock to a JSON-compatible ContentBlockData object. Call
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

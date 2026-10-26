@@ -7,7 +7,7 @@ Options for constructing a [ClassifierStrategy](/docs/api/typescript/ClassifierS
 ### systemPrompt?
 
 ```ts
-readonly optional systemPrompt?: string;
+readonly systemPrompt?: string;
 ```
 
 Defined in: [src/models/routing/classifier-strategy.ts:59](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/classifier-strategy.ts#L59)
@@ -19,7 +19,7 @@ Routing policy for the classifier, sent verbatim and never truncated. The SDK ap
 ### timeoutMs?
 
 ```ts
-readonly optional timeoutMs?: number;
+readonly timeoutMs?: number;
 ```
 
 Defined in: [src/models/routing/classifier-strategy.ts:65](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/classifier-strategy.ts#L65)
@@ -31,7 +31,7 @@ Maximum milliseconds to wait for classification. Defaults to 30000. The timeout 
 ### maxMessageChars?
 
 ```ts
-readonly optional maxMessageChars?: number;
+readonly maxMessageChars?: number;
 ```
 
 Defined in: [src/models/routing/classifier-strategy.ts:67](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/classifier-strategy.ts#L67)
@@ -43,7 +43,7 @@ Maximum characters copied from the latest request into the classifier’s user m
 ### maxAgentInstructionsChars?
 
 ```ts
-readonly optional maxAgentInstructionsChars?: number;
+readonly maxAgentInstructionsChars?: number;
 ```
 
 Defined in: [src/models/routing/classifier-strategy.ts:72](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/classifier-strategy.ts#L72)
@@ -55,7 +55,7 @@ Maximum characters copied from the parent agent’s system prompt text into the 
 ### maxCandidateChars?
 
 ```ts
-readonly optional maxCandidateChars?: number;
+readonly maxCandidateChars?: number;
 ```
 
 Defined in: [src/models/routing/classifier-strategy.ts:78](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/classifier-strategy.ts#L78)

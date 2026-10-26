@@ -19,7 +19,7 @@ Defined in: [src/sandbox/types.ts:33](https://github.com/strands-agents/harness-
 ### isDir?
 
 ```ts
-readonly optional isDir?: boolean;
+readonly isDir?: boolean;
 ```
 
 Defined in: [src/sandbox/types.ts:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/sandbox/types.ts#L34)
@@ -29,7 +29,7 @@ Defined in: [src/sandbox/types.ts:34](https://github.com/strands-agents/harness-
 ### size?
 
 ```ts
-readonly optional size?: number;
+readonly size?: number;
 ```
 
 Defined in: [src/sandbox/types.ts:35](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/sandbox/types.ts#L35)

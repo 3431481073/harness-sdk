@@ -82,7 +82,7 @@ Implement this method to register hooks and perform custom initialization. Tool 
 ### getTools()?
 
 ```ts
-optional getTools(): Tool[];
+getTools?(): Tool[];
 ```
 
 Defined in: [src/plugins/plugin.ts:76](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/plugins/plugin.ts#L76)

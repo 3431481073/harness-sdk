@@ -19,7 +19,7 @@ One or more memory stores to manage.
 ### searchToolConfig?
 
 ```ts
-optional searchToolConfig?: boolean | MemoryToolConfig;
+searchToolConfig?: boolean | MemoryToolConfig;
 ```
 
 Defined in: [src/memory/types.ts:269](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L269)
@@ -31,7 +31,7 @@ Search tool configuration. Defaults to `true`.
 ### addToolConfig?
 
 ```ts
-optional addToolConfig?: boolean | MemoryAddToolConfig;
+addToolConfig?: boolean | MemoryAddToolConfig;
 ```
 
 Defined in: [src/memory/types.ts:274](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L274)
@@ -43,7 +43,7 @@ Add tool configuration. Defaults to `false` (opt-in). `true` lets the tool write
 ### injection?
 
 ```ts
-optional injection?: boolean | MemoryInjectionConfig;
+injection?: boolean | MemoryInjectionConfig;
 ```
 
 Defined in: [src/memory/types.ts:290](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L290)

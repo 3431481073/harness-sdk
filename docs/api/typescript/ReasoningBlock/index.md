@@ -44,7 +44,7 @@ Discriminator for reasoning content.
 ### text?
 
 ```ts
-readonly optional text?: string;
+readonly text?: string;
 ```
 
 Defined in: [src/types/messages.ts:507](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L507)
@@ -60,7 +60,7 @@ The text content of the reasoning process.
 ### signature?
 
 ```ts
-readonly optional signature?: string;
+readonly signature?: string;
 ```
 
 Defined in: [src/types/messages.ts:512](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L512)
@@ -76,7 +76,7 @@ A cryptographic signature for verification purposes.
 ### redactedContent?
 
 ```ts
-readonly optional redactedContent?: Uint8Array;
+readonly redactedContent?: Uint8Array;
 ```
 
 Defined in: [src/types/messages.ts:517](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L517)
@@ -126,9 +126,7 @@ Serializes the ReasoningBlock to a JSON-compatible ContentBlockData object. Call
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

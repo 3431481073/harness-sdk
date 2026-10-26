@@ -31,7 +31,7 @@ User-defined name for the interrupt.
 ### reason?
 
 ```ts
-readonly optional reason?: JSONValue;
+readonly reason?: JSONValue;
 ```
 
 Defined in: [src/interrupt.ts:42](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/interrupt.ts#L42)
@@ -43,7 +43,7 @@ User-provided reason for raising the interrupt.
 ### response?
 
 ```ts
-optional response?: JSONValue;
+response?: JSONValue;
 ```
 
 Defined in: [src/interrupt.ts:47](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/interrupt.ts#L47)

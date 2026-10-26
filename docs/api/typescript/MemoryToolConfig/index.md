@@ -11,7 +11,7 @@ Configuration for customizing a memory tool’s name or description.
 ### name?
 
 ```ts
-optional name?: string;
+name?: string;
 ```
 
 Defined in: [src/memory/types.ts:191](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L191)
@@ -23,7 +23,7 @@ Custom tool name.
 ### description?
 
 ```ts
-optional description?: string;
+description?: string;
 ```
 
 Defined in: [src/memory/types.ts:193](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L193)

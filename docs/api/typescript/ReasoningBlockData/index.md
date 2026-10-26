@@ -7,7 +7,7 @@ Data for a reasoning block.
 ### text?
 
 ```ts
-optional text?: string;
+text?: string;
 ```
 
 Defined in: [src/types/messages.ts:480](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L480)
@@ -19,7 +19,7 @@ The text content of the reasoning process.
 ### signature?
 
 ```ts
-optional signature?: string;
+signature?: string;
 ```
 
 Defined in: [src/types/messages.ts:485](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L485)
@@ -31,7 +31,7 @@ A cryptographic signature for verification purposes.
 ### redactedContent?
 
 ```ts
-optional redactedContent?: Uint8Array;
+redactedContent?: Uint8Array;
 ```
 
 Defined in: [src/types/messages.ts:490](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L490)

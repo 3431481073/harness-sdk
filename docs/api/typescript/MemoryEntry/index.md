@@ -19,7 +19,7 @@ The textual content of this memory entry.
 ### storeName?
 
 ```ts
-optional storeName?: string;
+storeName?: string;
 ```
 
 Defined in: [src/memory/types.ts:18](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L18)
@@ -31,7 +31,7 @@ Name of the store this entry came from. Populated by [MemoryManager.search](/doc
 ### metadata?
 
 ```ts
-optional metadata?: Record<string, JSONValue>;
+metadata?: Record<string, JSONValue>;
 ```
 
 Defined in: [src/memory/types.ts:20](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L20)

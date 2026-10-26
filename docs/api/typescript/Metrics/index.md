@@ -19,7 +19,7 @@ Latency in milliseconds.
 ### timeToFirstByteMs?
 
 ```ts
-optional timeToFirstByteMs?: number;
+timeToFirstByteMs?: number;
 ```
 
 Defined in: [src/models/streaming.ts:535](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L535)

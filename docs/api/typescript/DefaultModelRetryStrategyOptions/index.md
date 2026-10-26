@@ -7,7 +7,7 @@ Options for [DefaultModelRetryStrategy](/docs/api/typescript/DefaultModelRetrySt
 ### maxAttempts?
 
 ```ts
-optional maxAttempts?: number;
+maxAttempts?: number;
 ```
 
 Defined in: [src/retry/default-model-retry-strategy.ts:29](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/retry/default-model-retry-strategy.ts#L29)
@@ -19,7 +19,7 @@ Total model attempts before giving up and re-raising the error. Must be >= 1. De
 ### backoff?
 
 ```ts
-optional backoff?: BackoffStrategy;
+backoff?: BackoffStrategy;
 ```
 
 Defined in: [src/retry/default-model-retry-strategy.ts:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/retry/default-model-retry-strategy.ts#L34)

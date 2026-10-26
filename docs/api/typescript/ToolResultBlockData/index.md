@@ -43,7 +43,7 @@ The content returned by the tool.
 ### error?
 
 ```ts
-optional error?: Error;
+error?: Error;
 ```
 
 Defined in: [src/types/messages.ts:383](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L383)

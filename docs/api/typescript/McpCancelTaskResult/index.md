@@ -11,7 +11,7 @@ Empty acknowledgement returned by `tasks/cancel`.
 ### \_meta?
 
 ```ts
-optional _meta?: Record<string, unknown>;
+_meta?: Record<string, unknown>;
 ```
 
 Defined in: [src/mcp/task-types.ts:100](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/task-types.ts#L100)

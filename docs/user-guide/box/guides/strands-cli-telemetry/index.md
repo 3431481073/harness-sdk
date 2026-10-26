@@ -1,4 +1,4 @@
-The box from [Getting started](/docs/user-guide/box/getting-started/index.md) writes its decisions to one records file. The agent can write to the same file: its own spans, which show what the model loop did, and its own metrics, which count tokens and cycles. Then one file answers both “what did the agent do?” and “what did the box allow?”.
+The box from [the quickstart](/docs/user-guide/box/quickstart/index.md) writes its decisions to one records file. The agent can write to the same file: its own spans, which show what the model loop did, and its own metrics, which count tokens and cycles. Then one file answers both “what did the agent do?” and “what did the box allow?”.
 
 The box side is already done. A box relays the agent’s spans and metrics, listens for them on a loopback address, and tells the agent where. A box with no `[telemetry.*]` table writes everything it receives to the records file. In this guide you configure the agent’s half. [Record decisions and telemetry](/docs/user-guide/box/guides/record-telemetry/index.md) covers record targets, what each record carries, and how to read a records file.
 
@@ -8,7 +8,7 @@ Box is at version 0.1.x. Keys, flags, and policy actions can change between rele
 
 ## Before you start
 
--   The box from [Getting started](/docs/user-guide/box/getting-started/index.md) under `~/box-tutorial`, with your Amazon Bedrock API key in `AWS_BEARER_TOKEN_BEDROCK`. Run every command in this guide from `~/box-tutorial`.
+-   The box from [the quickstart](/docs/user-guide/box/quickstart/index.md) under `~/box-tutorial`, with your Amazon Bedrock API key in `AWS_BEARER_TOKEN_BEDROCK`. Run every command in this guide from `~/box-tutorial`.
 -   `jq`, for the records file.
 
 ## Step 1: Turn the exporters on
@@ -181,7 +181,7 @@ That is one turn: the box refuses two probes nobody asked for, runs `pwd`, reach
 | No spans under your service name | Add `OTEL_TRACES_EXPORTER` to `[agent.env]`. Tracing stays off while that name is unset. |
 | Spans but no `resourceMetrics` | Either the metric block is missing from the end of `proxy-preload.mjs`, or the run was shorter than `OTEL_METRIC_EXPORT_INTERVAL`. The reader sends on that interval and once more at exit, and the exit send can be lost. Lower the interval, or hold the chat open longer. |
 
-For errors from the box itself, see [If something goes wrong](/docs/user-guide/box/getting-started/index.md#if-something-goes-wrong) in Getting started.
+For errors from the box itself, see [If something goes wrong](/docs/user-guide/box/quickstart/index.md#if-something-goes-wrong) in the quickstart.
 
 ## Next steps
 

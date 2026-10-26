@@ -25,7 +25,7 @@ Defined in: [src/mcp/task-types.ts:55](https://github.com/strands-agents/harness
 ### data?
 
 ```ts
-optional data?: unknown;
+data?: unknown;
 ```
 
 Defined in: [src/mcp/task-types.ts:57](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/task-types.ts#L57)

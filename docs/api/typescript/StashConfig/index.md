@@ -28,7 +28,7 @@ new Agent({ storage: storage.namespace('team'), contextManager: new ContextManag
 ### storage?
 
 ```ts
-optional storage?: Storage;
+storage?: Storage;
 ```
 
 Defined in: [src/context-manager/types.ts:96](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L96)
@@ -42,7 +42,7 @@ Storage backend. Defaults to the agent’s `storage`, then InMemoryStorage, when
 ### retrievalTool?
 
 ```ts
-optional retrievalTool?: false;
+retrievalTool?: false;
 ```
 
 Defined in: [src/context-manager/types.ts:103](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L103)

@@ -5,7 +5,7 @@ Defined in: [src/session/session-manager.ts:62](https://github.com/strands-agent
 ### storage?
 
 ```ts
-optional storage?:
+storage?:
   | Storage<string, string>
   | {
   snapshot: SnapshotStorage;
@@ -28,7 +28,7 @@ When omitted, resolves from the agent-level `storage` during initialization. If 
 ### sessionId?
 
 ```ts
-optional sessionId?: string;
+sessionId?: string;
 ```
 
 Defined in: [src/session/session-manager.ts:75](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/session/session-manager.ts#L75)
@@ -40,7 +40,7 @@ Unique session identifier. Defaults to `'default-session'`.
 ### saveLatestOn?
 
 ```ts
-optional saveLatestOn?: SaveLatestStrategy;
+saveLatestOn?: SaveLatestStrategy;
 ```
 
 Defined in: [src/session/session-manager.ts:77](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/session/session-manager.ts#L77)
@@ -52,7 +52,7 @@ When to save snapshot\_latest. Default: `'invocation'` (after each agent invocat
 ### snapshotTrigger?
 
 ```ts
-optional snapshotTrigger?: SnapshotTriggerCallback;
+snapshotTrigger?: SnapshotTriggerCallback;
 ```
 
 Defined in: [src/session/session-manager.ts:79](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/session/session-manager.ts#L79)
@@ -64,7 +64,7 @@ Callback invoked after each invocation to decide whether to create an immutable 
 ### multiAgentSaveLatestOn?
 
 ```ts
-optional multiAgentSaveLatestOn?: MultiAgentSaveLatestStrategy;
+multiAgentSaveLatestOn?: MultiAgentSaveLatestStrategy;
 ```
 
 Defined in: [src/session/session-manager.ts:85](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/session/session-manager.ts#L85)

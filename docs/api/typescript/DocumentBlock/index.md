@@ -92,7 +92,7 @@ Document source.
 ### citations?
 
 ```ts
-readonly optional citations?: {
+readonly citations?: {
   enabled: boolean;
 };
 ```
@@ -116,7 +116,7 @@ enabled: boolean;
 ### context?
 
 ```ts
-readonly optional context?: string;
+readonly context?: string;
 ```
 
 Defined in: [src/types/media.ts:556](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/media.ts#L556)
@@ -211,9 +211,7 @@ Serializes the DocumentBlock to a JSON-compatible ContentBlockData object. Calle
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

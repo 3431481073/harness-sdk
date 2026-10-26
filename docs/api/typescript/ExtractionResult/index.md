@@ -19,7 +19,7 @@ The textual content of the entry.
 ### metadata?
 
 ```ts
-optional metadata?: Record<string, JSONValue>;
+metadata?: Record<string, JSONValue>;
 ```
 
 Defined in: [src/memory/extraction/types.ts:46](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/extraction/types.ts#L46)

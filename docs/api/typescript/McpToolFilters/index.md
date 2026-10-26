@@ -7,7 +7,7 @@ Filters controlling which MCP tools a client exposes.
 ### allowed?
 
 ```ts
-optional allowed?: McpToolMatcher[];
+allowed?: McpToolMatcher[];
 ```
 
 Defined in: [src/mcp/client.ts:123](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L123)
@@ -19,7 +19,7 @@ When present, only tools matching at least one matcher are exposed.
 ### rejected?
 
 ```ts
-optional rejected?: McpToolMatcher[];
+rejected?: McpToolMatcher[];
 ```
 
 Defined in: [src/mcp/client.ts:125](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L125)

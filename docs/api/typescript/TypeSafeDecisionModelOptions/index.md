@@ -1,0 +1,92 @@
+Defined in: [src/decisions/typesafe-decision-model.ts:15](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/typesafe-decision-model.ts#L15)
+
+Options for constructing a [TypeSafeDecisionModel](/docs/api/typescript/TypeSafeDecisionModel/index.md).
+
+## Properties
+
+### apiKey?
+
+```ts
+readonly apiKey?: string;
+```
+
+Defined in: [src/decisions/typesafe-decision-model.ts:17](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/typesafe-decision-model.ts#L17)
+
+TypeSafe API key. Defaults to `TYPESAFE_API_KEY`.
+
+---
+
+### modelId?
+
+```ts
+readonly modelId?: string;
+```
+
+Defined in: [src/decisions/typesafe-decision-model.ts:19](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/typesafe-decision-model.ts#L19)
+
+Jev model identifier. Defaults to `jev-latest`.
+
+---
+
+### defaultMinConfidence?
+
+```ts
+readonly defaultMinConfidence?: number;
+```
+
+Defined in: [src/decisions/typesafe-decision-model.ts:21](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/typesafe-decision-model.ts#L21)
+
+Default minimum confidence. Defaults to `0.5`.
+
+---
+
+### fetch?
+
+```ts
+readonly fetch?: {
+  (input, init?): Promise<Response>;
+  (input, init?): Promise<Response>;
+};
+```
+
+Defined in: [src/decisions/typesafe-decision-model.ts:23](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/decisions/typesafe-decision-model.ts#L23)
+
+Custom fetch implementation, primarily for transport configuration and tests.
+
+#### Call Signature
+
+```ts
+(input, init?): Promise<Response>;
+```
+
+[MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/fetch)
+
+##### Parameters
+
+| Parameter | Type |
+| --- | --- |
+| `input` | `RequestInfo` | `URL` |
+| `init?` | `RequestInit` |
+
+##### Returns
+
+`Promise`<`Response`\>
+
+#### Call Signature
+
+```ts
+(input, init?): Promise<Response>;
+```
+
+[MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/fetch)
+
+##### Parameters
+
+| Parameter | Type |
+| --- | --- |
+| `input` | `string` | `Request` | `URL` |
+| `init?` | `RequestInit` |
+
+##### Returns
+
+`Promise`<`Response`\>

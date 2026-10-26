@@ -1,4 +1,4 @@
-Defined in: [src/models/model.ts:263](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L263)
+Defined in: [src/models/model.ts:271](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L271)
 
 Options for counting tokens in a set of messages.
 
@@ -7,10 +7,10 @@ Options for counting tokens in a set of messages.
 ### systemPrompt?
 
 ```ts
-optional systemPrompt?: SystemPrompt;
+systemPrompt?: SystemPrompt;
 ```
 
-Defined in: [src/models/model.ts:268](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L268)
+Defined in: [src/models/model.ts:276](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L276)
 
 System prompt to guide the model’s behavior. Can be a simple string or an array of content blocks for advanced caching.
 
@@ -19,9 +19,9 @@ System prompt to guide the model’s behavior. Can be a simple string or an arra
 ### toolSpecs?
 
 ```ts
-optional toolSpecs?: ToolSpec[];
+toolSpecs?: ToolSpec[];
 ```
 
-Defined in: [src/models/model.ts:273](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L273)
+Defined in: [src/models/model.ts:281](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L281)
 
 Array of tool specifications to include in the count.

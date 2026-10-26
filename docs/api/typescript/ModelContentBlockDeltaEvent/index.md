@@ -47,7 +47,7 @@ Discriminator for content block delta events.
 ### contentBlockIndex?
 
 ```ts
-readonly optional contentBlockIndex?: number;
+readonly contentBlockIndex?: number;
 ```
 
 Defined in: [src/models/streaming.ts:147](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L147)

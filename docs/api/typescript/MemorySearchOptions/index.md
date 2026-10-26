@@ -13,7 +13,7 @@ Extends the store primitive [SearchOptions](/docs/api/typescript/SearchOptions/i
 ### maxSearchResults?
 
 ```ts
-optional maxSearchResults?: number;
+maxSearchResults?: number;
 ```
 
 Defined in: [src/memory/types.ts:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L34)
@@ -29,7 +29,7 @@ Maximum number of results to return from this store.
 ### stores?
 
 ```ts
-optional stores?: string[];
+stores?: string[];
 ```
 
 Defined in: [src/memory/types.ts:173](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L173)

@@ -19,7 +19,7 @@ Amount of work completed so far. Increases even when the total is unknown.
 ### total?
 
 ```ts
-optional total?: number;
+total?: number;
 ```
 
 Defined in: [src/mcp/client.ts:94](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L94)
@@ -31,7 +31,7 @@ Total amount of work, when the server reports one.
 ### message?
 
 ```ts
-optional message?: string;
+message?: string;
 ```
 
 Defined in: [src/mcp/client.ts:97](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/client.ts#L97)

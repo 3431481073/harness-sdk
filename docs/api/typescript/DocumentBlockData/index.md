@@ -43,7 +43,7 @@ Document source.
 ### citations?
 
 ```ts
-optional citations?: {
+citations?: {
   enabled: boolean;
 };
 ```
@@ -63,7 +63,7 @@ enabled: boolean;
 ### context?
 
 ```ts
-optional context?: string;
+context?: string;
 ```
 
 Defined in: [src/types/media.ts:521](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/media.ts#L521)

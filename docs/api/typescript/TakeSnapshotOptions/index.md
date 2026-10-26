@@ -16,7 +16,7 @@ Options for taking a snapshot of agent state.
 ### preset?
 
 ```ts
-optional preset?: SnapshotPreset;
+preset?: SnapshotPreset;
 ```
 
 Defined in: [src/agent/snapshot.ts:59](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/agent/snapshot.ts#L59)
@@ -28,7 +28,7 @@ Preset to use as the starting set of fields. If not specified, starts with an em
 ### include?
 
 ```ts
-optional include?: SnapshotField[];
+include?: SnapshotField[];
 ```
 
 Defined in: [src/agent/snapshot.ts:64](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/agent/snapshot.ts#L64)
@@ -40,7 +40,7 @@ Fields to add to the snapshot. These are added to the preset fields (if any).
 ### exclude?
 
 ```ts
-optional exclude?: SnapshotField[];
+exclude?: SnapshotField[];
 ```
 
 Defined in: [src/agent/snapshot.ts:69](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/agent/snapshot.ts#L69)
@@ -52,7 +52,7 @@ Fields to exclude from the snapshot. Applied after preset and include to filter 
 ### appData?
 
 ```ts
-optional appData?: Record<string, JSONValue>;
+appData?: Record<string, JSONValue>;
 ```
 
 Defined in: [src/agent/snapshot.ts:74](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/agent/snapshot.ts#L74)

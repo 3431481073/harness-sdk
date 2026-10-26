@@ -51,7 +51,7 @@ Current context utilization ratio (0-1+). Above 1.0 means overflow.
 ### overflow?
 
 ```ts
-optional overflow?: boolean;
+overflow?: boolean;
 ```
 
 Defined in: [src/context-manager/types.ts:58](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L58)
@@ -65,7 +65,7 @@ Set when running in response to a `ContextWindowOverflowError`. Strategies shoul
 ### stash?
 
 ```ts
-optional stash?: Stash;
+stash?: Stash;
 ```
 
 Defined in: [src/context-manager/types.ts:61](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L61)
@@ -79,7 +79,7 @@ L1 stash for persisting offloaded content. Present when storage is configured.
 ### invocationContext?
 
 ```ts
-readonly optional invocationContext?: InvocationContext;
+readonly invocationContext?: InvocationContext;
 ```
 
 Defined in: [src/context-manager/types.ts:64](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L64)

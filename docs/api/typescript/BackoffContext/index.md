@@ -33,7 +33,7 @@ Total milliseconds elapsed since the first attempt started.
 ### lastDelayMs?
 
 ```ts
-optional lastDelayMs?: number;
+lastDelayMs?: number;
 ```
 
 Defined in: [src/retry/backoff-strategy.ts:22](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/retry/backoff-strategy.ts#L22)

@@ -30,6 +30,4 @@ Defined in: [src/errors.ts:252](https://github.com/strands-agents/harness-sdk/bl
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+`Error.constructor`

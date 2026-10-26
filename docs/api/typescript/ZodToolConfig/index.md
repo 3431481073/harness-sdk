@@ -26,7 +26,7 @@ The name of the tool
 ### description?
 
 ```ts
-optional description?: string;
+description?: string;
 ```
 
 Defined in: [src/tools/zod-tool.ts:25](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/zod-tool.ts#L25)
@@ -38,7 +38,7 @@ A description of what the tool does (optional)
 ### inputSchema?
 
 ```ts
-optional inputSchema?: TInput;
+inputSchema?: TInput;
 ```
 
 Defined in: [src/tools/zod-tool.ts:31](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/zod-tool.ts#L31)

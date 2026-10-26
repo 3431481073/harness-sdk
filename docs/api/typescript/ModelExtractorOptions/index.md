@@ -7,7 +7,7 @@ Options for [ModelExtractor](/docs/api/typescript/ModelExtractor/index.md).
 ### model?
 
 ```ts
-optional model?: Model;
+model?: Model;
 ```
 
 Defined in: [src/memory/extraction/model-extractor.ts:20](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/extraction/model-extractor.ts#L20)
@@ -19,7 +19,7 @@ Model used to extract facts. Resolution order: `this model > agent.auxModel > ag
 ### systemPrompt?
 
 ```ts
-optional systemPrompt?: string;
+systemPrompt?: string;
 ```
 
 Defined in: [src/memory/extraction/model-extractor.ts:25](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/extraction/model-extractor.ts#L25)

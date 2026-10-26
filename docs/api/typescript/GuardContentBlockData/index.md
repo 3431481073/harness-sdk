@@ -7,7 +7,7 @@ Data for a guard content block. Can contain either text or image content for gua
 ### text?
 
 ```ts
-optional text?: GuardContentText;
+text?: GuardContentText;
 ```
 
 Defined in: [src/types/messages.ts:894](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L894)
@@ -19,7 +19,7 @@ Text content with evaluation qualifiers.
 ### image?
 
 ```ts
-optional image?: GuardContentImage;
+image?: GuardContentImage;
 ```
 
 Defined in: [src/types/messages.ts:899](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L899)

@@ -44,7 +44,7 @@ The model of the call that triggered the reduction (the routed model under a `Mo
 ### error?
 
 ```ts
-optional error?: ContextWindowOverflowError;
+error?: ContextWindowOverflowError;
 ```
 
 Defined in: [src/conversation-manager/conversation-manager.ts:51](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L51)
@@ -60,7 +60,7 @@ When undefined, `reduce` is best-effort — errors are swallowed and the model c
 ### invocationContext?
 
 ```ts
-readonly optional invocationContext?: InvocationContext;
+readonly invocationContext?: InvocationContext;
 ```
 
 Defined in: [src/conversation-manager/conversation-manager.ts:54](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/conversation-manager.ts#L54)

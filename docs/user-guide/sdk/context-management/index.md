@@ -4,7 +4,7 @@ The SDK ships context management that works out of the box. Pick a mode and the 
 
 You can continue using [conversation managers](/docs/user-guide/sdk/agents/conversation-management/index.md) and [ContextOffloader](/docs/user-guide/sdk/plugins/context-offloader/index.md) while evaluating the experimental `ContextManager` strategy API. See [Migrating to the strategy API](#migrating-to-the-strategy-api) for optional migration examples.
 
-## Quick start
+## Quickstart
 
 Pass `context_manager="auto"``contextManager: "auto"` and the SDK manages context in the background:
 

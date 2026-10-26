@@ -7,7 +7,7 @@ Information about output content redaction. May include the original content if 
 ### redactedContent?
 
 ```ts
-optional redactedContent?: string;
+redactedContent?: string;
 ```
 
 Defined in: [src/models/streaming.ts:312](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L312)

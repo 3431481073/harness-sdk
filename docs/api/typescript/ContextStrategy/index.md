@@ -29,7 +29,7 @@ Stable identifier for logging and observability.
 ### init()?
 
 ```ts
-optional init(agent, stash?): void;
+init?(agent, stash?): void;
 ```
 
 Defined in: [src/context-manager/types.ts:29](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/types.ts#L29)

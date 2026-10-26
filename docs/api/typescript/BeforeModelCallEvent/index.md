@@ -35,7 +35,7 @@ Defined in: [src/hooks/events.ts:428](https://github.com/strands-agents/harness-
 ### invocationContext?
 
 ```ts
-readonly optional invocationContext?: InvocationContext;
+readonly invocationContext?: InvocationContext;
 ```
 
 Defined in: [src/hooks/events.ts:100](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L100)
@@ -103,7 +103,7 @@ Set by hook callbacks to cancel this model call. When set to `true`, a default c
 ### projectedInputTokens?
 
 ```ts
-readonly optional projectedInputTokens?: number;
+readonly projectedInputTokens?: number;
 ```
 
 Defined in: [src/hooks/events.ts:426](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L426)

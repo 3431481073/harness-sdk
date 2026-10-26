@@ -19,7 +19,7 @@ Fresh copy of the messages for this strategy ask.
 ### systemPrompt?
 
 ```ts
-readonly optional systemPrompt?: SystemPrompt;
+readonly systemPrompt?: SystemPrompt;
 ```
 
 Defined in: [src/models/routing/strategy.ts:21](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/strategy.ts#L21)
@@ -79,7 +79,7 @@ Chronological attempts made during this invocation.
 ### invocationContext?
 
 ```ts
-readonly optional invocationContext?: InvocationContext;
+readonly invocationContext?: InvocationContext;
 ```
 
 Defined in: [src/models/routing/strategy.ts:31](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/strategy.ts#L31)

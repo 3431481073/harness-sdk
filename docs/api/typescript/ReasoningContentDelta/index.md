@@ -19,7 +19,7 @@ Discriminator for reasoning delta.
 ### text?
 
 ```ts
-optional text?: string;
+text?: string;
 ```
 
 Defined in: [src/models/streaming.ts:455](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L455)
@@ -31,7 +31,7 @@ Incremental reasoning text.
 ### signature?
 
 ```ts
-optional signature?: string;
+signature?: string;
 ```
 
 Defined in: [src/models/streaming.ts:460](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L460)
@@ -43,7 +43,7 @@ Incremental signature data.
 ### redactedContent?
 
 ```ts
-optional redactedContent?: Uint8Array;
+redactedContent?: Uint8Array;
 ```
 
 Defined in: [src/models/streaming.ts:465](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L465)

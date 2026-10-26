@@ -82,9 +82,7 @@ Serializes to a JSON-compatible [InterruptResponseContentData](/docs/api/typescr
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

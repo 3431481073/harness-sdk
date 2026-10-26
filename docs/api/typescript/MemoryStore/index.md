@@ -29,7 +29,7 @@ Identifier for this store, used to target specific stores in search/add tools. M
 ### description?
 
 ```ts
-readonly optional description?: string;
+readonly description?: string;
 ```
 
 Defined in: [src/memory/types.ts:65](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L65)
@@ -45,7 +45,7 @@ Human-readable description of what this store contains. Included in tool descrip
 ### maxSearchResults?
 
 ```ts
-readonly optional maxSearchResults?: number;
+readonly maxSearchResults?: number;
 ```
 
 Defined in: [src/memory/types.ts:70](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L70)
@@ -61,7 +61,7 @@ Default maximum number of results this store returns per search, used when a cal
 ### extraction?
 
 ```ts
-readonly optional extraction?: boolean | ExtractionConfig;
+readonly extraction?: boolean | ExtractionConfig;
 ```
 
 Defined in: [src/memory/types.ts:90](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L90)
@@ -127,7 +127,7 @@ Search the store for entries matching the query, ordered by relevance.
 ### add()?
 
 ```ts
-optional add(content, metadata?): Promise<unknown>;
+add?(content, metadata?): Promise<unknown>;
 ```
 
 Defined in: [src/memory/types.ts:127](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L127)
@@ -156,7 +156,7 @@ The resolved value is store-specific (e.g. a created record id or a write receip
 ### addMessages()?
 
 ```ts
-optional addMessages(messages, context?): Promise<unknown>;
+addMessages?(messages, context?): Promise<unknown>;
 ```
 
 Defined in: [src/memory/types.ts:147](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L147)
@@ -183,7 +183,7 @@ A store scopes its writes (e.g. by tenant or namespace) through its own configur
 ### initialize()?
 
 ```ts
-optional initialize(): Promise<void>;
+initialize?(): Promise<void>;
 ```
 
 Defined in: [src/memory/types.ts:154](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L154)
@@ -201,7 +201,7 @@ Called by the [MemoryManager](/docs/api/typescript/MemoryManager/index.md) durin
 ### getTools()?
 
 ```ts
-optional getTools(): Tool[];
+getTools?(): Tool[];
 ```
 
 Defined in: [src/memory/types.ts:163](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L163)

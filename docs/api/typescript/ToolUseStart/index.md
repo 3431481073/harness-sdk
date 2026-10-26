@@ -43,7 +43,7 @@ Unique identifier for this tool use.
 ### reasoningSignature?
 
 ```ts
-optional reasoningSignature?: string;
+reasoningSignature?: string;
 ```
 
 Defined in: [src/models/streaming.ts:399](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L399)

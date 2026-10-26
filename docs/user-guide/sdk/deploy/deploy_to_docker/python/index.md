@@ -8,7 +8,7 @@ This guide covers deploying Python-based Strands agents using Docker for local a
 
 ---
 
-## Quick Start Setup
+## Quickstart setup
 
 Install uv:
 

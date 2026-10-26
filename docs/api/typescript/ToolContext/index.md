@@ -61,7 +61,7 @@ Execution-scoped cancellation signal for this tool call.
 ### invocationContext?
 
 ```ts
-readonly optional invocationContext?: InvocationContext;
+readonly invocationContext?: InvocationContext;
 ```
 
 Defined in: [src/tools/tool.ts:42](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/tool.ts#L42)
@@ -96,6 +96,4 @@ Defined in: [src/interrupt.ts:398](https://github.com/strands-agents/harness-sdk
 
 #### Inherited from
 
-```ts
-Interruptible.interrupt
-```
+`Interruptible.interrupt`

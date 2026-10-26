@@ -25,7 +25,7 @@ A box runs one **workload**, usually an agent harness such as the [Strands CLI](
 -   **The MCP broker.** Box starts each local MCP server in its own sandbox and decides MCP requests such as `tools/list` and `tools/call`.
 -   **Decision records.** Box writes permits and denials as OTLP JSON records to a local file, by default `<box_dir>/private/telemetry/records.jsonl`.
 
-Policy sees what goes through Box. An agent’s own file tools, such as a harness’s built-in Read and Write tools, open files from the agent’s process: the sandbox grants bound what they reach, but no policy rule sees those reads and writes. To have the policy decide every file change, give the agent a shell as its only file tool. The [getting started guide](/docs/user-guide/box/getting-started/index.md) does this with the Strands CLI, the [Strands harness guide](/docs/user-guide/box/guides/run-strands-harness/index.md) with an agent you build, and the [Claude Code](/docs/user-guide/box/guides/run-claude-code/index.md) and [Codex CLI](/docs/user-guide/box/guides/run-codex-cli/index.md) guides do it for those harnesses.
+Policy sees what goes through Box. An agent’s own file tools, such as a harness’s built-in Read and Write tools, open files from the agent’s process: the sandbox grants bound what they reach, but no policy rule sees those reads and writes. To have the policy decide every file change, give the agent a shell as its only file tool. The [quickstart](/docs/user-guide/box/quickstart/index.md) does this with the Strands CLI, the [Strands harness guide](/docs/user-guide/box/guides/run-strands-harness/index.md) with an agent you build, and the [Claude Code](/docs/user-guide/box/guides/run-claude-code/index.md) and [Codex CLI](/docs/user-guide/box/guides/run-codex-cli/index.md) guides do it for those harnesses.
 
 > **Diagram:** What a box contains. The agent harness, such as the Strands CLI, runs in the agent's sandbox. It acts through three parts of the box's trusted process: Strands Shell and Monty for bash and python, the egress gateway for HTTP and HTTPS traffic, and the MCP broker for MCP requests such as tools/list and tools/call. Each of the three asks the Dogwood policy engine, which decides each action and records each decision. The egress gateway handles TLS and credentials and forwards permitted HTTP and HTTPS requests to allowed destinations outside the box. When policy permits, the shell starts tools such as git or aws, and the broker starts local MCP servers. Each tool and each local MCP server runs in its own sandbox.
 
@@ -59,7 +59,7 @@ The [action reference](/docs/user-guide/box/reference/policy-actions/index.md) l
 
 ## Next steps
 
-[Getting started](getting-started/index.md)Download Box, put the Strands CLI in a box, and watch the policy decide.
+[Quickstart](quickstart/index.md)Download Box, put the Strands CLI in a box, and watch the policy decide.
 
 [Write a policy](guides/write-a-policy/index.md)Permit actions, add a temporal rule, and read what policy decided.
 

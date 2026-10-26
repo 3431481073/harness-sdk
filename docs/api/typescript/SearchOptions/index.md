@@ -13,7 +13,7 @@ Store implementations may extend this with backend-specific fields (e.g. a metad
 ### maxSearchResults?
 
 ```ts
-optional maxSearchResults?: number;
+maxSearchResults?: number;
 ```
 
 Defined in: [src/memory/types.ts:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L34)

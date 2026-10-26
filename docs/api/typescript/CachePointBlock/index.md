@@ -60,7 +60,7 @@ The cache type. Currently only ‘default’ is supported.
 ### ttl?
 
 ```ts
-readonly optional ttl?: string;
+readonly ttl?: string;
 ```
 
 Defined in: [src/types/messages.ts:610](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L610)
@@ -99,9 +99,7 @@ Serializes the CachePointBlock to a JSON-compatible ContentBlockData object. Cal
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

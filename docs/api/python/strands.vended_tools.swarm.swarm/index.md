@@ -29,7 +29,7 @@ def make_swarm(
 ) -> DecoratedFunctionTool
 ```
 
-Defined in: [src/strands/vended\_tools/swarm/swarm.py:73](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/swarm/swarm.py#L73)
+Defined in: [src/strands/vended\_tools/swarm/swarm.py:72](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/vended_tools/swarm/swarm.py#L72)
 
 Create a swarm tool with developer-controlled safety limits and authority modes.
 

@@ -39,7 +39,7 @@ Answer shape: `'boolean'` or a non-empty readonly tuple of string literals.
 ### uncertainty?
 
 ```ts
-optional uncertainty?:
+uncertainty?:
   | boolean
   | {
   minConfidence?: number;

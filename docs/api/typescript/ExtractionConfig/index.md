@@ -9,7 +9,7 @@ Lives on a store (via [MemoryStoreConfig](/docs/api/typescript/MemoryStoreConfig
 ### trigger?
 
 ```ts
-optional trigger?:
+trigger?:
   | ExtractionTrigger
   | ExtractionTrigger[];
 ```
@@ -23,7 +23,7 @@ When to run extraction. A single trigger or an array; multiple triggers compose 
 ### extractor?
 
 ```ts
-optional extractor?: Extractor;
+extractor?: Extractor;
 ```
 
 Defined in: [src/memory/extraction/types.ts:148](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/extraction/types.ts#L148)
@@ -35,7 +35,7 @@ How to turn messages into entries (client-side extraction). When set, the store 
 ### filter?
 
 ```ts
-optional filter?: MemoryMessageFilter;
+filter?: MemoryMessageFilter;
 ```
 
 Defined in: [src/memory/extraction/types.ts:156](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/extraction/types.ts#L156)

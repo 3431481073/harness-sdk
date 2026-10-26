@@ -15,7 +15,7 @@ Extends the generic [InjectionConfig](/docs/api/typescript/InjectionConfig/index
 ### trigger?
 
 ```ts
-optional trigger?:
+trigger?:
   | InjectionTrigger
   | ((context) => boolean);
 ```
@@ -39,7 +39,7 @@ When injection runs. An [InjectionTrigger](/docs/api/typescript/InjectionTrigger
 ### maxEntries?
 
 ```ts
-optional maxEntries?: number;
+maxEntries?: number;
 ```
 
 Defined in: [src/memory/types.ts:241](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L241)
@@ -61,7 +61,7 @@ With multiple stores, results are concatenated in store-registration order with 
 ### query?
 
 ```ts
-optional query?: (context) => string;
+query?: (context) => string;
 ```
 
 Defined in: [src/memory/types.ts:249](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L249)
@@ -86,7 +86,7 @@ Defaults to an adaptive query: the latest user message’s text on a user turn, 
 ### format?
 
 ```ts
-optional format?: (context) => string;
+format?: (context) => string;
 ```
 
 Defined in: [src/memory/types.ts:259](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/memory/types.ts#L259)

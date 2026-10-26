@@ -7,7 +7,7 @@ Options for creating an agent tool via [Agent.asTool](/docs/api/typescript/Agent
 ### name?
 
 ```ts
-optional name?: string;
+name?: string;
 ```
 
 Defined in: [src/agent/agent-as-tool.ts:39](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/agent/agent-as-tool.ts#L39)
@@ -21,7 +21,7 @@ Defaults to the agent’s name. Throws if the resolved name is not a valid tool 
 ### description?
 
 ```ts
-optional description?: string;
+description?: string;
 ```
 
 Defined in: [src/agent/agent-as-tool.ts:48](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/agent/agent-as-tool.ts#L48)
@@ -35,7 +35,7 @@ Defaults to the agent’s description, or a generic description if the agent has
 ### preserveContext?
 
 ```ts
-optional preserveContext?: boolean;
+preserveContext?: boolean;
 ```
 
 Defined in: [src/agent/agent-as-tool.ts:64](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/agent/agent-as-tool.ts#L64)
@@ -57,7 +57,7 @@ false
 ### delegate?
 
 ```ts
-optional delegate?: boolean;
+delegate?: boolean;
 ```
 
 Defined in: [src/agent/agent-as-tool.ts:75](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/agent/agent-as-tool.ts#L75)

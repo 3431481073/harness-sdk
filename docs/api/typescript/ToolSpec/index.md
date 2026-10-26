@@ -31,7 +31,7 @@ A description of what the tool does. This helps the model understand when to use
 ### inputSchema?
 
 ```ts
-optional inputSchema?: JSONSchema7;
+inputSchema?: JSONSchema7;
 ```
 
 Defined in: [src/tools/types.ts:29](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/types.ts#L29)
@@ -43,7 +43,7 @@ JSON Schema defining the expected input structure for the tool. If omitted, defa
 ### outputSchema?
 
 ```ts
-optional outputSchema?: JSONSchema7;
+outputSchema?: JSONSchema7;
 ```
 
 Defined in: [src/tools/types.ts:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/types.ts#L34)
@@ -55,7 +55,7 @@ JSON Schema defining the expected output structure for the tool.
 ### annotations?
 
 ```ts
-optional annotations?: Record<string, JSONValue | undefined>;
+annotations?: Record<string, JSONValue | undefined>;
 ```
 
 Defined in: [src/tools/types.ts:43](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/tools/types.ts#L43)

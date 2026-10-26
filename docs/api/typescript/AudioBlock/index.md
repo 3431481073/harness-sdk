@@ -127,9 +127,7 @@ Wrapped audio block data
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

@@ -19,7 +19,7 @@ The cache type. Currently only ‘default’ is supported.
 ### ttl?
 
 ```ts
-optional ttl?: string;
+ttl?: string;
 ```
 
 Defined in: [src/types/messages.ts:588](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L588)

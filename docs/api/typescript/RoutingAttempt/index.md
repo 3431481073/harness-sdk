@@ -19,7 +19,7 @@ The configured candidate instance.
 ### exception?
 
 ```ts
-readonly optional exception?: Error;
+readonly exception?: Error;
 ```
 
 Defined in: [src/models/routing/strategy.ts:13](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/strategy.ts#L13)

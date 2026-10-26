@@ -7,7 +7,7 @@ Options for registering a hook callback.
 ### order?
 
 ```ts
-optional order?: number;
+order?: number;
 ```
 
 Defined in: [src/hooks/types.ts:26](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/types.ts#L26)

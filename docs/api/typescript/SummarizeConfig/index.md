@@ -9,7 +9,7 @@ Configuration for the summarize method.
 ### model?
 
 ```ts
-optional model?: Model;
+model?: Model;
 ```
 
 Defined in: [src/context-manager/methods/summarize.ts:57](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/methods/summarize.ts#L57)
@@ -23,7 +23,7 @@ Model used for summarization. Resolution order: `this model > agent.auxModel > a
 ### systemPrompt?
 
 ```ts
-optional systemPrompt?: string;
+systemPrompt?: string;
 ```
 
 Defined in: [src/context-manager/methods/summarize.ts:60](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/context-manager/methods/summarize.ts#L60)

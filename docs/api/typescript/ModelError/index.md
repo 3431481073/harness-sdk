@@ -40,6 +40,4 @@ Creates a new ModelError.
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+`Error.constructor`

@@ -37,7 +37,7 @@ Defined in: [src/hooks/events.ts:363](https://github.com/strands-agents/harness-
 ### invocationContext?
 
 ```ts
-readonly optional invocationContext?: InvocationContext;
+readonly invocationContext?: InvocationContext;
 ```
 
 Defined in: [src/hooks/events.ts:100](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L100)
@@ -105,7 +105,7 @@ The tool result. Can be replaced by hook callbacks to transform the result befor
 ### error?
 
 ```ts
-readonly optional error?: Error;
+readonly error?: Error;
 ```
 
 Defined in: [src/hooks/events.ts:354](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L354)
@@ -125,7 +125,7 @@ Defined in: [src/hooks/events.ts:355](https://github.com/strands-agents/harness-
 ### retry?
 
 ```ts
-optional retry?: boolean;
+retry?: boolean;
 ```
 
 Defined in: [src/hooks/events.ts:361](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L361)

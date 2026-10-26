@@ -25,7 +25,7 @@ Per-question answer, statically narrowed from each question’s `choices`.
 ### usage?
 
 ```ts
-optional usage?: {
+usage?: {
   inputTokens: number;
   outputTokens: number;
   totalTokens: number;
@@ -61,6 +61,10 @@ totalTokens: number;
 ```ts
 metadata: {
   latencyMs: number;
+  providerName?: string;
+  modelId?: string;
+  probabilities?: { readonly [K in string | number | symbol]: Readonly<Record<string, number>> };
+  confidence?: { readonly [K in string | number | symbol]: number };
 };
 ```
 
@@ -75,3 +79,35 @@ latencyMs: number;
 ```
 
 Time spent in the underlying model call, in milliseconds.
+
+#### providerName?
+
+```ts
+providerName?: string;
+```
+
+Provider that served the decision.
+
+#### modelId?
+
+```ts
+modelId?: string;
+```
+
+Provider-reported model identifier that served the decision.
+
+#### probabilities?
+
+```ts
+probabilities?: { readonly [K in string | number | symbol]: Readonly<Record<string, number>> };
+```
+
+Per-question probability distributions, keyed by answer value.
+
+#### confidence?
+
+```ts
+confidence?: { readonly [K in string | number | symbol]: number };
+```
+
+Per-question confidence values in `[0.0, 1.0]`.

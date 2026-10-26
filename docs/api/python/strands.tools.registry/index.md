@@ -122,13 +122,29 @@ This performs a swap of the tool implementation in the registry. The replacement
 
 -   `ValueError` - If the tool doesn’t exist.
 
+#### remove
+
+```python
+def remove(tool_name: str) -> None
+```
+
+Defined in: [src/strands/tools/registry.py:315](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L315)
+
+Remove a tool by its registered name, including any dynamic registration.
+
+Does nothing if the tool does not exist.
+
+**Arguments**:
+
+-   `tool_name` - Name of the tool to remove.
+
 #### get\_tools\_dirs
 
 ```python
 def get_tools_dirs() -> list[Path]
 ```
 
-Defined in: [src/strands/tools/registry.py:315](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L315)
+Defined in: [src/strands/tools/registry.py:326](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L326)
 
 Get all tool directory paths.
 
@@ -142,7 +158,7 @@ A list of Path objects for current working directory’s ”./tools/”.
 def discover_tool_modules() -> dict[str, Path]
 ```
 
-Defined in: [src/strands/tools/registry.py:335](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L335)
+Defined in: [src/strands/tools/registry.py:346](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L346)
 
 Discover available tool modules in all tools directories.
 
@@ -156,7 +172,7 @@ Dictionary mapping tool names to their full paths.
 def reload_tool(tool_name: str) -> None
 ```
 
-Defined in: [src/strands/tools/registry.py:360](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L360)
+Defined in: [src/strands/tools/registry.py:371](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L371)
 
 Reload a specific tool module.
 
@@ -177,7 +193,7 @@ Reload a specific tool module.
 def initialize_tools(load_tools_from_directory: bool = False) -> None
 ```
 
-Defined in: [src/strands/tools/registry.py:444](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L444)
+Defined in: [src/strands/tools/registry.py:455](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L455)
 
 Initialize all tools by discovering and loading them dynamically from all tool directories.
 
@@ -191,7 +207,7 @@ Initialize all tools by discovering and loading them dynamically from all tool d
 def get_all_tool_specs() -> list[ToolSpec]
 ```
 
-Defined in: [src/strands/tools/registry.py:551](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L551)
+Defined in: [src/strands/tools/registry.py:562](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L562)
 
 Get all the tool specs for all tools in this registry..
 
@@ -205,7 +221,7 @@ A list of ToolSpecs.
 def register_dynamic_tool(tool: AgentTool) -> None
 ```
 
-Defined in: [src/strands/tools/registry.py:561](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L561)
+Defined in: [src/strands/tools/registry.py:572](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L572)
 
 Register a tool dynamically for temporary use.
 
@@ -223,7 +239,7 @@ Register a tool dynamically for temporary use.
 def validate_tool_spec(tool_spec: ToolSpec) -> None
 ```
 
-Defined in: [src/strands/tools/registry.py:576](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L576)
+Defined in: [src/strands/tools/registry.py:587](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L587)
 
 Validate tool specification against required schema.
 
@@ -241,7 +257,7 @@ Validate tool specification against required schema.
 class NewToolDict(TypedDict)
 ```
 
-Defined in: [src/strands/tools/registry.py:626](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L626)
+Defined in: [src/strands/tools/registry.py:637](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L637)
 
 Dictionary type for adding or updating a tool in the configuration.
 
@@ -255,6 +271,6 @@ Dictionary type for adding or updating a tool in the configuration.
 def cleanup(**kwargs: Any) -> None
 ```
 
-Defined in: [src/strands/tools/registry.py:694](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L694)
+Defined in: [src/strands/tools/registry.py:705](https://github.com/strands-agents/harness-sdk/blob/main/strands-py/src/strands/tools/registry.py#L705)
 
 Synchronously clean up all tool providers in this registry.

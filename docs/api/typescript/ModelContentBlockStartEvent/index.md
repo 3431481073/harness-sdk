@@ -47,7 +47,7 @@ Discriminator for content block start events.
 ### start?
 
 ```ts
-readonly optional start?: ToolUseStart;
+readonly start?: ToolUseStart;
 ```
 
 Defined in: [src/models/streaming.ts:111](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L111)

@@ -1,4 +1,4 @@
-[Claude Code](https://docs.anthropic.com/en/docs/claude-code) runs in a box like any other program. In this guide its own file tools reach none of the project’s files, so every read, write, and delete goes through its Bash tool, where the box’s shell asks the policy about every command and every file. By the end you have Claude Code working on the project from [Getting started](/docs/user-guide/box/getting-started/index.md), and you have watched the policy permit three tasks and refuse two, with the refusal text the agent read.
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code) runs in a box like any other program. In this guide its own file tools reach none of the project’s files, so every read, write, and delete goes through its Bash tool, where the box’s shell asks the policy about every command and every file. By the end you have Claude Code working on the project from [the quickstart](/docs/user-guide/box/quickstart/index.md), and you have watched the policy permit three tasks and refuse two, with the refusal text the agent read.
 
 The files are in [`examples/claude-code`](https://github.com/strands-agents/box/tree/main/examples/claude-code) in the Box repository, and this guide walks through them.
 
@@ -8,7 +8,7 @@ The action vocabulary and the context fields can change before 1.0.0. Pin the Bo
 
 ## Before you start
 
--   The box from [Getting started](/docs/user-guide/box/getting-started/index.md) under `~/box-tutorial`: Box in `box-core`, the project in `my-project`, and your Amazon Bedrock API key in `AWS_BEARER_TOKEN_BEDROCK`, made in `us-west-2`. Run every command in this guide from `~/box-tutorial`.
+-   The box from [the quickstart](/docs/user-guide/box/quickstart/index.md) under `~/box-tutorial`: Box in `box-core`, the project in `my-project`, and your Amazon Bedrock API key in `AWS_BEARER_TOKEN_BEDROCK`, made in `us-west-2`. Run every command in this guide from `~/box-tutorial`.
     
 -   Claude Code, from its native installer:
     
@@ -34,7 +34,7 @@ The action vocabulary and the context fields can change before 1.0.0. Pin the Bo
 
 ## Step 1: Copy the example
 
-Clone the Box repository, unless `box-src` is already there from Getting started, and copy the example directory to `~/box-tutorial/claude-code`:
+Clone the Box repository, unless `box-src` is already there from the quickstart, and copy the example directory to `~/box-tutorial/claude-code`:
 
 ```bash
 [ -d box-src ] || git clone --depth 1 https://github.com/strands-agents/box.git box-src
@@ -116,7 +116,7 @@ The `command` names the link in `~/.local/bin`, and the box resolves it to the v
 
 ## Step 3: Read the policy
 
-`claude-code/policy.dw` keeps the rules from Getting started, adds a write permit for the project and a permit for Claude Code’s two state directories, and adds four `forbid` rules. The tasks below exercise two of them, `no_env` and `no_deletes`, and each carries an `@id` and a `@description` that the denial text quotes:
+`claude-code/policy.dw` keeps the rules from the quickstart, adds a write permit for the project and a permit for Claude Code’s two state directories, and adds four `forbid` rules. The tasks below exercise two of them, `no_env` and `no_deletes`, and each carries an `@id` and a `@description` that the denial text quotes:
 
 claude-code/policy.dw
 

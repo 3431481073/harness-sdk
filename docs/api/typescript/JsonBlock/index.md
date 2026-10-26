@@ -53,9 +53,7 @@ Structured JSON data.
 
 #### Implementation of
 
-```ts
-JsonBlockData.json
-```
+`JsonBlockData.json`
 
 ## Methods
 
@@ -75,9 +73,7 @@ Serializes the JsonBlock to a JSON-compatible JsonBlockData object. Called autom
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

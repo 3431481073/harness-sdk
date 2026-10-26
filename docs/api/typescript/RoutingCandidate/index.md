@@ -59,7 +59,7 @@ Concrete model or opaque nested router.
 ### name?
 
 ```ts
-readonly optional name?: string;
+readonly name?: string;
 ```
 
 Defined in: [src/models/routing/router.ts:62](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/router.ts#L62)
@@ -71,7 +71,7 @@ Optional strategy-facing name.
 ### description?
 
 ```ts
-readonly optional description?: string;
+readonly description?: string;
 ```
 
 Defined in: [src/models/routing/router.ts:64](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/router.ts#L64)
@@ -83,7 +83,7 @@ Optional strategy-facing description.
 ### metadata?
 
 ```ts
-readonly optional metadata?: Readonly<Record<string, JSONValue>>;
+readonly metadata?: Readonly<Record<string, JSONValue>>;
 ```
 
 Defined in: [src/models/routing/router.ts:66](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/routing/router.ts#L66)

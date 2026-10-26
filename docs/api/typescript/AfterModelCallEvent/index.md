@@ -37,7 +37,7 @@ Defined in: [src/hooks/events.ts:520](https://github.com/strands-agents/harness-
 ### invocationContext?
 
 ```ts
-readonly optional invocationContext?: InvocationContext;
+readonly invocationContext?: InvocationContext;
 ```
 
 Defined in: [src/hooks/events.ts:100](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L100)
@@ -83,7 +83,7 @@ Defined in: [src/hooks/events.ts:498](https://github.com/strands-agents/harness-
 ### stopData?
 
 ```ts
-readonly optional stopData?: ModelStopResponse;
+readonly stopData?: ModelStopResponse;
 ```
 
 Defined in: [src/hooks/events.ts:499](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L499)
@@ -93,7 +93,7 @@ Defined in: [src/hooks/events.ts:499](https://github.com/strands-agents/harness-
 ### error?
 
 ```ts
-readonly optional error?: Error;
+readonly error?: Error;
 ```
 
 Defined in: [src/hooks/events.ts:500](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L500)
@@ -127,7 +127,7 @@ Retry strategies may rely on `attemptCount === 1` to mark the start of a new ret
 ### retry?
 
 ```ts
-optional retry?: boolean;
+retry?: boolean;
 ```
 
 Defined in: [src/hooks/events.ts:518](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/hooks/events.ts#L518)

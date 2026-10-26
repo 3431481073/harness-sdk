@@ -18,7 +18,7 @@ Configuration for the summarization conversation manager.
 ### model?
 
 ```ts
-optional model?: Model;
+model?: Model;
 ```
 
 Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:34](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L34)
@@ -30,7 +30,7 @@ Model to use for generating summaries. Resolution order: `this model > agent.aux
 ### summaryRatio?
 
 ```ts
-optional summaryRatio?: number;
+summaryRatio?: number;
 ```
 
 Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:40](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L40)
@@ -42,7 +42,7 @@ Ratio of messages to summarize when context overflow occurs. Value is clamped to
 ### preserveRecentMessages?
 
 ```ts
-optional preserveRecentMessages?: number;
+preserveRecentMessages?: number;
 ```
 
 Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:46](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L46)
@@ -54,7 +54,7 @@ Minimum number of recent messages to always keep. Defaults to 10.
 ### summarizationSystemPrompt?
 
 ```ts
-optional summarizationSystemPrompt?: string;
+summarizationSystemPrompt?: string;
 ```
 
 Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:52](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L52)
@@ -66,7 +66,7 @@ Custom system prompt for summarization. If not provided, uses a default prompt t
 ### proactiveCompression?
 
 ```ts
-optional proactiveCompression?: boolean | ProactiveCompressionConfig;
+proactiveCompression?: boolean | ProactiveCompressionConfig;
 ```
 
 Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:61](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L61)
@@ -82,7 +82,7 @@ Enable proactive context compression before the model call.
 ### pinFirst?
 
 ```ts
-optional pinFirst?: number;
+pinFirst?: number;
 ```
 
 Defined in: [src/conversation-manager/summarizing-conversation-manager.ts:67](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/conversation-manager/summarizing-conversation-manager.ts#L67)

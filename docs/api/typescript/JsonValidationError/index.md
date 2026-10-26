@@ -32,6 +32,4 @@ Creates a new JsonValidationError.
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+`Error.constructor`

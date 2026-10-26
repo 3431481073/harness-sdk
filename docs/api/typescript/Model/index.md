@@ -1,4 +1,4 @@
-Defined in: [src/models/model.ts:312](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L312)
+Defined in: [src/models/model.ts:320](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L320)
 
 Base abstract class for model providers. Defines the contract that all model provider implementations must follow.
 
@@ -36,7 +36,7 @@ new Model<T>(): Model<T>;
 get modelId(): string;
 ```
 
-Defined in: [src/models/model.ts:331](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L331)
+Defined in: [src/models/model.ts:339](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L339)
 
 The model ID from the current configuration, if configured.
 
@@ -54,7 +54,7 @@ The model ID from the current configuration, if configured.
 get stateful(): boolean;
 ```
 
-Defined in: [src/models/model.ts:347](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L347)
+Defined in: [src/models/model.ts:355](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L355)
 
 Whether this model manages conversation state server-side.
 
@@ -76,7 +76,7 @@ Model providers that support server-side state management should override this t
 abstract updateConfig(modelConfig): void;
 ```
 
-Defined in: [src/models/model.ts:319](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L319)
+Defined in: [src/models/model.ts:327](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L327)
 
 Updates the model configuration. Merges the provided configuration with existing settings.
 
@@ -98,7 +98,7 @@ Updates the model configuration. Merges the provided configuration with existing
 abstract getConfig(): T;
 ```
 
-Defined in: [src/models/model.ts:326](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L326)
+Defined in: [src/models/model.ts:334](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L334)
 
 Retrieves the current model configuration.
 
@@ -116,7 +116,7 @@ The current configuration object
 abstract stream(messages, options?): AsyncIterable<ModelStreamEvent>;
 ```
 
-Defined in: [src/models/model.ts:359](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L359)
+Defined in: [src/models/model.ts:367](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L367)
 
 Streams a conversation with the model. Returns an async iterable that yields streaming events as they occur.
 
@@ -141,7 +141,7 @@ Async iterable of streaming events
 countTokens(messages, options?): Promise<number>;
 ```
 
-Defined in: [src/models/model.ts:375](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L375)
+Defined in: [src/models/model.ts:383](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L383)
 
 Count tokens for the given input before sending to the model.
 
@@ -170,7 +170,7 @@ Total input token count
 estimateUtilization(inputTokens): number;
 ```
 
-Defined in: [src/models/model.ts:388](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L388)
+Defined in: [src/models/model.ts:396](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L396)
 
 Estimate the fraction of the model’s context window consumed by the given input token count.
 
@@ -198,7 +198,7 @@ streamAggregated(messages, options?): AsyncGenerator<
 | ModelStreamEvent, StreamAggregatedResult, undefined>;
 ```
 
-Defined in: [src/models/model.ts:455](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L455)
+Defined in: [src/models/model.ts:463](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/model.ts#L463)
 
 Streams a conversation with aggregated content blocks and messages. Returns an async generator that yields streaming events and content blocks, and returns the final message with stop reason and optional metadata.
 

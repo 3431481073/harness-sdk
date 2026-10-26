@@ -7,7 +7,7 @@ Tool filters in a serializable form, for an MCP server config entry. Because a c
 ### allowed?
 
 ```ts
-optional allowed?: string[];
+allowed?: string[];
 ```
 
 Defined in: [src/mcp/config.ts:11](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/config.ts#L11)
@@ -19,7 +19,7 @@ When present, only tools whose names match one of these patterns are exposed.
 ### rejected?
 
 ```ts
-optional rejected?: string[];
+rejected?: string[];
 ```
 
 Defined in: [src/mcp/config.ts:13](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/mcp/config.ts#L13)

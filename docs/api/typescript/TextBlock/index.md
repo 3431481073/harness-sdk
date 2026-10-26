@@ -73,9 +73,7 @@ Serializes the TextBlock to a JSON-compatible TextBlockData object. Called autom
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

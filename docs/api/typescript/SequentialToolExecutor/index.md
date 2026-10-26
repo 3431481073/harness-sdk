@@ -32,9 +32,7 @@ new SequentialToolExecutor(): SequentialToolExecutor;
 
 #### Inherited from
 
-```ts
-ToolExecutor.constructor
-```
+`ToolExecutor.constructor`
 
 ## Methods
 
@@ -68,9 +66,7 @@ Defined in: [src/tools/executors/executor.ts:84](https://github.com/strands-agen
 
 #### Inherited from
 
-```ts
-ToolExecutor.executeBackground
-```
+`ToolExecutor.executeBackground`
 
 ---
 
@@ -100,9 +96,7 @@ Defined in: [src/tools/executors/executor.ts:110](https://github.com/strands-age
 
 #### Inherited from
 
-```ts
-ToolExecutor.executeTool
-```
+`ToolExecutor.executeTool`
 
 ---
 
@@ -132,6 +126,4 @@ Defined in: [src/tools/executors/executor.ts:245](https://github.com/strands-age
 
 #### Inherited from
 
-```ts
-ToolExecutor._storePendingToolExecution
-```
+`ToolExecutor._storePendingToolExecution`

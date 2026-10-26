@@ -56,9 +56,7 @@ HookRegistry.addCallback
 
 #### Implementation of
 
-```ts
-HookRegistry.addCallback
-```
+`HookRegistry.addCallback`
 
 ---
 

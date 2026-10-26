@@ -63,7 +63,7 @@ Reason why generation stopped.
 ### additionalModelResponseFields?
 
 ```ts
-readonly optional additionalModelResponseFields?: JSONValue;
+readonly additionalModelResponseFields?: JSONValue;
 ```
 
 Defined in: [src/models/streaming.ts:218](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/models/streaming.ts#L218)

@@ -44,7 +44,7 @@ Discriminator for guard content.
 ### text?
 
 ```ts
-readonly optional text?: GuardContentText;
+readonly text?: GuardContentText;
 ```
 
 Defined in: [src/types/messages.ts:918](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L918)
@@ -60,7 +60,7 @@ Text content with evaluation qualifiers.
 ### image?
 
 ```ts
-readonly optional image?: GuardContentImage;
+readonly image?: GuardContentImage;
 ```
 
 Defined in: [src/types/messages.ts:923](https://github.com/strands-agents/harness-sdk/blob/main/strands-ts/src/types/messages.ts#L923)
@@ -128,9 +128,7 @@ Serializes the GuardContentBlock to a JSON-compatible ContentBlockData object. C
 
 #### Implementation of
 
-```ts
-JSONSerializable.toJSON
-```
+`JSONSerializable.toJSON`
 
 ---
 

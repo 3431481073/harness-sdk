@@ -28,9 +28,7 @@ Defined in: [src/interrupt.ts:110](https://github.com/strands-agents/harness-sdk
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+`Error.constructor`
 
 ## Properties
 
