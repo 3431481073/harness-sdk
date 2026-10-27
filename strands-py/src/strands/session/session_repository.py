@@ -3,12 +3,20 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
+from typing_extensions import deprecated
+
 from ..types.session import Session, SessionAgent, SessionMessage
 
 if TYPE_CHECKING:
     from ..multiagent import MultiAgentBase
 
 
+@deprecated(
+    "SessionRepository is deprecated and will be removed in v2.0.0. "
+    "Implement a Storage backend and use SnapshotSessionManager instead. See the migration guide: "
+    "https://strandsagents.com/docs/user-guide/sdk/agents/migrate-repository-sessions/",
+    category=None,
+)
 class SessionRepository(ABC):
     """Abstract repository for creating, reading, and updating Sessions, AgentSessions, and AgentMessages."""
 

@@ -16,6 +16,7 @@ from strands.hooks import AfterInvocationEvent
 from strands.interrupt import _InterruptState
 from strands.session.file_session_manager import FileSessionManager
 from strands.session.repository_session_manager import RepositorySessionManager
+from strands.session.session_repository import SessionRepository
 from strands.types.content import ContentBlock
 from strands.types.exceptions import SessionException
 from strands.types.session import Session, SessionAgent, SessionMessage, SessionType
@@ -49,6 +50,18 @@ def test_subclassing_does_not_emit_deprecation_warning():
             pass
 
     assert issubclass(CustomRepositorySessionManager, RepositorySessionManager)
+
+
+def test_session_repository_has_static_deprecation_metadata():
+    """SessionRepository guides custom implementations toward Storage without runtime warnings."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+
+        class CustomSessionRepository(SessionRepository):
+            pass
+
+    assert "SessionRepository is deprecated" in SessionRepository.__deprecated__
+    assert issubclass(CustomSessionRepository, SessionRepository)
 
 
 @pytest.fixture
