@@ -37,11 +37,10 @@ logger = logging.getLogger(__name__)
 class RepositorySessionManager(SessionManager[LocalAgent]):
     """Session manager for persisting agents in a SessionRepository.
 
-    .. deprecated:: 1.x
-        Deprecated and will be removed in v2.0.0. Use
-        :class:`~strands.session.snapshot_session_manager.SnapshotSessionManager` instead,
-        implementing a custom ``Storage`` backend rather than a ``SessionRepository``. See the
-        migration guide linked in the deprecation warning above.
+    Deprecated: This class will be removed in v2.0.0. Use
+    :class:`~strands.session.snapshot_session_manager.SnapshotSessionManager` instead,
+    implementing a custom ``Storage`` backend rather than a ``SessionRepository``. See the
+    migration guide linked in the deprecation warning above.
 
     This manager uses a :class:`SessionRepository` (a structured per-message CRUD interface),
     not the unified :class:`~strands.storage.storage.Storage` protocol. It does not resolve
