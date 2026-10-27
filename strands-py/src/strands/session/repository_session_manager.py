@@ -31,7 +31,8 @@ logger = logging.getLogger(__name__)
     "RepositorySessionManager is deprecated and will be removed in v2.0.0. "
     "Use SnapshotSessionManager instead; implement a custom Storage backend rather than a "
     "SessionRepository. See the migration guide: "
-    "https://strandsagents.com/docs/user-guide/sdk/agents/migrate-repository-sessions/"
+    "https://strandsagents.com/docs/user-guide/sdk/agents/migrate-repository-sessions/",
+    category=None,
 )
 class RepositorySessionManager(SessionManager[LocalAgent]):
     """Session manager for persisting agents in a SessionRepository.
@@ -66,6 +67,16 @@ class RepositorySessionManager(SessionManager[LocalAgent]):
             **kwargs: Additional keyword arguments for future extensibility.
 
         """
+        if self.__class__ is RepositorySessionManager:
+            warnings.warn(
+                "RepositorySessionManager is deprecated and will be removed in v2.0.0. "
+                "Use SnapshotSessionManager instead; implement a custom Storage backend rather than a "
+                "SessionRepository. See the migration guide: "
+                "https://strandsagents.com/docs/user-guide/sdk/agents/migrate-repository-sessions/",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
         self.session_repository = session_repository
         self.session_id = session_id
         session = session_repository.read_session(session_id)

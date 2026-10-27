@@ -1,6 +1,7 @@
 """Tests for AgentSessionManager."""
 
 import copy
+import warnings
 from unittest.mock import Mock
 
 import pytest
@@ -37,6 +38,17 @@ def test__init__emits_deprecation_warning(mock_repository):
     """RepositorySessionManager is deprecated in favor of SnapshotSessionManager."""
     with pytest.warns(DeprecationWarning, match="RepositorySessionManager is deprecated"):
         RepositorySessionManager(session_id="test-session", session_repository=mock_repository)
+
+
+def test_subclassing_does_not_emit_deprecation_warning():
+    """Static deprecation metadata does not warn while subclasses are defined."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+
+        class CustomRepositorySessionManager(RepositorySessionManager):
+            pass
+
+    assert issubclass(CustomRepositorySessionManager, RepositorySessionManager)
 
 
 @pytest.fixture
