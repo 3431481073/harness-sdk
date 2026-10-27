@@ -10,7 +10,7 @@ import math
 import os
 import time
 from dataclasses import dataclass
-from typing import Any, TypeGuard
+from typing import Any, NoReturn, TypeGuard
 
 import httpx
 
@@ -40,6 +40,15 @@ class _SystemOneProviderConfig:
     max_body_bytes: int
     http_client: httpx.AsyncClient | None = None
     max_questions: int | None = None
+
+
+class _SystemOneHttpError(Exception):
+    """Internal HTTP failure retained as the cause of translated provider errors."""
+
+    def __init__(self, status: int, body: Any, message: str) -> None:
+        super().__init__(message)
+        self.status = status
+        self.body = body
 
 
 def _resolve_system_one_provider_config(
@@ -139,7 +148,7 @@ async def _ask_system_one(
 
     payload = _read_payload(response)
     if not response.is_success:
-        raise _translate_http_error(config.provider_name, response.status_code, payload)
+        _raise_http_error(config.provider_name, response.status_code, payload)
 
     parsed = _parse_result(payload, questions, config.default_min_confidence)
     latency_ms = round((time.perf_counter() - started_at) * 1000)
@@ -221,21 +230,27 @@ def _read_payload(response: httpx.Response) -> Any:
     if not text:
         return None
     try:
-        return json.loads(text)
-    except json.JSONDecodeError as error:
+        return json.loads(text, parse_constant=_reject_json_constant)
+    except ValueError as error:
         if response.is_success:
             raise StructuredOutputException("decision provider returned a non-JSON response") from error
         return text
 
 
-def _translate_http_error(provider_name: str, status: int, body: Any) -> Exception:
+def _reject_json_constant(value: str) -> NoReturn:
+    raise ValueError(f"invalid JSON constant: {value}")
+
+
+def _raise_http_error(provider_name: str, status: int, body: Any) -> NoReturn:
     detail = _error_detail(body)
     message = f"{provider_name} decision request failed with HTTP {status}" + (f": {detail}" if detail else "")
-    if status in (429, 529):
-        return ModelThrottledException(message)
     if status == 413:
-        return ContextWindowOverflowException(message)
-    return StructuredOutputException(message)
+        raise ContextWindowOverflowException(message)
+
+    cause = _SystemOneHttpError(status, body, message)
+    if status in (429, 529):
+        raise ModelThrottledException(message) from cause
+    raise StructuredOutputException(message) from cause
 
 
 def _error_detail(body: Any) -> str | None:
