@@ -39,8 +39,9 @@ class S3SessionManager(RepositorySessionManager, SessionRepository):
 
     Deprecated: This class will be removed in v2.0.0. Use
     :class:`~strands.session.snapshot_session_manager.SnapshotSessionManager` with an
-    ``S3Storage`` backend instead. See the migration guide linked in the deprecation warning
-    above.
+    ``S3Storage`` backend instead. See the
+    [migration guide](https://strandsagents.com/docs/user-guide/sdk/agents/migrate-repository-sessions/)
+    for migration steps.
 
     Creates the following filesystem structure for the session storage:
     ```bash

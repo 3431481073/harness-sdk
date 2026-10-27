@@ -18,7 +18,13 @@ if TYPE_CHECKING:
     category=None,
 )
 class SessionRepository(ABC):
-    """Abstract repository for creating, reading, and updating Sessions, AgentSessions, and AgentMessages."""
+    """Abstract repository for creating, reading, and updating Sessions, AgentSessions, and AgentMessages.
+
+    Deprecated: This interface will be removed in v2.0.0. Implement a ``Storage`` backend
+    and use ``SnapshotSessionManager`` instead. See the
+    [migration guide](https://strandsagents.com/docs/user-guide/sdk/agents/migrate-repository-sessions/)
+    for migration steps.
+    """
 
     @abstractmethod
     def create_session(self, session: Session, **kwargs: Any) -> Session:

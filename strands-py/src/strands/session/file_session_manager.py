@@ -37,8 +37,9 @@ class FileSessionManager(RepositorySessionManager, SessionRepository):
 
     Deprecated: This class will be removed in v2.0.0. Use
     :class:`~strands.session.snapshot_session_manager.SnapshotSessionManager` with a
-    ``LocalFileStorage`` backend instead. See the migration guide linked in the deprecation
-    warning above.
+    ``LocalFileStorage`` backend instead. See the
+    [migration guide](https://strandsagents.com/docs/user-guide/sdk/agents/migrate-repository-sessions/)
+    for migration steps.
 
     Creates the following filesystem structure for the session storage:
     ```bash
