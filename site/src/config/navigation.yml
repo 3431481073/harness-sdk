@@ -124,8 +124,8 @@ products:
     pages:
       - label: Overview
         href: /docs/user-guide/sdk/
-      - label: "Quickstart: Python"
-        href: /docs/user-guide/sdk/quickstart/python/
+      - label: Quickstart
+        href: /docs/user-guide/sdk/quickstart/overview/
       - label: Add tools
         href: /docs/user-guide/sdk/tools/
       - label: Long-term memory
@@ -141,8 +141,8 @@ products:
     pages:
       - label: Overview
         href: /docs/user-guide/box/
-      - label: Getting started
-        href: /docs/user-guide/box/getting-started/
+      - label: Quickstart
+        href: /docs/user-guide/box/quickstart/
       - label: Write a policy
         href: /docs/user-guide/box/guides/write-a-policy/
       - label: Security model
@@ -392,6 +392,7 @@ sidebar:
             addedDate: 2026-06-17
             items:
               - docs/user-guide/sdk/memory/test-memory-store
+              - docs/user-guide/sdk/memory/file-memory-store
               - docs/user-guide/sdk/memory/bedrock-knowledge-base
           - label: Plugins
             items:
@@ -444,7 +445,8 @@ sidebar:
                     slug: docs/user-guide/sdk/bidi/models
                   - docs/user-guide/sdk/bidi/models/bedrock
                   - docs/user-guide/sdk/bidi/models/google
-                  - docs/user-guide/sdk/bidi/models/openai
+                  - docs/user-guide/sdk/bidi/models/openai/realtime
+                  - docs/user-guide/sdk/bidi/models/openai/live
               - docs/user-guide/sdk/bidi/tools
               - docs/user-guide/sdk/bidi/io
               - docs/user-guide/sdk/bidi/content
@@ -510,7 +512,7 @@ sidebar:
         items:
           - label: "Overview"
             slug: docs/user-guide/box
-          - docs/user-guide/box/getting-started
+          - docs/user-guide/box/quickstart
       - label: How-to guides
         items:
           - docs/user-guide/box/guides/run-strands-harness
