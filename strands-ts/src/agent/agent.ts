@@ -1563,6 +1563,7 @@ export class Agent implements LocalAgent, InvokableAgent {
    *
    * @param snapshot - The snapshot to restore from
    * @throws Error if `snapshot.schemaVersion` is incompatible or scope is wrong
+   * @throws SessionError if the snapshot's activated interrupt state carries a malformed pending tool execution
    *
    * @example
    * ```typescript
@@ -1993,6 +1994,8 @@ export class Agent implements LocalAgent, InvokableAgent {
         for (const interrupt of error.interrupts) {
           this._interruptState.registerInterrupt(interrupt)
         }
+        // Activate before yielding so a consumer that stops at an InterruptEvent can still resume.
+        this._interruptState.activate()
         // Fan out one event per interrupt. Each event exposes `interrupt.source` so
         // consumers can filter by origin (tool callback vs hook callback) without
         // subscribing to separate event types.
@@ -2085,7 +2088,6 @@ export class Agent implements LocalAgent, InvokableAgent {
     invocationState: InvocationState,
     invocationContext: InvocationContextImpl
   ): AgentResult {
-    this._interruptState.activate()
     return new AgentResult({
       invocationContext,
       stopReason: 'interrupt',
